@@ -1,4 +1,4 @@
-#include "game_manager.h"
+#include "game_manager.hpp"
 
 
 namespace ulti_minimax {

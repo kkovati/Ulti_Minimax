@@ -1,11 +1,10 @@
-cmake_minimum_required (VERSION 3.10)
+cmake_minimum_required(VERSION 3.10)
 
-# https://github.com/pyk/cmake-tutorial
+project(Ulti_Minimax VERSION 1.0.0 LANGUAGES CXX)
 
-project(ulti_minimax)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_library(game_rules src/game_rules.hpp src/game_rules.cpp)
-add_library(game_manager src/game_manager.hpp src/game_manager.cpp)
+add_executable(Ulti_Minimax src/main.cpp src/game_manager.cpp src/game_rules.cpp)
 
-add_executable(ulti_minimax src/main.cpp)
-target_link_libraries(ulti_minimax game_rules game_manager)
+target_include_directories(Ulti_Minimax PRIVATE ${PROJECT_SOURCE_DIR}/src)
