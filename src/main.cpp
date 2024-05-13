@@ -3,16 +3,13 @@
 
 #include "game_manager.hpp"
 
-namespace ulti_minimax {
-
 int main()
 {
 	std::cout << "Hello World!\n";
-	//GameManager gameManager = GameManager();
-	//gameManager.simulate();
+	auto gameManager = ulti_minimax::GameManager();
+	gameManager.simulate();
 	return 0;
 }
 
-}
 
 
