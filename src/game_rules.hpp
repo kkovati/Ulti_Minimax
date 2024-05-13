@@ -40,22 +40,28 @@ private:
 class Action {
 public:
 	Action() = default;
-	Action(int round, int playerHits) : round(round), playerHits(playerHits) {};
+	Action(int round, int posInRound) : round(round), posInRound(posInRound) {};
+
+	inline int getRound() { return round; };
+	inline int getPosInRound() { return posInRound; };
+	inline int getPlayerToHit() { return playerToHit; };
+	inline void setPlayerToHit(int playerToHit) { playerToHit = playerToHit; };
 
 private:
-	int round;
-	int playerHits;
+	int round;  // Current round
+	int posInRound; // Position in round
+	int playerToHit;  // Player to hit
 };
 
 
 class ActionList {
 public:
 	ActionList() = default;
-	ActionList(int, int, int);
+	ActionList(int nPlayer, int nCardInHand, int firstPlayer = 0);
 
 	inline int getIndex() { return index; };
 	Action getAction() { return actions[index]; };
-
+	inline int getPosInRound() { return getAction().getPosInRound(); };
 
 private:
 	using ActionVector = std::vector<Action>;
@@ -93,17 +99,17 @@ class PartyState {
 public:
 	PartyState() = default;
 
-	void deal();
+	void init();
 
-	std::vector<Card> get_playable_cards();
+	std::vector<Card> getPlayableCards();
+	void setNextPlayer();
 
 private:
 	const int nPlayer = 3;
 	const int nCardInHand = 10;	
 
 	PlayerHands playerHands = PlayerHands(nPlayer, nCardInHand);
-	//ActionList actionList = ActionList(nPlayer, nCardInHand);
-		
+	ActionList actionList = ActionList(nPlayer, nCardInHand);		
 };
 
 }

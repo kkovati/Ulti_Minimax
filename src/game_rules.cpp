@@ -51,11 +51,13 @@ std::vector<std::vector<Card>> Deck::deal(int nPlayer, int nCardInHand) {
 }
 
 
-ActionList::ActionList(int nPlayer, int nCardInHand, int firstPlayer = 0) : 
+ActionList::ActionList(int nPlayer, int nCardInHand, int firstPlayer) : 
     nPlayer(nPlayer), nCardInHand(nCardInHand), firstPlayer(firstPlayer) {
     index = 0;
-    actions = ActionVector(nPlayer * nCardInHand);
-    actions[0] = Action(0, firstPlayer);
+    for (int i = 0; i < nPlayer * nCardInHand; ++i) {
+        actions.push_back(Action(static_cast<int>(i / nPlayer), i % nPlayer));
+    }    
+    actions[0].setPlayerToHit(firstPlayer);
 }
 
 
@@ -78,13 +80,24 @@ void PlayerHands::deal() {
 }
 
 
-void PartyState::deal() {
-    
-
+void PartyState::init() {
+    playerHands.deal();
 }
 
-std::vector<Card> PartyState::get_playable_cards() {
+std::vector<Card> PartyState::getPlayableCards() {
+    int posInRound = actionList.getPosInRound();
+    if (posInRound == 0) {
+
+    }
+    else {
+
+    }
+
 	return std::vector<Card>();
+}
+
+void PartyState::setNextPlayer() {
+
 }
 
 }
