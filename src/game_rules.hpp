@@ -20,6 +20,23 @@ private:
 };
 
 
+class Deck {
+public:
+	Deck();
+
+	void shuffle();
+	std::vector<std::vector<Card>> deal(int, int);
+	inline int getSize() { return cards.size(); };
+	inline Card getCard(int index) { return cards[index]; };
+
+private:
+	static constexpr uint8_t nSuit = 4;
+	static constexpr uint8_t nValue = 8;
+
+	std::vector<Card> cards;
+};
+
+
 class Action {
 public:
 	Action() = default;
@@ -37,7 +54,7 @@ public:
 	ActionList(int, int, int);
 
 	inline int getIndex() { return index; };
-	Action getAction() { return actionList[index]; };
+	Action getAction() { return actions[index]; };
 
 
 private:
@@ -45,7 +62,7 @@ private:
 
 	int nPlayer, nCardInHand, firstPlayer;
 	int index;
-	ActionVector actionList;	
+	ActionVector actions;	
 };
 
 
@@ -54,26 +71,21 @@ public:
 	PlayerHands() = default;
 	PlayerHands(int, int);
 
+	void deal();
+
+	inline int getNPlayer() { return nPlayer; };
+	inline int getNCardInHand() { return nCardInHand; };
+	inline const Card getCard(int player, int index) const {};
+
 private:
-	using PlayerCardVector = std::vector<std::vector<Card>>;
-	using PlayerUsedVector = std::vector<std::vector<int>>;
+	using CardVector = std::vector<Card>;
+	using PlayerCardVector = std::vector<CardVector>;
+	using IntVector = std::vector<int>;
+	using PlayerUsedVector = std::vector<IntVector>;
 
 	int nPlayer, nCardInHand;
-
-};
-
-
-class Deck {
-public:
-	Deck();
-
-	std::vector<std::vector<Card>> deal(int a, int b, PlayerHands c);
-
-private:
-	static constexpr uint8_t N_SUIT = 4;
-	static constexpr uint8_t N_VALUE = 8;
-
-	std::vector<Card> cards;
+	PlayerCardVector playerCards;
+	PlayerUsedVector playerUseds;
 };
 
 
