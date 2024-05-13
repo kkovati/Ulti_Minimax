@@ -5,7 +5,7 @@
 
 int main()
 {
-	std::cout << "Hello World!\n";
+	std::cout << "Start simulation\n";
 	auto gameManager = ulti_minimax::GameManager();
 	gameManager.simulate();
 	return 0;

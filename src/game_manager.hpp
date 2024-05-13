@@ -5,14 +5,14 @@ namespace ulti_minimax {
 
 class GameManager {
 public:
-	GameManager();
-
+	GameManager() = default;
 	GameManager(const PartyState& partyState);
 
 	void simulate();
 
 private:
 	PartyState partyState;
+
 };
 
 }
