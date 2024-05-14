@@ -7,6 +7,9 @@ class GameManager {
 public:
 	GameManager() = default;
 	void simulate();
+
+private:
+	int minimax();
 };
 
 }

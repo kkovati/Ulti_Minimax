@@ -8,4 +8,8 @@ void GameManager::simulate() {
 	partyState.init();
 }
 
+int GameManager::minimax() {
+	return 0;
+}
+
 }

@@ -70,7 +70,6 @@ PlayerHands::PlayerHands(int nPlayer, int nCardInHand) :
 void PlayerHands::deal() {
     Deck deck = Deck();
     assert(nPlayer * nCardInHand <= deck.getSize());
-
     deck.shuffle();    
     for (int i = 0; i < nPlayer; ++i) {
         for (int j = 0; j < nCardInHand; ++j) {
@@ -85,9 +84,14 @@ void PartyState::init() {
 }
 
 std::vector<Card> PartyState::getPlayableCards() {
+    std::vector<Card> playableCards;
+    int playerToHit = actionList.getPlayerToHit();
     int posInRound = actionList.getPosInRound();
     if (posInRound == 0) {
-
+        for (int i = 0; i < nCardInHand; ++i) {
+            if (playerHands.getUsed(playerToHit, i) > )
+            playerHands.getCard(playerToHit, i);
+        }
     }
     else {
 

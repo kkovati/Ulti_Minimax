@@ -56,12 +56,13 @@ private:
 
 class ActionList {
 public:
-	ActionList() = default;
 	ActionList(int nPlayer, int nCardInHand, int firstPlayer = 0);
 
 	inline int getIndex() { return index; };
+	inline int setIndex(int index_) { index = index_; };
 	Action getAction() { return actions[index]; };
 	inline int getPosInRound() { return getAction().getPosInRound(); };
+	inline int getPlayerToHit() { return getAction().getPlayerToHit(); };
 
 private:
 	using ActionVector = std::vector<Action>;
@@ -81,7 +82,12 @@ public:
 
 	inline int getNPlayer() { return nPlayer; };
 	inline int getNCardInHand() { return nCardInHand; };
-	inline const Card getCard(int player, int index) const {};
+	inline const Card getCard(int player_, int index_) const { 
+		return playerCards[player_][index_];
+	};
+	inline int getUsed(int player_, int index_) const {
+		return playerUseds[player_][index_];
+	};
 
 private:
 	using CardVector = std::vector<Card>;
