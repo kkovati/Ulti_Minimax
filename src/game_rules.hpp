@@ -18,9 +18,11 @@ public:
 	Card(int suit_, int value_) : suit(suit_), value(value_) {};
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
 
-	bool operator==(const Card&) const;
-	bool operator>(const Card&) const;
-	bool operator<(const Card&) const;
+	bool operator==(const Card&) const; // True if equal suit
+	bool operator>(const Card&) const;	// True greater value
+	bool operator<(const Card&) const;	// True smaller value
+	//bool operator>(const Card&) const;	// True if different suit or equal suit and greater value
+	//bool operator<(const Card&) const;	// True if equal suit and smaller value
 
 private:
 	int suit;
@@ -45,33 +47,38 @@ private:
 class Action {
 public:
 	Action() = default;
-	Action(int round_, int posInRound_) : round(round_), posInRound(posInRound_), playerToHit(-1) {};
+	Action(int round_, int posInRound_) : round(round_), posInRound(posInRound_), playerToHit(-1), card() {};
 
 	inline int getRound() { return round; };
 	inline int getPosInRound() { return posInRound; };
 	inline int getPlayerToHit() { return playerToHit; };
 	inline void setPlayerToHit(int playerToHit_) { playerToHit = playerToHit_; };
+	inline Card getCard() { return card; };
+	inline void setCard(Card card_) { card = card_; };
 
 private:
 	int round;			// Current round
 	int posInRound;		// Position in round
 	int playerToHit;	// Player to hit in this round in this position
+	Card card;			// Card hit by the player
 };
 
 
 class ActionList {
 public:
-	ActionList(int firstPlayer_ = 0);
-
-	Action getAction(int index_) { return actions[index_]; };
+	ActionList(int firstPlayer_ = 0);	
+	inline int getRound(int index_) { return getAction(index_).getRound(); };
 	inline int getPosInRound(int index_) { return getAction(index_).getPosInRound(); };
 	inline int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
+	inline Card getCard(int index_) { return getAction(index_).getCard(); };
 
 private:
-	using ActionVector = std::array<Action, N_PLAYER* N_CARD_IN_HAND>;
+	using ActionVector = std::array<Action, N_PLAYER * N_CARD_IN_HAND>;
 
 	int firstPlayer;
 	ActionVector actions;	
+
+	Action getAction(int index_) { return actions[index_]; };
 };
 
 
@@ -114,7 +121,6 @@ public:
 	bool isLargerValue(const CardVector&, const Card&) const;
 	bool isLargerValue(const CardVector&, const Card&, const Card&) const;
 
-	void getNotUsedCards(CardVector&, int);
 	void getPlayableCards(CardVector&, int);
 	void setNextPlayer();
 

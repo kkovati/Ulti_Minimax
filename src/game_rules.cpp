@@ -7,16 +7,24 @@
 namespace ulti_minimax {
 
 bool Card::operator==(const Card& other) const {
-	return suit == other.suit && value == other.value;
+    return suit == other.suit;
 }
 
 bool Card::operator>(const Card& other) const {
-	return suit == other.suit ? value > other.value : true;
+	return value > other.value;
 }
 
 bool Card::operator<(const Card& other) const {
-	return suit == other.suit ? value > other.value : false;
+	return value < other.value;
 }
+
+//bool Card::operator>(const Card& other) const {
+//    return suit == other.suit ? value > other.value : true;
+//}
+//
+//bool Card::operator<(const Card& other) const {
+//    return suit == other.suit ? value < other.value : false;
+//}
 
 
 Deck::Deck() {
@@ -84,33 +92,61 @@ bool PartyState::isLargerValue(const CardVector&, const Card& card0, const Card&
     return false;
 }
 
-void PartyState::getNotUsedCards(CardVector& cardVector, int index_) {
+void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
     int posInRound = actionList.getPosInRound(index_);
     int playerToHit = actionList.getPlayerToHit(index_);
-    for (int i = 0; i < N_CARD_IN_HAND; ++i) {
-        if (playerHands.getUsed(playerToHit, i) >= index_) {
-            cardVector.push_back(playerHands.getCard(playerToHit, i));
+
+    if (posInRound == 0) {
+        for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+            if (playerHands.getUsed(playerToHit, i) >= index_) {
+                cardVector.push_back(playerHands.getCard(playerToHit, i));
+            }
         }
     }
-    assert(cardVector.size() > 0);
-}
 
-void PartyState::getPlayableCards(CardVector& playableCards, int index_) {
-    int posInRound = actionList.getPosInRound(index_);
-    int playerToHit = actionList.getPlayerToHit(index_);
-    //for (int i = 0; i < N_CARD_IN_HAND; ++i) {
-    //    if (playerHands.getUsed(playerToHit, i) < index_) continue;
-    //    if (posInRound == 0) {
-    //        playableCards.push_back(playerHands.getCard(playerToHit, i));
-    //    }
-    //    else if (posInRound == 1) {
-    //
-    //    }
-    //    else { // posInRound == 2
-    //
-    //    }
-    //}
-    assert(playableCards.size() > 0);
+    else if (posInRound == 1) {
+        Card opponentCard = actionList.getCard(index_ - 1);
+        CardVector sameSuitGreaterValue, sameSuitLowerValue, differentSuit;
+        for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+            if (playerHands.getUsed(playerToHit, i) < index_) continue;
+            Card playerCard = playerHands.getCard(playerToHit, i);
+            if (playerCard == opponentCard && playerCard > opponentCard) {
+                sameSuitGreaterValue.push_back(playerCard);
+            }
+            else if (playerCard == opponentCard) {
+                sameSuitLowerValue.push_back(playerCard);
+            }
+            else {
+                differentSuit.push_back(playerCard);
+            }
+        }
+        if (sameSuitGreaterValue.size()) cardVector = sameSuitGreaterValue;
+        else if (sameSuitLowerValue.size()) cardVector = sameSuitLowerValue;
+        else cardVector = differentSuit;
+    }
+
+    else { // posInRound == 2
+        Card opponentCard0 = actionList.getCard(index_ - 2);
+        Card opponentCard1 = actionList.getCard(index_ - 1);
+        CardVector sameSuitGreaterValue, sameSuitLowerValue, differentSuit;
+        for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+            if (playerHands.getUsed(playerToHit, i) < index_) continue;
+            Card playerCard = playerHands.getCard(playerToHit, i);
+            if (playerCard == opponentCard0 && playerCard > opponentCard0 && playerCard > opponentCard1) {
+                sameSuitGreaterValue.push_back(playerCard);
+            }
+            else if (playerCard == opponentCard0) {
+                sameSuitLowerValue.push_back(playerCard);
+            }
+            else {
+                differentSuit.push_back(playerCard);
+            }
+        }
+        if (sameSuitGreaterValue.size()) cardVector = sameSuitGreaterValue;
+        else if (sameSuitLowerValue.size()) cardVector = sameSuitLowerValue;
+        else cardVector = differentSuit;
+    }
+    assert(cardVector.size());
 }
 
 void PartyState::setNextPlayer() {
