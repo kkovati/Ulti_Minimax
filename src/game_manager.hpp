@@ -9,7 +9,7 @@ public:
 	void simulate();
 
 private:
-	int minimax();
+	int minimax(PartyState&, int);
 };
 
 }

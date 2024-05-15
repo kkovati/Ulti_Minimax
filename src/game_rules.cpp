@@ -47,9 +47,9 @@ std::vector<std::vector<Card>> Deck::deal(int nPlayer, int nCardInHand) {
 }
 
 
-ActionList::ActionList(int firstPlayer) : firstPlayer(firstPlayer) {
-    for (int i = 0; i < N_PLAYER * N_CARD_IN_HAND; ++i) {
-        actions.push_back(Action(static_cast<int>(i / N_PLAYER), i % N_PLAYER));
+ActionList::ActionList(int firstPlayer_) : firstPlayer(firstPlayer_) {
+    for (int i = 0; i < actions.size(); ++i) {
+        actions[i] = Action(static_cast<int>(i / N_PLAYER), i % N_PLAYER);
     }    
     actions[0].setPlayerToHit(firstPlayer);
 }
@@ -57,11 +57,12 @@ ActionList::ActionList(int firstPlayer) : firstPlayer(firstPlayer) {
 
 void PlayerHands::deal() {
     Deck deck = Deck();
-    assert(N_PLAYER * N_CARD_IN_HAND <= deck.getSize());
+    assert(N_PLAYER * N_CARD_IN_HAND <= deck.size());
     deck.shuffle();    
     for (int i = 0; i < N_PLAYER; ++i) {
         for (int j = 0; j < N_CARD_IN_HAND; ++j) {
             playerCards[i][j] = deck.getCard(i * N_CARD_IN_HAND + j);
+            playerUseds[i][j] = LAST_ACTION_INDEX + 1;
         }
     }
 }
@@ -71,21 +72,45 @@ void PartyState::init() {
     playerHands.deal();
 }
 
-std::vector<Card> PartyState::getPlayableCards(int index_) {
-    std::vector<Card> playableCards;
-    int playerToHit = actionList.getPlayerToHit(index_);
+bool PartyState::isSameSuit(const CardVector& cardVector, const Card card) const {
+    return false;
+}
+
+bool PartyState::isLargerValue(const CardVector&, const Card& card) const {
+    return false;
+}
+
+bool PartyState::isLargerValue(const CardVector&, const Card& card0, const Card& card1) const {
+    return false;
+}
+
+void PartyState::getNotUsedCards(CardVector& cardVector, int index_) {
     int posInRound = actionList.getPosInRound(index_);
-    if (posInRound == 0) {
-        //for (int i = 0; i < N_CARD_IN_HAND; ++i) {
-        //    if (playerHands.getUsed(playerToHit, i) > )
-        //    playerHands.getCard(playerToHit, i);
-        //}
+    int playerToHit = actionList.getPlayerToHit(index_);
+    for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+        if (playerHands.getUsed(playerToHit, i) >= index_) {
+            cardVector.push_back(playerHands.getCard(playerToHit, i));
+        }
     }
-    else {
+    assert(cardVector.size() > 0);
+}
 
-    }
-
-	return std::vector<Card>();
+void PartyState::getPlayableCards(CardVector& playableCards, int index_) {
+    int posInRound = actionList.getPosInRound(index_);
+    int playerToHit = actionList.getPlayerToHit(index_);
+    //for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+    //    if (playerHands.getUsed(playerToHit, i) < index_) continue;
+    //    if (posInRound == 0) {
+    //        playableCards.push_back(playerHands.getCard(playerToHit, i));
+    //    }
+    //    else if (posInRound == 1) {
+    //
+    //    }
+    //    else { // posInRound == 2
+    //
+    //    }
+    //}
+    assert(playableCards.size() > 0);
 }
 
 void PartyState::setNextPlayer() {
