@@ -6,10 +6,6 @@
 
 namespace ulti_minimax {
 
-Card::Card(uint8_t suit, uint8_t value) : suit(suit), value(value) {}
-
-Card::Card(const Card& other) : suit(other.suit), value(other.value) {}
-
 bool Card::operator==(const Card& other) const {
 	return suit == other.suit && value == other.value;
 }
@@ -24,16 +20,16 @@ bool Card::operator<(const Card& other) const {
 
 
 Deck::Deck() {
-    for (int i = 0; i < nSuit; ++i) {
-        for (int j = 0; j < nValue; ++j) {
-            cards.push_back(Card(i, j));
+    for (int i = 0; i < N_SUIT; ++i) {
+        for (int j = 0; j < N_VALUE; ++j) {
+            cards[i * j + j] = Card(i, j);
         }
     }
 }
 
 void Deck::shuffle() {
     // Fix seed
-    std::mt19937 g(0);
+    std::mt19937 g(SEED);
     // Shuffle cards
     std::shuffle(cards.begin(), cards.end(), g);
 }
@@ -51,29 +47,21 @@ std::vector<std::vector<Card>> Deck::deal(int nPlayer, int nCardInHand) {
 }
 
 
-ActionList::ActionList(int nPlayer, int nCardInHand, int firstPlayer) : 
-    nPlayer(nPlayer), nCardInHand(nCardInHand), firstPlayer(firstPlayer) {
-    index = 0;
-    for (int i = 0; i < nPlayer * nCardInHand; ++i) {
-        actions.push_back(Action(static_cast<int>(i / nPlayer), i % nPlayer));
+ActionList::ActionList(int firstPlayer) : firstPlayer(firstPlayer) {
+    for (int i = 0; i < N_PLAYER * N_CARD_IN_HAND; ++i) {
+        actions.push_back(Action(static_cast<int>(i / N_PLAYER), i % N_PLAYER));
     }    
     actions[0].setPlayerToHit(firstPlayer);
 }
 
 
-PlayerHands::PlayerHands(int nPlayer, int nCardInHand) :
-    nPlayer(nPlayer), nCardInHand(nCardInHand) {
-    playerCards = PlayerCardVector(nPlayer, CardVector(nCardInHand));
-    playerUseds = PlayerUsedVector(nPlayer, IntVector(nCardInHand));
-}
-
 void PlayerHands::deal() {
     Deck deck = Deck();
-    assert(nPlayer * nCardInHand <= deck.getSize());
+    assert(N_PLAYER * N_CARD_IN_HAND <= deck.getSize());
     deck.shuffle();    
-    for (int i = 0; i < nPlayer; ++i) {
-        for (int j = 0; j < nCardInHand; ++j) {
-            playerCards[i][j] = deck.getCard(i * nCardInHand + j);
+    for (int i = 0; i < N_PLAYER; ++i) {
+        for (int j = 0; j < N_CARD_IN_HAND; ++j) {
+            playerCards[i][j] = deck.getCard(i * N_CARD_IN_HAND + j);
         }
     }
 }
@@ -83,15 +71,15 @@ void PartyState::init() {
     playerHands.deal();
 }
 
-std::vector<Card> PartyState::getPlayableCards() {
+std::vector<Card> PartyState::getPlayableCards(int index_) {
     std::vector<Card> playableCards;
-    int playerToHit = actionList.getPlayerToHit();
-    int posInRound = actionList.getPosInRound();
+    int playerToHit = actionList.getPlayerToHit(index_);
+    int posInRound = actionList.getPosInRound(index_);
     if (posInRound == 0) {
-        for (int i = 0; i < nCardInHand; ++i) {
-            if (playerHands.getUsed(playerToHit, i) > )
-            playerHands.getCard(playerToHit, i);
-        }
+        //for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+        //    if (playerHands.getUsed(playerToHit, i) > )
+        //    playerHands.getCard(playerToHit, i);
+        //}
     }
     else {
 
