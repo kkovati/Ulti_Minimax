@@ -10,6 +10,10 @@ bool Card::operator==(const Card& other) const {
     return suit == other.suit;
 }
 
+bool Card::operator!=(const Card& other) const {
+    return suit != other.suit;
+}
+
 bool Card::operator>(const Card& other) const {
 	return value > other.value;
 }
@@ -80,18 +84,6 @@ void PartyState::init() {
     playerHands.deal();
 }
 
-bool PartyState::isSameSuit(const CardVector& cardVector, const Card card) const {
-    return false;
-}
-
-bool PartyState::isLargerValue(const CardVector&, const Card& card) const {
-    return false;
-}
-
-bool PartyState::isLargerValue(const CardVector&, const Card& card0, const Card& card1) const {
-    return false;
-}
-
 void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
     int posInRound = actionList.getPosInRound(index_);
     int playerToHit = actionList.getPlayerToHit(index_);
@@ -149,8 +141,40 @@ void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
     assert(cardVector.size());
 }
 
-void PartyState::setNextPlayer() {
+void PartyState::setHitCard(int index_, Card card_) {
+    actionList.setCard(index_, card_);
+}
 
+void PartyState::setNextPlayer(int index_) {
+    int posInRound = actionList.getPosInRound(index_);
+    int playerToHit = actionList.getPlayerToHit(index_);
+
+    if (actionList.isLastIndex(index_)) return;
+
+    if (posInRound == 0 || posInRound == 1) {
+        actionList.setPlayerToHit(index_ + 1, (playerToHit + 1) % 3);
+    }
+    else { // posInRound == 2
+        Card card0 = actionList.getCard(index_ - 2);
+        Card card1 = actionList.getCard(index_ - 1);
+        Card card2 = actionList.getCard(index_);
+        // card0 beats card1
+        bool c0bc1;
+        if ((card0 == card1 && card0 > card1) ||
+            (card0 != card1)) {
+
+        }
+        bool c0bc2;
+        if ((card0 == card2 && card0 > card2) ||
+            (card0 != card2)) {
+
+        }
+        if (c0bc1 && c0bc2) return; //C0
+        if (c0bc1 && !c0bc2); //C2
+        if (!c0bc1 && c0bc2); //C2
+
+        // TEST needed
+    }
 }
 
 }

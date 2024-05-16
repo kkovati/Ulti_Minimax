@@ -14,3 +14,5 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/src" PREFIX "Header Files" FILES
     src/game_rules.hpp
     src/game_manager.hpp
 )
+
+add_subdirectory(test)

@@ -18,9 +18,10 @@ public:
 	Card(int suit_, int value_) : suit(suit_), value(value_) {};
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
 
-	bool operator==(const Card&) const; // True if equal suit
-	bool operator>(const Card&) const;	// True greater value
-	bool operator<(const Card&) const;	// True smaller value
+	bool operator==(const Card&) const; // True if same suit
+	bool operator!=(const Card&) const; // True if different suit
+	bool operator>(const Card&) const;	// True if greater value
+	bool operator<(const Card&) const;	// True if smaller value
 	//bool operator>(const Card&) const;	// True if different suit or equal suit and greater value
 	//bool operator<(const Card&) const;	// True if equal suit and smaller value
 
@@ -67,10 +68,15 @@ private:
 class ActionList {
 public:
 	ActionList(int firstPlayer_ = 0);	
+
 	inline int getRound(int index_) { return getAction(index_).getRound(); };
 	inline int getPosInRound(int index_) { return getAction(index_).getPosInRound(); };
 	inline int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
+	inline void setPlayerToHit(int index_, int player_) { actions[index_].setPlayerToHit(player_); };
 	inline Card getCard(int index_) { return getAction(index_).getCard(); };
+	inline void setCard(int index_, Card card_) { actions[index_].setCard(card_); };
+
+	inline bool isLastIndex(int index_) { return index_ >= actions.size() - 1; };
 
 private:
 	using ActionVector = std::array<Action, N_PLAYER * N_CARD_IN_HAND>;
@@ -117,12 +123,11 @@ public:
 
 	void init();
 
-	bool isSameSuit(const CardVector&, const Card) const;
-	bool isLargerValue(const CardVector&, const Card&) const;
-	bool isLargerValue(const CardVector&, const Card&, const Card&) const;
-
 	void getPlayableCards(CardVector&, int);
-	void setNextPlayer();
+	void setHitCard(int, Card);
+	void setNextPlayer(int);
+
+	inline bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 
 private:
 	ActionList actionList = ActionList();
