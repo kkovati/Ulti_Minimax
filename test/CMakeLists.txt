@@ -13,7 +13,9 @@ include_directories(${GTEST_SOURCE_DIR}/include ${GTEST_SOURCE_DIR} ../src)
 
 add_executable(test_game_rules test_game_rules.cpp)
 
-target_link_libraries(test_game_rules ${GTEST_LIBRARIES} gtest gtest_main pthread game_rules)
+target_link_libraries(test_game_rules ${GTEST_LIBRARIES} gtest gtest_main pthread ulti_game game_rules)
+
+target_include_directories(test_game_rules PRIVATE ${PROJECT_SOURCE_DIR}/src)
 
 include(GoogleTest)
 

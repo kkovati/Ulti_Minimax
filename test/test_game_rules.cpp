@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "game_rules.h"
+#include "game_rules.hpp"
 
 TEST(PartyStateTest, TestsetNextPlayer) {
 	PartyState partyState();
