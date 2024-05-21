@@ -130,6 +130,8 @@ public:
 
 	inline bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 
+	int evaluateParty();
+
 private:
 	ActionList actionList = ActionList();
 	PlayerHands playerHands = PlayerHands();			

@@ -143,6 +143,7 @@ void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
 
 void PartyState::setHitCard(int index_, Card card_) {
     actionList.setCard(index_, card_);
+    playerHands.setUsed();
 }
 
 void PartyState::setNextPlayer(int index_) {
@@ -159,7 +160,8 @@ void PartyState::setNextPlayer(int index_) {
         Card card1 = actionList.getCard(index_ - 1);
         Card card2 = actionList.getCard(index_);
         int winCardIndex = chooseWinnerCard(card0, card1, card2);
-    }
+        actionList.setPlayerToHit(index_ + 1, winCardIndex);
+    } 
 }
 
 int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
@@ -178,6 +180,11 @@ int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
     assert(c0 == c1 && c1 == c2);
     if (c1 > c2) return 1;
     return 2;
+}
+
+int PartyState::evaluateParty() {
+    // TODO
+    return 0;
 }
 
 }
