@@ -126,6 +126,7 @@ public:
 	void getPlayableCards(CardVector&, int);
 	void setHitCard(int, Card);
 	void setNextPlayer(int);
+	int chooseWinnerCard(Card, Card, Card);
 
 	inline bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 

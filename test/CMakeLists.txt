@@ -11,7 +11,7 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(test_game_rules test_game_rules.cpp)
-target_link_libraries(test_game_rules GTest::gtest_main)
+target_link_libraries(test_game_rules GTest::gtest_main ulti_game)
 
 include(GoogleTest)
 gtest_discover_tests(test_game_rules)

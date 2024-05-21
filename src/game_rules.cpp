@@ -158,23 +158,26 @@ void PartyState::setNextPlayer(int index_) {
         Card card0 = actionList.getCard(index_ - 2);
         Card card1 = actionList.getCard(index_ - 1);
         Card card2 = actionList.getCard(index_);
-        // card0 beats card1
-        bool c0bc1;
-        if ((card0 == card1 && card0 > card1) ||
-            (card0 != card1)) {
-
-        }
-        bool c0bc2;
-        if ((card0 == card2 && card0 > card2) ||
-            (card0 != card2)) {
-
-        }
-        if (c0bc1 && c0bc2) return; //C0
-        if (c0bc1 && !c0bc2); //C2
-        if (!c0bc1 && c0bc2); //C2
-
-        // TEST needed
+        int winCardIndex = chooseWinnerCard(card0, card1, card2);
     }
+}
+
+int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
+    // c0 beats c1
+    bool c0bc1_ = (c0 == c1 && c0 > c1) || (c0 != c1);
+    bool c0bc1 = !(c0 == c1 && c0 < c1);
+    assert(c0bc1 == c0bc1_);
+    // c0 beats c2
+    bool c0bc2 = !(c0 == c2 && c0 < c2);
+
+    if (c0bc1 && c0bc2) return 0;
+    if (c0bc1 && !c0bc2) return 2;
+    if (!c0bc1 && c0bc2) return 1;
+
+    // both c1 and c2 beats c0
+    assert(c0 == c1 && c1 == c2);
+    if (c1 > c2) return 1;
+    return 2;
 }
 
 }
