@@ -1,13 +1,15 @@
 #pragma once
 #include <array>
+#include <assert.h>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace ulti_minimax {
 
 constexpr int N_SUIT = 4;
 constexpr int N_VALUE = 8;
-constexpr int N_PLAYER = 3;
+constexpr int N_PLAYER = 3; // Do not modify
 constexpr int N_CARD_IN_HAND = 10;
 constexpr int LAST_ACTION_INDEX = N_PLAYER * N_CARD_IN_HAND - 1;
 constexpr int SEED = 0;
@@ -18,12 +20,15 @@ public:
 	Card(int suit_, int value_) : suit(suit_), value(value_) {};
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
 
-	bool operator==(const Card&) const; // True if same suit
-	bool operator!=(const Card&) const; // True if different suit
-	bool operator>(const Card&) const;	// True if greater value
-	bool operator<(const Card&) const;	// True if smaller value
-	//bool operator>(const Card&) const;	// True if different suit or equal suit and greater value
-	//bool operator<(const Card&) const;	// True if equal suit and smaller value
+	inline int getSuit() { return suit; };
+	inline int getValue() { return value; };
+
+	inline bool operator==(const Card& other) const { return suit == other.suit; } // True if same suit
+	inline bool operator!=(const Card& other) const { return suit != other.suit; } // True if different suit
+	inline bool operator>(const Card& other) const { return value > other.value; }	// True if greater value
+	inline bool operator<(const Card& other) const { return value < other.value; }	// True if smaller value
+	// inline bool operator>(const Card& other) const { return suit == other.suit ? value > other.value : true; } // True if different suit or equal suit and greater value
+	// inline bool operator<(const Card& other) const { return suit == other.suit ? value < other.value : false; } // True if equal suit and smaller value
 
 private:
 	int suit;
@@ -100,8 +105,17 @@ public:
 	inline int getUsed(int player_, int index_) const {
 		return playerUseds[player_][index_];
 	};
-	inline void setUsed(int player_, int index_, int actionIndex_) {
-		playerUseds[player_][index_] = actionIndex_;
+	inline void setUsed(int player_, const Card& card_, int actionIndex_) {
+		clearActionIndex(actionIndex_);
+		for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+			Card curr_card = getCard(player_, i);
+			if (curr_card != card_ || curr_card > card_ || curr_card < card_) continue;
+			assert(curr_card == card_ && !(curr_card > card_) && !(curr_card < card_));
+			assert(getUsed(player_, i) > actionIndex_);
+			setUsed(player_, i, actionIndex_);
+			return;
+		}
+		assert(false);
 	};
 
 private:
@@ -112,6 +126,23 @@ private:
 
 	PlayerCardArray playerCards;
 	PlayerUsedArray playerUseds; // Action index when that card was used
+
+	inline void clearActionIndex(int actionIndex_) {
+		int counter = 0;
+		for (int player = 0; player < N_PLAYER; ++player) {
+			for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+				if (playerUseds[player][i] == actionIndex_) {
+					playerUseds[player][i] = LAST_ACTION_INDEX + 1;
+					counter++;
+				}
+			}
+		}
+		assert(counter <= 1);
+	}
+
+	inline void setUsed(int player_, int index_, int actionIndex_) {
+		playerUseds[player_][index_] = actionIndex_;
+	}
 };
 
 
@@ -123,6 +154,7 @@ public:
 
 	void init();
 
+	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
 	void setHitCard(int, Card);
 	void setNextPlayer(int);
@@ -131,6 +163,8 @@ public:
 	inline bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 
 	int evaluateParty();
+
+	void print(int);
 
 private:
 	ActionList actionList = ActionList();

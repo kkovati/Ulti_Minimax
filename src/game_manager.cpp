@@ -14,6 +14,8 @@ void GameManager::simulate() {
 int GameManager::minimax(PartyState& partyState, int index) {
 	std::vector<Card> playableCards;
 	partyState.getPlayableCards(playableCards, index);
+	assert(playableCards.size());
+	partyState.print(index);
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);

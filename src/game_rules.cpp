@@ -1,40 +1,17 @@
 #include <algorithm>
 #include <assert.h>
+#include <iostream>
 #include <random>
+#include <string>
 
 #include "game_rules.hpp"
 
 namespace ulti_minimax {
 
-bool Card::operator==(const Card& other) const {
-    return suit == other.suit;
-}
-
-bool Card::operator!=(const Card& other) const {
-    return suit != other.suit;
-}
-
-bool Card::operator>(const Card& other) const {
-	return value > other.value;
-}
-
-bool Card::operator<(const Card& other) const {
-	return value < other.value;
-}
-
-//bool Card::operator>(const Card& other) const {
-//    return suit == other.suit ? value > other.value : true;
-//}
-//
-//bool Card::operator<(const Card& other) const {
-//    return suit == other.suit ? value < other.value : false;
-//}
-
-
 Deck::Deck() {
     for (int i = 0; i < N_SUIT; ++i) {
         for (int j = 0; j < N_VALUE; ++j) {
-            cards[i * j + j] = Card(i, j);
+            cards[i * N_VALUE + j] = Card(i, j);
         }
     }
 }
@@ -82,6 +59,14 @@ void PlayerHands::deal() {
 
 void PartyState::init() {
     playerHands.deal();
+}
+
+void PartyState::getCardsInHand(CardVector& cardVector, int player_, int index_) {
+    for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+        if (playerHands.getUsed(player_, i) >= index_) {
+            cardVector.push_back(playerHands.getCard(player_, i));
+        }
+    }
 }
 
 void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
@@ -143,24 +128,26 @@ void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
 
 void PartyState::setHitCard(int index_, Card card_) {
     actionList.setCard(index_, card_);
-    playerHands.setUsed();
+    int playerToHit = actionList.getPlayerToHit(index_);
+    playerHands.setUsed(playerToHit, card_, index_);
 }
 
 void PartyState::setNextPlayer(int index_) {
-    int posInRound = actionList.getPosInRound(index_);
-    int playerToHit = actionList.getPlayerToHit(index_);
+    int posInRound = actionList.getPosInRound(index_);    
 
     if (actionList.isLastIndex(index_)) return;
 
     if (posInRound == 0 || posInRound == 1) {
-        actionList.setPlayerToHit(index_ + 1, (playerToHit + 1) % 3);
+        int playerToHit = actionList.getPlayerToHit(index_);
+        actionList.setPlayerToHit(index_ + 1, (playerToHit + 1) % N_PLAYER);
     }
     else { // posInRound == 2
         Card card0 = actionList.getCard(index_ - 2);
         Card card1 = actionList.getCard(index_ - 1);
         Card card2 = actionList.getCard(index_);
         int winCardIndex = chooseWinnerCard(card0, card1, card2);
-        actionList.setPlayerToHit(index_ + 1, winCardIndex);
+        int firstPlayerInRound = actionList.getPlayerToHit(index_ - 2);
+        actionList.setPlayerToHit(index_ + 1, (firstPlayerInRound + winCardIndex) % N_PLAYER);
     } 
 }
 
@@ -185,6 +172,23 @@ int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
 int PartyState::evaluateParty() {
     // TODO
     return 0;
+}
+
+void PartyState::print(int index) {
+    int posInRound = actionList.getPosInRound(index);
+    int playerToHit = actionList.getPlayerToHit(index);
+
+    std::cout << "=== Index: " << index << " =====================" << std::endl;
+    for (int player = 0; player < N_PLAYER; ++player) {
+        std::cout << (player == playerToHit ? "*" : " ") << "Player " << player << ": ";
+        std::vector<Card> cards;
+        getCardsInHand(cards, player, index);
+        for (Card card : cards) {
+            std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "Table: ";
 }
 
 }
