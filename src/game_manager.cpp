@@ -19,8 +19,9 @@ int GameManager::minimax(int index) {
 
 	std::vector<Card> playableCards;
 	partyState.getPlayableCards(playableCards, index);
+	partyState.simplifyPlayableCards(playableCards);
 	assert(playableCards.size());
-	//partyState.print(index);
+	//partyState.print(index, playableCards);
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);
@@ -36,7 +37,7 @@ int GameManager::minimax(int index) {
 	}
 
 	// Time measurement
-	if (index == 13) {
+	if (index == 8) {
 		auto stop = std::chrono::high_resolution_clock::now();
 		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 		int time = duration.count();

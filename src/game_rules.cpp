@@ -8,6 +8,13 @@
 
 namespace ulti_minimax {
 
+
+bool Card::compareCard(const Card& a, const Card& b) {
+    if (a == b) return a < b;
+    return a.suit < b.suit;
+}
+
+
 Deck::Deck() {
     for (int i = 0; i < N_SUIT; ++i) {
         for (int j = 0; j < N_VALUE; ++j) {
@@ -47,12 +54,15 @@ ActionList::ActionList(int firstPlayer_) : firstPlayer(firstPlayer_) {
 void PlayerHands::deal() {
     Deck deck = Deck();
     assert(N_PLAYER * N_CARD_IN_HAND <= deck.size());
-    deck.shuffle();    
+    deck.shuffle(); 
+    // Deal the cards from the shuffled deck
     for (int i = 0; i < N_PLAYER; ++i) {
         for (int j = 0; j < N_CARD_IN_HAND; ++j) {
             playerCards[i][j] = deck.getCard(i * N_CARD_IN_HAND + j);
             playerUseds[i][j] = LAST_ACTION_INDEX + 1;
         }
+        // Order the cards        
+        std::sort(playerCards[i].begin(), playerCards[i].end(), Card::compareCard);
     }
 }
 
@@ -126,6 +136,27 @@ void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
     assert(cardVector.size());
 }
 
+void PartyState::simplifyPlayableCards(CardVector& cardVector) {
+    // TODO Cards with values must be handled in different sets 
+    for (int i = 0; i < cardVector.size() - 1; ++i) {
+        int series_length = 0;
+        Card cardI = cardVector[i];
+        for (int j = i + 1; j < cardVector.size(); ++j) {
+            Card cardJ = cardVector[j];
+            if (cardI.isNextInSeries(cardJ)) {
+                cardI = cardJ;
+                series_length++;
+            }
+            else {
+                break;
+            }
+        }
+        for (int k = 0; k < series_length; ++k) {
+            cardVector.erase(cardVector.begin() + i + 1);
+        }
+    }
+}
+
 void PartyState::setHitCard(int index_, Card card_) {
     actionList.setCard(index_, card_);
     int playerToHit = actionList.getPlayerToHit(index_);
@@ -174,7 +205,7 @@ int PartyState::evaluateParty() {
     return 0;
 }
 
-void PartyState::print(int index_) {
+void PartyState::print(int index_, const CardVector& playableCards) {
     int posInRound = actionList.getPosInRound(index_);
     int playerToHit = actionList.getPlayerToHit(index_);
 
@@ -184,7 +215,7 @@ void PartyState::print(int index_) {
         // Signal current player to hit with asterisk
         std::cout << (player == playerToHit ? "*" : " ") << "Player " << player << ": ";        
         for (int i = 0; i < N_CARD_IN_HAND; ++i) {
-            // Card is playable
+            // Card is not played yet
             if (playerHands.getUsed(player, i) >= index_) {                
                 Card card = playerHands.getCard(player, i);
                 std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
@@ -192,6 +223,13 @@ void PartyState::print(int index_) {
             // Card is already played
             else {                
                 std::cout << "   ";
+            }
+        }
+        // Print playable cards of current player
+        if (player == playerToHit) {
+            std::cout << "Playable: ";
+            for (Card card : playableCards) {
+                std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
             }
         }
         std::cout << std::endl;

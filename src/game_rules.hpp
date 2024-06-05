@@ -19,6 +19,7 @@ public:
 	Card() = default;
 	Card(int suit_, int value_) : suit(suit_), value(value_) {};
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
+	Card& operator=(const Card& other) { suit = other.suit; value = other.value; return *this; }
 
 	inline int getSuit() { return suit; };
 	inline int getValue() { return value; };
@@ -27,8 +28,10 @@ public:
 	inline bool operator!=(const Card& other) const { return suit != other.suit; } // True if different suit
 	inline bool operator>(const Card& other) const { return value > other.value; }	// True if greater value
 	inline bool operator<(const Card& other) const { return value < other.value; }	// True if smaller value
-	// inline bool operator>(const Card& other) const { return suit == other.suit ? value > other.value : true; } // True if different suit or equal suit and greater value
-	// inline bool operator<(const Card& other) const { return suit == other.suit ? value < other.value : false; } // True if equal suit and smaller value
+		
+	inline bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value; }
+
+	static bool compareCard(const Card&, const Card&);
 
 private:
 	int suit;
@@ -156,6 +159,7 @@ public:
 
 	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
+	void simplifyPlayableCards(CardVector&);
 	void setHitCard(int, Card);
 	void setNextPlayer(int);
 	int chooseWinnerCard(Card, Card, Card);
@@ -164,7 +168,7 @@ public:
 
 	int evaluateParty();
 
-	void print(int);
+	void print(int, const CardVector&);
 
 private:
 	ActionList actionList = ActionList();
