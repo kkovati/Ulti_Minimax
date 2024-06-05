@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <iostream>
 
 #include "game_manager.hpp"
 
@@ -12,10 +13,11 @@ void GameManager::simulate() {
 }
 
 int GameManager::minimax(PartyState& partyState, int index) {
+	//if (index < 11) std::cout << index << std::endl;
 	std::vector<Card> playableCards;
 	partyState.getPlayableCards(playableCards, index);
 	assert(playableCards.size());
-	partyState.print(index);
+	//partyState.print(index);
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);

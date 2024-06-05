@@ -174,21 +174,35 @@ int PartyState::evaluateParty() {
     return 0;
 }
 
-void PartyState::print(int index) {
-    int posInRound = actionList.getPosInRound(index);
-    int playerToHit = actionList.getPlayerToHit(index);
+void PartyState::print(int index_) {
+    int posInRound = actionList.getPosInRound(index_);
+    int playerToHit = actionList.getPlayerToHit(index_);
 
-    std::cout << "=== Index: " << index << " =====================" << std::endl;
+    std::cout << "=== Index: " << index_ << " =====================" << std::endl;
+    // Print each players' hand
     for (int player = 0; player < N_PLAYER; ++player) {
-        std::cout << (player == playerToHit ? "*" : " ") << "Player " << player << ": ";
-        std::vector<Card> cards;
-        getCardsInHand(cards, player, index);
-        for (Card card : cards) {
-            std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+        // Signal current player to hit with asterisk
+        std::cout << (player == playerToHit ? "*" : " ") << "Player " << player << ": ";        
+        for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+            // Card is playable
+            if (playerHands.getUsed(player, i) >= index_) {                
+                Card card = playerHands.getCard(player, i);
+                std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+            }
+            // Card is already played
+            else {                
+                std::cout << "   ";
+            }
         }
         std::cout << std::endl;
     }
+    // Print current table
     std::cout << "Table: ";
+    for (int i = 0; i < posInRound; ++i) {
+        Card card = actionList.getCard(index_ - posInRound + i);
+        std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+    }
+    std::cout << std::endl;
 }
 
 }
