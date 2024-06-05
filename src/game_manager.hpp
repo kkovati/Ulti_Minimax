@@ -10,6 +10,10 @@ public:
 
 private:
 	int minimax(PartyState&, int);
+
+	// Time measuremet
+	int sum_time = 0;
+	int n_meas = 0;
 };
 
 }

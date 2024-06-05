@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <chrono>
 #include <iostream>
 
 #include "game_manager.hpp"
@@ -13,7 +14,9 @@ void GameManager::simulate() {
 }
 
 int GameManager::minimax(PartyState& partyState, int index) {
-	//if (index < 11) std::cout << index << std::endl;
+	// Time measurement
+	auto start = std::chrono::high_resolution_clock::now();	
+
 	std::vector<Card> playableCards;
 	partyState.getPlayableCards(playableCards, index);
 	assert(playableCards.size());
@@ -30,6 +33,18 @@ int GameManager::minimax(PartyState& partyState, int index) {
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
 		minimax(partyState, index + 1);
+	}
+
+	// Time measurement
+	if (index == 13) {
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+		int time = duration.count();
+		std::cout << "Duration: " << time << "ms" << std::endl;
+
+		//sum_time += time;
+		//n_meas++;		
+		//if (n_meas % 10 == 0) std::cout << "Avg time: " << sum_time / n_meas << "ms" << std::endl;
 	}
 
 	return 0;
