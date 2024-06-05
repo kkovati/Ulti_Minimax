@@ -8,12 +8,12 @@
 namespace ulti_minimax {
 
 void GameManager::simulate() {
-	PartyState partyState = PartyState();
+	partyState = PartyState();
 	partyState.init();
-	minimax(partyState, 0);
+	minimax(0);
 }
 
-int GameManager::minimax(PartyState& partyState, int index) {
+int GameManager::minimax(int index) {
 	// Time measurement
 	auto start = std::chrono::high_resolution_clock::now();	
 
@@ -32,7 +32,7 @@ int GameManager::minimax(PartyState& partyState, int index) {
 	for (Card card : playableCards) {
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		minimax(partyState, index + 1);
+		minimax(index + 1);
 	}
 
 	// Time measurement

@@ -89,7 +89,7 @@ private:
 	int firstPlayer;
 	ActionVector actions;	
 
-	Action getAction(int index_) { return actions[index_]; };
+	inline Action getAction(int index_) { return actions[index_]; };
 };
 
 

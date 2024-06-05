@@ -9,7 +9,9 @@ public:
 	void simulate();
 
 private:
-	int minimax(PartyState&, int);
+	PartyState partyState;
+
+	int minimax(int);
 
 	// Time measuremet
 	int sum_time = 0;
