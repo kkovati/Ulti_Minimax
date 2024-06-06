@@ -96,6 +96,21 @@ private:
 };
 
 
+class RoundResults {
+public:
+	RoundResults() = default;
+
+	inline uint8_t getWinner(uint8_t round) { return winner[round]; };
+	inline uint8_t getPouint8_ts(uint8_t round) { return pouint8_ts[round]; };
+	inline void setWinner(uint8_t round, uint8_t player_) { winner[round] = player_; };
+	inline void setPouint8_ts(uint8_t round, uint8_t pouint8_ts_) { pouint8_ts[round] = pouint8_ts_; };
+
+private:
+	std::array<uint8_t, N_CARD_IN_HAND> winner;
+	std::array<uint8_t, N_CARD_IN_HAND> pouint8_ts;
+};
+
+
 class PlayerHands {
 public:
 	PlayerHands() = default;
