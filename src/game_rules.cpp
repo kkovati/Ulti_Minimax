@@ -72,22 +72,22 @@ void PartyState::init() {
 }
 
 void PartyState::getCardsInHand(CardVector& cardVector, int player_, int index_) {
+    playerHands.clearActionIndex(index_);
     for (int i = 0; i < N_CARD_IN_HAND; ++i) {
-        if (playerHands.getUsed(player_, i) >= index_) {
-            cardVector.push_back(playerHands.getCard(player_, i));
-        }
+        if (playerHands.getUsed(player_, i) < index_) continue;
+        cardVector.push_back(playerHands.getCard(player_, i));
     }
 }
 
 void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
+    playerHands.clearActionIndex(index_);
     int posInRound = actionList.getPosInRound(index_);
     int playerToHit = actionList.getPlayerToHit(index_);
 
     if (posInRound == 0) {
         for (int i = 0; i < N_CARD_IN_HAND; ++i) {
-            if (playerHands.getUsed(playerToHit, i) >= index_) {
-                cardVector.push_back(playerHands.getCard(playerToHit, i));
-            }
+            if (playerHands.getUsed(playerToHit, i) < index_) continue;
+            cardVector.push_back(playerHands.getCard(playerToHit, i));            
         }
     }
 
@@ -216,7 +216,8 @@ void PartyState::print(int index_, const CardVector& playableCards) {
         std::cout << (player == playerToHit ? "*" : " ") << "Player " << player << ": ";        
         for (int i = 0; i < N_CARD_IN_HAND; ++i) {
             // Card is not played yet
-            if (playerHands.getUsed(player, i) >= index_) {                
+            assert(playerHands.getUsed(player, i) != index_);
+            if (playerHands.getUsed(player, i) > index_) {                
                 Card card = playerHands.getCard(player, i);
                 std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
             }

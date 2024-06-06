@@ -120,16 +120,6 @@ public:
 		}
 		assert(false);
 	};
-
-private:
-	using CardArray = std::array<Card, N_CARD_IN_HAND>;
-	using PlayerCardArray = std::array<CardArray, N_PLAYER>;
-	using IntArray = std::array<int, N_CARD_IN_HAND>;
-	using PlayerUsedArray = std::array<IntArray, N_PLAYER>;
-
-	PlayerCardArray playerCards;
-	PlayerUsedArray playerUseds; // Action index when that card was used
-
 	inline void clearActionIndex(int actionIndex_) {
 		int counter = 0;
 		for (int player = 0; player < N_PLAYER; ++player) {
@@ -142,6 +132,15 @@ private:
 		}
 		assert(counter <= 1);
 	}
+
+private:
+	using CardArray = std::array<Card, N_CARD_IN_HAND>;
+	using PlayerCardArray = std::array<CardArray, N_PLAYER>;
+	using IntArray = std::array<int, N_CARD_IN_HAND>;
+	using PlayerUsedArray = std::array<IntArray, N_PLAYER>;
+
+	PlayerCardArray playerCards;
+	PlayerUsedArray playerUseds; // Action index when that card was used
 
 	inline void setUsed(int player_, int index_, int actionIndex_) {
 		playerUseds[player_][index_] = actionIndex_;
