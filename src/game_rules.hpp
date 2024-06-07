@@ -9,9 +9,13 @@ namespace ulti_minimax {
 
 constexpr int N_SUIT = 4;
 constexpr int N_VALUE = 8;
+constexpr int LOWEST_CARD_VALUE_WITH_POINT = 6;
+constexpr int N_POINT_IN_DECK = (N_VALUE - LOWEST_CARD_VALUE_WITH_POINT) * N_SUIT;
+
 constexpr int N_PLAYER = 3; // Do not modify
 constexpr int N_CARD_IN_HAND = 10;
 constexpr int LAST_ACTION_INDEX = N_PLAYER * N_CARD_IN_HAND - 1;
+
 constexpr int SEED = 0;
 
 class Card {
@@ -23,13 +27,14 @@ public:
 
 	inline int getSuit() { return suit; };
 	inline int getValue() { return value; };
+	inline int getPoint() { return value >= LOWEST_CARD_VALUE_WITH_POINT; };
 
 	inline bool operator==(const Card& other) const { return suit == other.suit; } // True if same suit
 	inline bool operator!=(const Card& other) const { return suit != other.suit; } // True if different suit
 	inline bool operator>(const Card& other) const { return value > other.value; }	// True if greater value
 	inline bool operator<(const Card& other) const { return value < other.value; }	// True if smaller value
 		
-	inline bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value; }
+	inline bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value && other.value != LOWEST_CARD_VALUE_WITH_POINT; }
 
 	static bool compareCard(const Card&, const Card&);
 
@@ -77,6 +82,7 @@ class ActionList {
 public:
 	ActionList(int firstPlayer_ = 0);	
 
+	inline int getFirstPlayer() { return firstPlayer; };
 	inline int getRound(int index_) { return getAction(index_).getRound(); };
 	inline int getPosInRound(int index_) { return getAction(index_).getPosInRound(); };
 	inline int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
@@ -100,14 +106,14 @@ class RoundResults {
 public:
 	RoundResults() = default;
 
-	inline uint8_t getWinner(uint8_t round) { return winner[round]; };
-	inline uint8_t getPouint8_ts(uint8_t round) { return pouint8_ts[round]; };
-	inline void setWinner(uint8_t round, uint8_t player_) { winner[round] = player_; };
-	inline void setPouint8_ts(uint8_t round, uint8_t pouint8_ts_) { pouint8_ts[round] = pouint8_ts_; };
+	inline uint8_t getWinner(int round) { return winner[round]; };
+	inline uint8_t getPoint(int round) { return point[round]; };
+	inline void setWinner(int round, int player_) { winner[round] = player_; };
+	inline void setPoint(int round, int point_) { point[round] = point_; };
 
 private:
-	std::array<uint8_t, N_CARD_IN_HAND> winner;
-	std::array<uint8_t, N_CARD_IN_HAND> pouint8_ts;
+	std::array<int, N_CARD_IN_HAND> winner;
+	std::array<int, N_CARD_IN_HAND> point;
 };
 
 
@@ -180,12 +186,13 @@ public:
 
 	inline bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 
-	int evaluateParty();
+	int evaluateParty(int);
 
 	void print(int, const CardVector&);
 
 private:
 	ActionList actionList = ActionList();
+	RoundResults roundResults = RoundResults();
 	PlayerHands playerHands = PlayerHands();			
 };
 

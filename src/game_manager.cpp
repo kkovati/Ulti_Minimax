@@ -21,19 +21,25 @@ int GameManager::minimax(int index) {
 	partyState.getPlayableCards(playableCards, index);
 	partyState.simplifyPlayableCards(playableCards);
 	assert(playableCards.size());
-	//partyState.print(index, playableCards);
+	partyState.print(index, playableCards);
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);
 		Card card = playableCards[0];
 		partyState.setHitCard(index, card);
-		return partyState.evaluateParty();
+		partyState.setNextPlayer(index);
+		return partyState.evaluateParty(index);
 	}
 
+	std::vector<int> results;
 	for (Card card : playableCards) {
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		minimax(index + 1);
+		int result = partyState.evaluateParty(index);
+		if (result) return result; // result is not 0
+		result = minimax(index + 1);
+		assert(result);
+		if (result == 1) return result;		
 	}
 
 	// Time measurement
@@ -48,7 +54,7 @@ int GameManager::minimax(int index) {
 		//if (n_meas % 10 == 0) std::cout << "Avg time: " << sum_time / n_meas << "ms" << std::endl;
 	}
 
-	return 0;
+	return -1;
 }
 
 }

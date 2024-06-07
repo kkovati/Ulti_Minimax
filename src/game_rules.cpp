@@ -137,7 +137,6 @@ void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
 }
 
 void PartyState::simplifyPlayableCards(CardVector& cardVector) {
-    // TODO Cards with values must be handled in different sets 
     for (int i = 0; i < cardVector.size() - 1; ++i) {
         int series_length = 0;
         Card cardI = cardVector[i];
@@ -164,21 +163,25 @@ void PartyState::setHitCard(int index_, Card card_) {
 }
 
 void PartyState::setNextPlayer(int index_) {
-    int posInRound = actionList.getPosInRound(index_);    
-
-    if (actionList.isLastIndex(index_)) return;
-
+    int round = actionList.getRound(index_);
+    int posInRound = actionList.getPosInRound(index_); 
+    
     if (posInRound == 0 || posInRound == 1) {
         int playerToHit = actionList.getPlayerToHit(index_);
         actionList.setPlayerToHit(index_ + 1, (playerToHit + 1) % N_PLAYER);
     }
     else { // posInRound == 2
+        // Evaluate round, determine winner player and won points
         Card card0 = actionList.getCard(index_ - 2);
         Card card1 = actionList.getCard(index_ - 1);
         Card card2 = actionList.getCard(index_);
         int winCardIndex = chooseWinnerCard(card0, card1, card2);
         int firstPlayerInRound = actionList.getPlayerToHit(index_ - 2);
-        actionList.setPlayerToHit(index_ + 1, (firstPlayerInRound + winCardIndex) % N_PLAYER);
+        int winnerPlayer = (firstPlayerInRound + winCardIndex) % N_PLAYER;
+        if (!actionList.isLastIndex(index_))
+            actionList.setPlayerToHit(index_ + 1, winnerPlayer);
+        roundResults.setWinner(round, winnerPlayer);
+        roundResults.setPoint(round, card0.getPoint() + card1.getPoint() + card2.getPoint());
     } 
 }
 
@@ -200,8 +203,28 @@ int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
     return 2;
 }
 
-int PartyState::evaluateParty() {
-    // TODO
+int PartyState::evaluateParty(int index_) {
+    // TODO integrate with setNextPlayer() if possible
+    int round = actionList.getRound(index_);
+    int posInRound = actionList.getPosInRound(index_);
+
+    int playerPoints = 0, opponentPoints = 0;
+    if (posInRound == 0 || posInRound == 1) {
+        return 0;
+    }
+    else { // posInRound == 2
+        for (int i = 0; i <= round; ++i) {
+            int point = roundResults.getPoint(i);
+            if (actionList.isLastIndex(index_)) point++;
+            if (roundResults.getWinner(i) == actionList.getFirstPlayer()) 
+                playerPoints += point;
+            else 
+                opponentPoints += point;
+        }
+    }
+    if (playerPoints > N_POINT_IN_DECK) return 1;
+    if (opponentPoints > N_POINT_IN_DECK) return -1;
+    assert(!actionList.isLastIndex(index_));
     return 0;
 }
 
