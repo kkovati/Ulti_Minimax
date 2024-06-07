@@ -228,7 +228,7 @@ int PartyState::evaluateParty(int index_) {
     return 0;
 }
 
-void PartyState::print(int index_, const CardVector& playableCards) {
+void PartyState::print_current_state(int index_, const CardVector& playableCards) {
     int posInRound = actionList.getPosInRound(index_);
     int playerToHit = actionList.getPlayerToHit(index_);
 
@@ -265,6 +265,26 @@ void PartyState::print(int index_, const CardVector& playableCards) {
         std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
     }
     std::cout << std::endl;
+}
+
+void PartyState::print_game_progression() {
+    std::cout << "=== Game Progression: =====================" << std::endl;
+    // Print each players' initial hand
+    for (int player = 0; player < N_PLAYER; ++player) {
+        std::cout << "Player " << player << ": ";
+        for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+            Card card = playerHands.getCard(player, i);
+            std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+        }
+        std::cout << std::endl;
+    }
+    // Print each round
+    std::cout << "Rounds" << std::endl;
+    for (int i = 0; i < N_PLAYER * N_CARD_IN_HAND; ++i) {
+        Card card = actionList.getCard(i);
+        std::cout << actionList.getRound(i) << " " << actionList.getPosInRound(i) << " " << actionList.getPlayerToHit(i) << " " << (char)('A' + card.getSuit()) << card.getValue();
+    }
+
 }
 
 }

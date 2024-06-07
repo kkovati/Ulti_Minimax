@@ -23,7 +23,7 @@ public:
 	Card() = default;
 	Card(int suit_, int value_) : suit(suit_), value(value_) {};
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
-	Card& operator=(const Card& other) { suit = other.suit; value = other.value; return *this; }
+	Card& operator=(const Card& other) { suit = other.suit; value = other.value; return *this; };
 
 	inline int getSuit() { return suit; };
 	inline int getValue() { return value; };
@@ -61,7 +61,14 @@ private:
 class Action {
 public:
 	Action() = default;
-	Action(int round_, int posInRound_) : round(round_), posInRound(posInRound_), playerToHit(-1), card() {};
+	Action(int round_, int posInRound_) : round(round_), posInRound(posInRound_), 
+		playerToHit(-1), card() {};
+	Action(const Action& other) : round(other.round), posInRound(other.posInRound), 
+		playerToHit(other.playerToHit), card(other.card) {};
+	Action& operator=(const Action& other) {
+		round = other.round; posInRound = other.posInRound;
+		playerToHit = other.playerToHit; card = other.card; return *this;
+	};
 
 	inline int getRound() { return round; };
 	inline int getPosInRound() { return posInRound; };
@@ -81,6 +88,10 @@ private:
 class ActionList {
 public:
 	ActionList(int firstPlayer_ = 0);	
+	ActionList(const ActionList& other) : firstPlayer(other.firstPlayer), actions(other.actions) {};
+	ActionList& operator=(const ActionList& other) { 
+		firstPlayer = other.firstPlayer; actions = other.actions; return *this; 
+	};
 
 	inline int getFirstPlayer() { return firstPlayer; };
 	inline int getRound(int index_) { return getAction(index_).getRound(); };
@@ -91,6 +102,7 @@ public:
 	inline void setCard(int index_, Card card_) { actions[index_].setCard(card_); };
 
 	inline bool isLastIndex(int index_) { return index_ >= actions.size() - 1; };
+	inline bool isFirstPlayerToHit(int index_) { return firstPlayer == getPlayerToHit(index_); };
 
 private:
 	using ActionVector = std::array<Action, N_PLAYER * N_CARD_IN_HAND>;
@@ -105,6 +117,10 @@ private:
 class RoundResults {
 public:
 	RoundResults() = default;
+	RoundResults(const RoundResults& other) : winner(other.winner), point(other.point) {};
+	RoundResults& operator=(const RoundResults& other) {
+		winner = other.winner; point = other.point; return *this;
+	};
 
 	inline uint8_t getWinner(int round) { return winner[round]; };
 	inline uint8_t getPoint(int round) { return point[round]; };
@@ -120,6 +136,10 @@ private:
 class PlayerHands {
 public:
 	PlayerHands() = default;
+	PlayerHands(const PlayerHands& other) : playerCards(other.playerCards), playerUseds(other.playerUseds) {};
+	PlayerHands& operator=(const PlayerHands& other) {
+		playerCards = other.playerCards; playerUseds = other.playerUseds; return *this;
+	};
 
 	void deal();
 
@@ -172,6 +192,12 @@ private:
 class PartyState {
 public:
 	PartyState() = default;
+	PartyState(const PartyState& other) : actionList(other.actionList), roundResults(other.roundResults), 
+		playerHands(other.playerHands) {};
+	PartyState& operator=(const PartyState& other) {
+		actionList = other.actionList; roundResults = other.roundResults; playerHands = other.playerHands;
+		return *this;
+	};
 
 	using CardVector = std::vector<Card>;
 
@@ -185,10 +211,12 @@ public:
 	int chooseWinnerCard(Card, Card, Card);
 
 	inline bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
+	inline bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
 
 	int evaluateParty(int);
 
-	void print(int, const CardVector&);
+	void print_current_state(int, const CardVector&);
+	void print_game_progression();
 
 private:
 	ActionList actionList = ActionList();

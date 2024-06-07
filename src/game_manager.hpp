@@ -1,3 +1,6 @@
+#include <optional>
+#include <tuple>
+
 #include "game_rules.hpp"
 
 
@@ -11,9 +14,10 @@ public:
 private:
 	PartyState partyState;
 
-	int minimax(int);
+	std::tuple<int, std::optional<PartyState>> minimax(int);
 
-	// Time measuremet
+	// Measurement
+	int n_minimax_call = 0;
 	int sum_time = 0;
 	int n_meas = 0;
 };
