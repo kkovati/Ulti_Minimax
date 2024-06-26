@@ -8,16 +8,22 @@
 namespace ulti_minimax {
 
 void GameManager::simulate() {
+	auto start = std::chrono::high_resolution_clock::now();
+	
 	partyState = PartyState();
 	partyState.init();
-	auto [result, partyState] = minimax(0);
-	std::cout << result << std::endl;
-	std::cout << n_minimax_call << std::endl;
-	if (partyState)
-	partyState->print_game_progression();
+	int result = minimax(0);
+
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+	int time = duration.count();	
+
+	std::cout << "Result: " << result << std::endl;
+	std::cout << "No. calls: " << n_minimax_call << std::endl;
+	std::cout << "Duration: " << time << " ms" << std::endl;
 }
 
-std::tuple<int, std::optional<PartyState>> GameManager::minimax(int index) {
+int GameManager::minimax(int index) {
 	// Time measurement
 	// auto start = std::chrono::high_resolution_clock::now();	
 	n_minimax_call += 1;
@@ -33,29 +39,29 @@ std::tuple<int, std::optional<PartyState>> GameManager::minimax(int index) {
 		Card card = playableCards[0];
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		return std::make_tuple(partyState.evaluateParty(index), partyState); // TODO decide when std::nullopt
+		return partyState.evaluateParty(index);
 	}
 
-	bool firstPlayerToHit = partyState.isFirstPlayerToHit(index);
+	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
 	for (Card card : playableCards) {
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
 		int result = partyState.evaluateParty(index);
-		if (firstPlayerToHit) {
-			if (result == 1) return std::make_tuple(1, partyState);
+		if (isFirstPlayerToHit) {
+			if (result == 1) return 1;
 			if (result == -1) continue;
 		}
-		else { // !firstPlayerToHit
+		else { // !isFirstPlayerToHit
 			if (result == 1) continue;
-			if (result == -1) return std::make_tuple(-1, std::nullopt);
+			if (result == -1) return -1;
 		}
-		auto [result2, inheritedPartyState] = minimax(index + 1);
-		assert(result2);
-		if (firstPlayerToHit && result == 1) return std::make_tuple(1, inheritedPartyState);
-		if (!firstPlayerToHit && result == -1) return std::make_tuple(-1, std::nullopt);
+		result = minimax(index + 1);
+		assert(result);
+		if (isFirstPlayerToHit && result == 1) return 1;
+		if (!isFirstPlayerToHit && result == -1) return -1;
 	}
-	if (firstPlayerToHit) return std::make_tuple(-1, std::nullopt);
-	if (!firstPlayerToHit) return std::make_tuple(1, std::nullopt);
+	if (isFirstPlayerToHit) return -1;
+	if (!isFirstPlayerToHit) return 1;
 
 	// Time measurement
 	//if (index == 8) {

@@ -14,7 +14,7 @@ public:
 private:
 	PartyState partyState;
 
-	std::tuple<int, std::optional<PartyState>> minimax(int);
+	int minimax(int);
 
 	// Measurement
 	int n_minimax_call = 0;
