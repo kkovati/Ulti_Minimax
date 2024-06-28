@@ -25,16 +25,16 @@ public:
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
 	Card& operator=(const Card& other) { suit = other.suit; value = other.value; return *this; };
 
-	inline int getSuit() { return suit; };
-	inline int getValue() { return value; };
-	inline int getPoint() { return value >= LOWEST_CARD_VALUE_WITH_POINT; };
+	int getSuit() { return suit; };
+	int getValue() { return value; };
+	int getPoint() { return value >= LOWEST_CARD_VALUE_WITH_POINT; };
 
-	inline bool operator==(const Card& other) const { return suit == other.suit; } // True if same suit
-	inline bool operator!=(const Card& other) const { return suit != other.suit; } // True if different suit
-	inline bool operator>(const Card& other) const { return value > other.value; }	// True if greater value
-	inline bool operator<(const Card& other) const { return value < other.value; }	// True if smaller value
+	bool operator==(const Card& other) const { return suit == other.suit; } // True if same suit
+	bool operator!=(const Card& other) const { return suit != other.suit; } // True if different suit
+	bool operator>(const Card& other) const { return value > other.value; }	// True if greater value
+	bool operator<(const Card& other) const { return value < other.value; }	// True if smaller value
 		
-	inline bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value && other.value != LOWEST_CARD_VALUE_WITH_POINT; }
+	bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value && other.value != LOWEST_CARD_VALUE_WITH_POINT; }
 
 	static bool compareCard(const Card&, const Card&);
 
@@ -50,8 +50,8 @@ public:
 
 	void shuffle();
 	std::vector<std::vector<Card>> deal(int, int);
-	inline int size() { return cards.size(); };
-	inline Card getCard(int index_) { return cards[index_]; };
+	int size() { return cards.size(); };
+	Card getCard(int index_) { return cards[index_]; };
 
 private:
 	std::array<Card, N_SUIT * N_VALUE> cards;
@@ -70,12 +70,12 @@ public:
 		playerToHit = other.playerToHit; card = other.card; return *this;
 	};
 
-	inline int getRound() { return round; };
-	inline int getPosInRound() { return posInRound; };
-	inline int getPlayerToHit() { return playerToHit; };
-	inline void setPlayerToHit(int playerToHit_) { playerToHit = playerToHit_; };
-	inline Card getCard() { return card; };
-	inline void setCard(Card card_) { card = card_; };
+	int getRound() { return round; };
+	int getPosInRound() { return posInRound; };
+	int getPlayerToHit() { return playerToHit; };
+	void setPlayerToHit(int playerToHit_) { playerToHit = playerToHit_; };
+	Card getCard() { return card; };
+	void setCard(Card card_) { card = card_; };
 
 private:
 	int round;			// Current round
@@ -93,16 +93,16 @@ public:
 		firstPlayer = other.firstPlayer; actions = other.actions; return *this; 
 	};
 
-	inline int getFirstPlayer() { return firstPlayer; };
-	inline int getRound(int index_) { return getAction(index_).getRound(); };
-	inline int getPosInRound(int index_) { return getAction(index_).getPosInRound(); };
-	inline int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
-	inline void setPlayerToHit(int index_, int player_) { actions[index_].setPlayerToHit(player_); };
-	inline Card getCard(int index_) { return getAction(index_).getCard(); };
-	inline void setCard(int index_, Card card_) { actions[index_].setCard(card_); };
+	int getFirstPlayer() { return firstPlayer; };
+	int getRound(int index_) { return getAction(index_).getRound(); };
+	int getPosInRound(int index_) { return getAction(index_).getPosInRound(); };
+	int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
+	void setPlayerToHit(int index_, int player_) { actions[index_].setPlayerToHit(player_); };
+	Card getCard(int index_) { return getAction(index_).getCard(); };
+	void setCard(int index_, Card card_) { actions[index_].setCard(card_); };
 
-	inline bool isLastIndex(int index_) { return index_ >= actions.size() - 1; };
-	inline bool isFirstPlayerToHit(int index_) { return firstPlayer == getPlayerToHit(index_); };
+	bool isLastIndex(int index_) { return index_ >= actions.size() - 1; };
+	bool isFirstPlayerToHit(int index_) { return firstPlayer == getPlayerToHit(index_); };
 
 private:
 	using ActionVector = std::array<Action, N_PLAYER * N_CARD_IN_HAND>;
@@ -110,7 +110,7 @@ private:
 	int firstPlayer;
 	ActionVector actions;	
 
-	inline Action getAction(int index_) { return actions[index_]; };
+	Action getAction(int index_) { return actions[index_]; };
 };
 
 
@@ -122,10 +122,10 @@ public:
 		winner = other.winner; point = other.point; return *this;
 	};
 
-	inline uint8_t getWinner(int round) { return winner[round]; };
-	inline uint8_t getPoint(int round) { return point[round]; };
-	inline void setWinner(int round, int player_) { winner[round] = player_; };
-	inline void setPoint(int round, int point_) { point[round] = point_; };
+	uint8_t getWinner(int round) { return winner[round]; };
+	uint8_t getPoint(int round) { return point[round]; };
+	void setWinner(int round, int player_) { winner[round] = player_; };
+	void setPoint(int round, int point_) { point[round] = point_; };
 
 private:
 	std::array<int, N_CARD_IN_HAND> winner;
@@ -143,13 +143,13 @@ public:
 
 	void deal();
 
-	inline const Card getCard(int player_, int index_) const { 
+	const Card getCard(int player_, int index_) const { 
 		return playerCards[player_][index_];
 	};
-	inline int getUsed(int player_, int index_) const {
+	int getUsed(int player_, int index_) const {
 		return playerUseds[player_][index_];
 	};
-	inline void setUsed(int player_, const Card& card_, int actionIndex_) {
+	void setUsed(int player_, const Card& card_, int actionIndex_) {
 		clearActionIndex(actionIndex_);
 		for (int i = 0; i < N_CARD_IN_HAND; ++i) {
 			Card curr_card = getCard(player_, i);
@@ -161,7 +161,7 @@ public:
 		}
 		assert(false);
 	};
-	inline void clearActionIndex(int actionIndex_) {
+	void clearActionIndex(int actionIndex_) {
 		int counter = 0;
 		for (int player = 0; player < N_PLAYER; ++player) {
 			for (int i = 0; i < N_CARD_IN_HAND; ++i) {
@@ -183,7 +183,7 @@ private:
 	PlayerCardArray playerCards;
 	PlayerUsedArray playerUseds; // Action index when that card was used
 
-	inline void setUsed(int player_, int index_, int actionIndex_) {
+	void setUsed(int player_, int index_, int actionIndex_) {
 		playerUseds[player_][index_] = actionIndex_;
 	}
 };
@@ -210,8 +210,8 @@ public:
 	void setNextPlayer(int);
 	int chooseWinnerCard(Card, Card, Card);
 
-	inline bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
-	inline bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
+	bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
+	bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
 
 	int evaluateParty(int);
 

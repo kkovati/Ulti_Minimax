@@ -36,11 +36,11 @@ public:
 		return *this;
 	};
 
-	inline void setDigit(int index, uint8_t value) {
+	void setDigit(int index, uint8_t value) {
 		assert(0 <= index && index <= 31 && value <= 9);
 		code[index] = value;
 	};
-	inline uint8_t getDigit(int index) const {
+	uint8_t getDigit(int index) const {
 		assert(0 <= index && index <= 31);
 		return code[index];
 	};
