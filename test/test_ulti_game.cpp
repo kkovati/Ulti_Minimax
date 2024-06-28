@@ -2,6 +2,7 @@
 #include <vector>
 #include <gtest/gtest.h>
 
+#include "game_manager.hpp"
 #include "game_rules.hpp"
 
 TEST(PartyStateTest, TestChooseWinnerCard) {
@@ -35,6 +36,30 @@ TEST(PartyStateTest, TestChooseWinnerCard) {
             std::cout << std::endl;
         }
         EXPECT_EQ(winCardIndex, testCase[6]);        
+    }
+}
+
+TEST(TreePathCoderTest, TestDigitGetterSetter) {
+    auto tpc = ulti_minimax::TreePathCoder();
+    for (int i = 0; i < 32; ++i) {
+        tpc.setDigit(i, i % 10);
+    }
+    for (int i = 0; i < 32; ++i) {
+        EXPECT_EQ(i % 10, tpc.getDigit(i));
+    }
+
+    for (int i = 0; i < 32; ++i) {
+        tpc.setDigit(i, 1);
+    }
+    for (int i = 0; i < 32; ++i) {
+        EXPECT_EQ(1, tpc.getDigit(i));
+    }
+
+    for (int i = 0; i < 32; ++i) {
+        tpc.setDigit(i, (i + 1) % 10);
+    }
+    for (int i = 0; i < 32; ++i) {
+        EXPECT_EQ((i + 1) % 10, tpc.getDigit(i));
     }
 }
 

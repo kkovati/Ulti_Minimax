@@ -76,4 +76,38 @@ int GameManager::minimax(int index) {
 	//}
 }
 
+void TreePathCoder::setDigit(int index, uint64_t value) {
+	assert(0 <= index && index <= 31 && value <= 9);
+	if (index < 16) {
+		// Clear the bits at the specified position
+		code0 &= ~((uint64_t)0xF << (index * 4));
+		// Set the bits to the new value in code1
+		code0 |= (value << (index * 4));
+	}
+	else {
+		index -= 16; // Index offset
+		code1 &= ~((uint64_t)0xF << (index * 4));
+		code1 |= ((uint64_t)value << (index * 4));
+	}
+}
+
+uint8_t TreePathCoder::getDigit(int index) const {
+	assert(0 <= index && index <= 31);
+	if (index < 16) {
+		// Extract the bits at the specified index
+		return (code0 >> (index * 4)) & 0xF;
+	}
+	else {
+		index -= 16; // Index offset
+		return (code1 >> (index * 4)) & 0xF;
+	}
+}
+
+void TreePathCoder::printCode() const {
+	for (int i = 0; i < 32; ++i) {
+		std::cout << unsigned(getDigit(i));
+	}
+	std::cout << std::endl;
+}
+
 }

@@ -10,10 +10,10 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 
-add_executable(test_game_rules test_game_rules.cpp)
-target_link_libraries(test_game_rules GTest::gtest_main ulti_game)
+add_executable(test_ulti_game test_ulti_game.cpp)
+target_link_libraries(test_ulti_game GTest::gtest_main ulti_game)
 
 include(GoogleTest)
-gtest_discover_tests(test_game_rules)
+gtest_discover_tests(test_ulti_game)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
