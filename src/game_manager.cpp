@@ -96,4 +96,21 @@ void TreePathCoder::printCode() const {
 	std::cout << std::endl;
 }
 
+void TreePathCoderArray::setDigit(int index, uint8_t value) {
+	assert(0 <= index && index <= 31 && value <= 9);
+	code[index] = value;
+}
+
+uint8_t TreePathCoderArray::getDigit(int index) const {
+	assert(0 <= index && index <= 31);
+	return code[index];
+}
+
+void TreePathCoderArray::printCode() const {
+	for (int i = 0; i < 32; ++i) {
+		std::cout << unsigned(getDigit(i));
+	}
+	std::cout << std::endl;
+}
+
 }
