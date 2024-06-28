@@ -64,7 +64,7 @@ int GameManager::minimax(int index) {
 
 
 void TreePathCoder::printCode() const {
-	for (int i = 0; i < 32; ++i) {
+	for (int i = 0; i < size; ++i) {
 		std::cout << unsigned(getDigit(i));
 	}
 	std::cout << std::endl;

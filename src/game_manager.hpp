@@ -44,11 +44,19 @@ public:
 		assert(0 <= index && index <= 31);
 		return code[index];
 	};
+	void setResult(int result) {
+		assert(-1 <= result && result <= 1);
+		code[size] = result;
+	};
+	uint8_t getResult() const {
+		return code[size];
+	};
 
 	void printCode() const;
 
 private:
-	uint8_t code[32] = { 0 };
+	static const int size = ulti_minimax::N_PLAYER * ulti_minimax::N_CARD_IN_HAND;
+	uint8_t code[size + 1] = { 0 };
 };
 
 }

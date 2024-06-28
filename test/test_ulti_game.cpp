@@ -41,24 +41,26 @@ TEST(PartyStateTest, TestChooseWinnerCard) {
 
 TEST(TreePathCoderTest, TestDigitGetterSetter) {
     auto tpc = ulti_minimax::TreePathCoder();
-    for (int i = 0; i < 32; ++i) {
+    int n = ulti_minimax::N_PLAYER * ulti_minimax::N_CARD_IN_HAND;
+
+    for (int i = 0; i < n; ++i) {
         tpc.setDigit(i, i % 10);
     }
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < n; ++i) {
         EXPECT_EQ(i % 10, tpc.getDigit(i));
     }
 
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < n; ++i) {
         tpc.setDigit(i, 1);
     }
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < n; ++i) {
         EXPECT_EQ(1, tpc.getDigit(i));
     }
 
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < n; ++i) {
         tpc.setDigit(i, (i + 1) % 10);
     }
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 0; i < n; ++i) {
         EXPECT_EQ((i + 1) % 10, tpc.getDigit(i));
     }
 }
