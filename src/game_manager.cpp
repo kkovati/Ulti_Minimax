@@ -23,9 +23,7 @@ void GameManager::simulate() {
 	std::cout << "Duration: " << time << " ms" << std::endl;
 }
 
-int GameManager::minimax(int index) {
-	// Time measurement
-	// auto start = std::chrono::high_resolution_clock::now();	
+int GameManager::minimax(int index) {	
 	n_minimax_call += 1;
 
 	std::vector<Card> playableCards;
@@ -62,18 +60,6 @@ int GameManager::minimax(int index) {
 	}
 	if (isFirstPlayerToHit) return -1;
 	if (!isFirstPlayerToHit) return 1;
-
-	// Time measurement
-	//if (index == 8) {
-	//	auto stop = std::chrono::high_resolution_clock::now();
-	//	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	//	int time = duration.count();
-	//	std::cout << "Duration: " << time << "ms" << std::endl;
-	//
-	//	//sum_time += time;
-	//	//n_meas++;		
-	//	//if (n_meas % 10 == 0) std::cout << "Avg time: " << sum_time / n_meas << "ms" << std::endl;
-	//}
 }
 
 void TreePathCoder::setDigit(int index, uint64_t value) {
