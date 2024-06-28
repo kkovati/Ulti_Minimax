@@ -27,34 +27,23 @@ private:
 
 class TreePathCoder {
 public:
-    TreePathCoder() : code0(0), code1(0) {}
-	TreePathCoder(const TreePathCoder& other) : code0(other.code0), code1(other.code1) {}
-	TreePathCoder& operator=(const TreePathCoder& other) {
-		code0 = other.code0; code1 = other.code1; return *this;
-	};
-
-    void setDigit(int, uint64_t);
-    uint8_t getDigit(int) const;
-
-	void printCode() const;
-
-private:
-    uint64_t code0; // 16 digits stored in a 64-bit integer, 4 bits per digit
-    uint64_t code1; // 16 digits stored in another 64-bit integer, 4 bits per digit
-};
-
-class TreePathCoderArray {
-public:
-	TreePathCoderArray() {}
-	TreePathCoderArray(const TreePathCoderArray& other) {
+	TreePathCoder() {}
+	TreePathCoder(const TreePathCoder& other) {
 		std::copy(std::begin(other.code), std::end(other.code), std::begin(code));
-	}
-	TreePathCoderArray& operator=(const TreePathCoderArray& other) {
-		std::copy(std::begin(other.code), std::end(other.code), std::begin(code)); return *this;
+	};
+	TreePathCoder& operator=(const TreePathCoder& other) {
+		std::copy(std::begin(other.code), std::end(other.code), std::begin(code)); 
+		return *this;
 	};
 
-	void setDigit(int, uint8_t);
-	uint8_t getDigit(int) const;
+	inline void setDigit(int index, uint8_t value) {
+		assert(0 <= index && index <= 31 && value <= 9);
+		code[index] = value;
+	};
+	inline uint8_t getDigit(int index) const {
+		assert(0 <= index && index <= 31);
+		return code[index];
+	};
 
 	void printCode() const;
 
