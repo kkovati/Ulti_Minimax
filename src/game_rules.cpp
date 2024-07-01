@@ -156,7 +156,7 @@ void PartyState::simplifyPlayableCards(CardVector& cardVector) {
     }
 }
 
-void PartyState::setHitCard(int index_, Card card_) {
+void PartyState::setHitCard(int index_, Card& card_) {
     actionList.setCard(index_, card_);
     int playerToHit = actionList.getPlayerToHit(index_);
     playerHands.setUsed(playerToHit, card_, index_);
@@ -203,7 +203,7 @@ int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
     return 2;
 }
 
-int PartyState::evaluateParty(int index_) {
+uint8_t PartyState::evaluateParty(int index_) {
     // TODO integrate with setNextPlayer() if possible
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
@@ -222,8 +222,8 @@ int PartyState::evaluateParty(int index_) {
                 opponentPoints += point;
         }
     }
-    if (playerPoints > N_POINT_IN_DECK) return 1;
-    if (opponentPoints > N_POINT_IN_DECK) return -1;
+    if (playerPoints > N_POINT_IN_DECK) return 1; // Player wins
+    if (opponentPoints > N_POINT_IN_DECK) return 2; // Opponents win
     assert(!actionList.isLastIndex(index_));
     return 0;
 }

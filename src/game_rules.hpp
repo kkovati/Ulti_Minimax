@@ -74,8 +74,8 @@ public:
 	int getPosInRound() { return posInRound; };
 	int getPlayerToHit() { return playerToHit; };
 	void setPlayerToHit(int playerToHit_) { playerToHit = playerToHit_; };
-	Card getCard() { return card; };
-	void setCard(Card card_) { card = card_; };
+	const Card& getCard() { return card; };
+	void setCard(Card& card_) { card = card_; };
 
 private:
 	int round;			// Current round
@@ -98,8 +98,8 @@ public:
 	int getPosInRound(int index_) { return getAction(index_).getPosInRound(); };
 	int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
 	void setPlayerToHit(int index_, int player_) { actions[index_].setPlayerToHit(player_); };
-	Card getCard(int index_) { return getAction(index_).getCard(); };
-	void setCard(int index_, Card card_) { actions[index_].setCard(card_); };
+	const Card& getCard(int index_) { return getAction(index_).getCard(); };
+	void setCard(int index_, Card& card_) { actions[index_].setCard(card_); };
 
 	bool isLastIndex(int index_) { return index_ >= actions.size() - 1; };
 	bool isFirstPlayerToHit(int index_) { return firstPlayer == getPlayerToHit(index_); };
@@ -143,7 +143,7 @@ public:
 
 	void deal();
 
-	const Card getCard(int player_, int index_) const { 
+	const Card& getCard(int player_, int index_) const { 
 		return playerCards[player_][index_];
 	};
 	int getUsed(int player_, int index_) const {
@@ -206,14 +206,14 @@ public:
 	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
 	void simplifyPlayableCards(CardVector&);
-	void setHitCard(int, Card);
+	void setHitCard(int, Card&);
 	void setNextPlayer(int);
 	int chooseWinnerCard(Card, Card, Card);
 
 	bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 	bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
 
-	int evaluateParty(int);
+	uint8_t evaluateParty(int);
 
 	void print_current_state(int, const CardVector&);
 	void print_game_progression();
