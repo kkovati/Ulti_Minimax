@@ -11,6 +11,3 @@ int main()
 	gameManager.simulate();
 	return 0;
 }
-
-
-

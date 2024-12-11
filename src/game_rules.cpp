@@ -8,7 +8,7 @@
 
 namespace ulti_minimax {
 
-
+// Compare for sorting
 bool Card::compareCard(const Card& a, const Card& b) {
     if (a == b) return a < b;
     return a.suit < b.suit;
@@ -240,9 +240,8 @@ void PartyState::print_current_state(int index_, const CardVector& playableCards
         for (int i = 0; i < N_CARD_IN_HAND; ++i) {
             // Card is not played yet
             assert(playerHands.getUsed(player, i) != index_);
-            if (playerHands.getUsed(player, i) > index_) {                
-                Card card = playerHands.getCard(player, i);
-                std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+            if (playerHands.getUsed(player, i) > index_) {                 
+                std::cout << playerHands.getCard(player, i) << " ";
             }
             // Card is already played
             else {                
@@ -253,7 +252,7 @@ void PartyState::print_current_state(int index_, const CardVector& playableCards
         if (player == playerToHit) {
             std::cout << "Playable: ";
             for (Card card : playableCards) {
-                std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+                std::cout << card << " ";
             }
         }
         std::cout << std::endl;
@@ -262,7 +261,7 @@ void PartyState::print_current_state(int index_, const CardVector& playableCards
     std::cout << "Table: ";
     for (int i = 0; i < posInRound; ++i) {
         Card card = actionList.getCard(index_ - posInRound + i);
-        std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+        std::cout << card << " ";
     }
     std::cout << std::endl;
 }
@@ -273,16 +272,14 @@ void PartyState::print_game_progression() {
     for (int player = 0; player < N_PLAYER; ++player) {
         std::cout << "Player " << player << ": ";
         for (int i = 0; i < N_CARD_IN_HAND; ++i) {
-            Card card = playerHands.getCard(player, i);
-            std::cout << (char)('A' + card.getSuit()) << card.getValue() << " ";
+            std::cout << playerHands.getCard(player, i) << " ";
         }
         std::cout << std::endl;
     }
     // Print each round
     std::cout << "Rounds" << std::endl;
     for (int i = 0; i < N_PLAYER * N_CARD_IN_HAND; ++i) {
-        Card card = actionList.getCard(i);
-        std::cout << actionList.getRound(i) << " " << actionList.getPosInRound(i) << " " << actionList.getPlayerToHit(i) << " " << (char)('A' + card.getSuit()) << card.getValue();
+        std::cout << actionList.getRound(i) << " " << actionList.getPosInRound(i) << " " << actionList.getPlayerToHit(i) << " " << actionList.getCard(i);
     }
 
 }

@@ -29,14 +29,23 @@ public:
 	int getValue() { return value; };
 	int getPoint() { return value >= LOWEST_CARD_VALUE_WITH_POINT; };
 
-	bool operator==(const Card& other) const { return suit == other.suit; } // True if same suit
-	bool operator!=(const Card& other) const { return suit != other.suit; } // True if different suit
-	bool operator>(const Card& other) const { return value > other.value; }	// True if greater value
-	bool operator<(const Card& other) const { return value < other.value; }	// True if smaller value
-		
-	bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value && other.value != LOWEST_CARD_VALUE_WITH_POINT; }
-
+	bool operator==(const Card& other) const { return suit == other.suit; }; // True if same suit
+	bool operator!=(const Card& other) const { return suit != other.suit; }; // True if different suit
+	bool operator>(const Card& other) const { return value > other.value; }; // True if greater value
+	bool operator<(const Card& other) const { return value < other.value; }; // True if smaller value
 	static bool compareCard(const Card&, const Card&);
+		
+	bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value && other.value != LOWEST_CARD_VALUE_WITH_POINT; };
+
+	std::string toString() const { 
+		std::string s = std::string(1, (char)('A' + suit)) + std::to_string(value);
+		return s;
+	};
+
+	friend std::ostream& operator<< (std::ostream& os, const Card& card) {
+		os << card.toString();
+		return os;
+	};
 
 private:
 	int suit;

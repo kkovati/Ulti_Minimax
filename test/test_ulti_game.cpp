@@ -39,29 +39,29 @@ TEST(PartyStateTest, TestChooseWinnerCard) {
     }
 }
 
-TEST(TreePathCoderTest, TestDigitGetterSetter) {
+TEST(TreePathCoderTest, TestValueGetterSetter) {
     auto tpc = ulti_minimax::TreePathCoder();
     int n = ulti_minimax::N_PLAYER * ulti_minimax::N_CARD_IN_HAND;
 
     for (int i = 0; i < n; ++i) {
-        tpc.setDigit(i, i % 10);
+        tpc.setValue(i, i % 10);
     }
     for (int i = 0; i < n; ++i) {
-        EXPECT_EQ(i % 10, tpc.getDigit(i));
-    }
-
-    for (int i = 0; i < n; ++i) {
-        tpc.setDigit(i, 1);
-    }
-    for (int i = 0; i < n; ++i) {
-        EXPECT_EQ(1, tpc.getDigit(i));
+        EXPECT_EQ(i % 10, tpc.getValue(i));
     }
 
     for (int i = 0; i < n; ++i) {
-        tpc.setDigit(i, (i + 1) % 10);
+        tpc.setValue(i, 1);
     }
     for (int i = 0; i < n; ++i) {
-        EXPECT_EQ((i + 1) % 10, tpc.getDigit(i));
+        EXPECT_EQ(1, tpc.getValue(i));
+    }
+
+    for (int i = 0; i < n; ++i) {
+        tpc.setValue(i, (i + 1) % 10);
+    }
+    for (int i = 0; i < n; ++i) {
+        EXPECT_EQ((i + 1) % 10, tpc.getValue(i));
     }
 }
 

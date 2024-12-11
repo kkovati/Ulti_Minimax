@@ -13,7 +13,7 @@ public:
 	TreePathCoder() = default;
 	TreePathCoder(uint8_t result, int index, uint8_t value) {
 		setResult(result);
-		setDigit(index, value);
+		setValue(index, value);
 	};
 	TreePathCoder(const TreePathCoder& other) {
 		std::copy(std::begin(other.code), std::end(other.code), std::begin(code));
@@ -23,16 +23,16 @@ public:
 		return *this;
 	};
 
-	void setDigit(int index, uint8_t value) {
+	void setValue(int index, uint8_t value) {
 		assert(0 <= index && index <= 31 && value <= 9);
 		code[index] = value;
 	};
-	uint8_t getDigit(int index) const {
+	uint8_t getValue(int index) const {
 		assert(0 <= index && index <= 31);
 		return code[index];
 	};
 	void setResult(uint8_t result) {
-		assert(-1 <= result && result <= 1);
+		assert(0 <= result && result <= 2);
 		code[size] = result;
 	};
 	uint8_t getResult() const {
