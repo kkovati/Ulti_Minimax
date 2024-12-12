@@ -47,22 +47,40 @@ TEST(TreePathCoderTest, TestValueGetterSetter) {
         tpc.setValue(i, i % 10);
     }
     for (int i = 0; i < n; ++i) {
-        EXPECT_EQ(i % 10, tpc.getValue(i));
+        EXPECT_EQ(tpc.getValue(i), i % 10);
     }
 
     for (int i = 0; i < n; ++i) {
         tpc.setValue(i, 1);
     }
     for (int i = 0; i < n; ++i) {
-        EXPECT_EQ(1, tpc.getValue(i));
+        EXPECT_EQ(tpc.getValue(i), 1);
     }
 
     for (int i = 0; i < n; ++i) {
         tpc.setValue(i, (i + 1) % 10);
     }
     for (int i = 0; i < n; ++i) {
-        EXPECT_EQ((i + 1) % 10, tpc.getValue(i));
+        EXPECT_EQ(tpc.getValue(i), (i + 1) % 10);
     }
+
+    tpc.setResult(0);
+    EXPECT_EQ(tpc.getResult(), 0);
+
+    tpc.setResult(1);
+    EXPECT_EQ(tpc.getResult(), 1);
+}
+
+TEST(TreePathCoderTest, TestCopy) {
+    auto tpc0 = ulti_minimax::TreePathCoder(1, 25, 3);
+    auto tpc1 = ulti_minimax::TreePathCoder(tpc0);
+    EXPECT_EQ(tpc1.getResult(), 1);
+    EXPECT_EQ(tpc1.getValue(25), 3);
+
+    tpc0 = ulti_minimax::TreePathCoder(2, 29, 4);
+    tpc1 = ulti_minimax::TreePathCoder(tpc0);
+    EXPECT_EQ(tpc1.getResult(), 2);
+    EXPECT_EQ(tpc1.getValue(29), 4);
 }
 
 int main(int argc, char **argv) {

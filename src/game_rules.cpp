@@ -156,7 +156,7 @@ void PartyState::simplifyPlayableCards(CardVector& cardVector) {
     }
 }
 
-void PartyState::setHitCard(int index_, Card& card_) {
+void PartyState::setHitCard(int index_, const Card& card_) {
     actionList.setCard(index_, card_);
     int playerToHit = actionList.getPlayerToHit(index_);
     playerHands.setUsed(playerToHit, card_, index_);
@@ -185,7 +185,7 @@ void PartyState::setNextPlayer(int index_) {
     } 
 }
 
-int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
+int PartyState::chooseWinnerCard(const Card c0, const Card c1, const Card c2) {
     // c0 beats c1
     bool c0bc1_ = (c0 == c1 && c0 > c1) || (c0 != c1);
     bool c0bc1 = !(c0 == c1 && c0 < c1);
@@ -222,6 +222,9 @@ uint8_t PartyState::evaluateParty(int index_) {
                 opponentPoints += point;
         }
     }
+
+    if (DEBUG) std::cout << "Player Points: " << playerPoints << "  Opponent Points: " << opponentPoints << std::endl;
+
     if (playerPoints > MIN_POINT_TO_WIN) return PLAYER_WIN; // Player wins
     if (opponentPoints > MIN_POINT_TO_WIN) return OPPONENT_WIN; // Opponents win
     assert(!actionList.isLastIndex(index_));

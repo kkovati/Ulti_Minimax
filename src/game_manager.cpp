@@ -42,8 +42,8 @@ TreePathCoder GameManager::minimax(int index) {
 	std::vector<Card> playableCards;
 	partyState.getPlayableCards(playableCards, index);
 	partyState.simplifyPlayableCards(playableCards);
-	assert(playableCards.size());
-	partyState.print_current_state(index, playableCards); // DEBUG PRINT
+	assert(playableCards.size() && playableCards.size() <= N_CARD_IN_HAND);
+	if (DEBUG) partyState.print_current_state(index, playableCards);
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);
@@ -56,22 +56,34 @@ TreePathCoder GameManager::minimax(int index) {
 	}
 
 	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
-	int cardIndex = -1;
-	for (Card& card : playableCards) {
-		cardIndex++;
-		partyState.setHitCard(index, card);
+	for (uint8_t cardIndex = 0; cardIndex < playableCards.size(); ++cardIndex) {
+		partyState.setHitCard(index, playableCards[cardIndex]);
 		partyState.setNextPlayer(index);
-		uint8_t result = partyState.evaluateParty(index);
-
+		
 		// End party early if have a result before the last round
+		uint8_t result = partyState.evaluateParty(index);
 		if (isFirstPlayerToHit) {
 			if (result == PLAYER_WIN) {				
 				return TreePathCoder(result, index, cardIndex);
 			}
-			if (result == OPPONENT_WIN) continue;  
+			if (result == OPPONENT_WIN) {
+				if (cardIndex == playableCards.size() - 1) {
+					return TreePathCoder(result, index, cardIndex);
+				}
+				else {
+					continue;
+				}				
+			}
 		}
 		else { // !isFirstPlayerToHit
-			if (result == PLAYER_WIN) continue;
+			if (result == PLAYER_WIN) {
+				if (cardIndex == playableCards.size() - 1) {
+					return TreePathCoder(result, index, cardIndex);
+				}
+				else {
+					continue;
+				}
+			}
 			if (result == OPPONENT_WIN) {				
 				return TreePathCoder(result, index, cardIndex);
 			}
@@ -90,17 +102,24 @@ TreePathCoder GameManager::minimax(int index) {
 			tpc.setValue(index, cardIndex);
 			return tpc;
 		}
-	}
 
-	// No optimal card found
-	if (isFirstPlayerToHit) {
-		TreePathCoder tpc(OPPONENT_WIN, index, cardIndex);
-		return tpc;
+		// No optimal card found
+		if (cardIndex == playableCards.size() - 1) {
+			if (isFirstPlayerToHit) {
+				tpc.setResult(OPPONENT_WIN);
+				tpc.setValue(index, cardIndex);
+				//TreePathCoder tpc(OPPONENT_WIN, index, cardIndex);
+				return tpc;
+			}
+			else { // !isFirstPlayerToHit
+				tpc.setResult(PLAYER_WIN);
+				tpc.setValue(index, cardIndex);
+				//TreePathCoder tpc(PLAYER_WIN, index, cardIndex);
+				return tpc;
+			}
+		}
 	}
-	else { // !isFirstPlayerToHit
-		TreePathCoder tpc(PLAYER_WIN, index, cardIndex);
-		return tpc;
-	}
+	assert(false); // Unreachable code
 }
 
 }

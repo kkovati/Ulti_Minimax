@@ -24,6 +24,7 @@ constexpr uint8_t PLAYER_WIN = 1;
 constexpr uint8_t OPPONENT_WIN = 2;
 
 constexpr int SEED = 0;
+constexpr bool DEBUG = false;
 
 
 class Card {
@@ -103,7 +104,7 @@ public:
 	int getPlayerToHit() { return playerToHit; };
 	void setPlayerToHit(int playerToHit_) { playerToHit = playerToHit_; };
 	const Card& getCard() { return card; };
-	void setCard(Card& card_) { card = card_; };
+	void setCard(const Card& card_) { card = card_; };
 
 private:
 	int round;			// Current round
@@ -130,7 +131,7 @@ public:
 	int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
 	void setPlayerToHit(int index_, int player_) { actions[index_].setPlayerToHit(player_); };
 	const Card& getCard(int index_) { return getAction(index_).getCard(); };
-	void setCard(int index_, Card& card_) { actions[index_].setCard(card_); };
+	void setCard(int index_, const Card& card_) { actions[index_].setCard(card_); };
 
 	bool isLastIndex(int index_) { return index_ >= LAST_ACTION_INDEX; };
 	bool isFirstPlayerToHit(int index_) { return firstPlayer == getPlayerToHit(index_); };
@@ -251,9 +252,9 @@ public:
 	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
 	void simplifyPlayableCards(CardVector&);
-	void setHitCard(int, Card&);
+	void setHitCard(int, const Card&);
 	void setNextPlayer(int);
-	int chooseWinnerCard(Card, Card, Card);
+	int chooseWinnerCard(const Card, const Card, const Card);
 
 	bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 	bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };

@@ -36,11 +36,11 @@ public:
 	};
 
 	void setValue(int index, uint8_t value) {
-		assert(0 <= index && index < N_ACTION && value <= N_CARD_IN_HAND - 1);
+		assert(0 <= index && index <= LAST_ACTION_INDEX && value <= N_CARD_IN_HAND - 1);
 		code[index] = value;
 	};
 	uint8_t getValue(int index) const {
-		assert(0 <= index && index < N_ACTION);
+		assert(0 <= index && index <= LAST_ACTION_INDEX);
 		return code[index];
 	};
 	void setResult(uint8_t result) {
