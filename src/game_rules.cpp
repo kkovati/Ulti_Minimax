@@ -203,14 +203,14 @@ int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
     return 2;
 }
 
-Result PartyState::evaluateParty(int index_) {
+uint8_t PartyState::evaluateParty(int index_) {
     // TODO integrate with setNextPlayer() if possible
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
 
     int playerPoints = 0, opponentPoints = 0;
     if (posInRound == 0 || posInRound == 1) {
-        Result::UNDEFINED;
+        return RESULT_UNDEFINED;
     }
     else { // posInRound == 2
         for (int i = 0; i <= round; ++i) {
@@ -222,10 +222,10 @@ Result PartyState::evaluateParty(int index_) {
                 opponentPoints += point;
         }
     }
-    if (playerPoints > N_POINT_IN_DECK) return Result::PLAYER_WIN; // Player wins  // TODO is this okay like this?
-    if (opponentPoints > N_POINT_IN_DECK) return Result::OPPONENT_WIN; // Opponents win
+    if (playerPoints > N_POINT_IN_DECK) return PLAYER_WIN; // Player wins  // TODO is this okay like this?
+    if (opponentPoints > N_POINT_IN_DECK) return OPPONENT_WIN; // Opponents win
     assert(!actionList.isLastIndex(index_));
-    return Result::UNDEFINED;
+    return RESULT_UNDEFINED;
 }
 
 void PartyState::print_current_state(int index_, const CardVector& playableCards) {

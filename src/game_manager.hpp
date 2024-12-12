@@ -11,28 +11,24 @@ namespace ulti_minimax {
 class TreePathCoder {
 public:
 	TreePathCoder() = default;
-	TreePathCoder(Result result_, int index, uint8_t value) {
-		setResult(result_);
+	TreePathCoder(uint8_t result, int index, uint8_t value) {
+		setResult(result);
 		setValue(index, value);
 	};
 	TreePathCoder(const TreePathCoder& other) {
-		result = other.result;
 		std::copy(std::begin(other.code), std::end(other.code), std::begin(code));
 	};
 	TreePathCoder& operator=(const TreePathCoder& other) {
 		if (this != &other) {
-			result = other.result;
 			std::copy(std::begin(other.code), std::end(other.code), std::begin(code));
 		}
 		return *this;
 	};
 	TreePathCoder(TreePathCoder&& other) noexcept {
-		result = other.result;
 		std::move(std::begin(other.code), std::end(other.code), std::begin(code));
 	};
 	TreePathCoder& operator=(TreePathCoder&& other) noexcept {
 		if (this != &other) {
-			result = other.result;
 			std::move(std::begin(other.code), std::end(other.code), std::begin(code));
 		}
 		return *this;
@@ -46,18 +42,18 @@ public:
 		assert(0 <= index && index < N_ACTION);
 		return code[index];
 	};
-	void setResult(Result result_) {
-		result = result_;
+	void setResult(uint8_t result) {
+		assert(result == RESULT_UNDEFINED || result == PLAYER_WIN || result == OPPONENT_WIN);
+		code[N_ACTION] = result;
 	};
-	Result getResult() const {
-		return result;
+	uint8_t getResult() const {
+		return code[N_ACTION];
 	};
 
 	void printCode() const;
 
 private:
-	Result result;
-	uint8_t code[N_ACTION] = { 0 };
+	uint8_t code[N_ACTION + 1] = { 0 };
 };
 
 

@@ -24,7 +24,7 @@ void GameManager::simulate() {
 
 	// Start minimaX
 	TreePathCoder tpc = minimax(0);
-	Result result = tpc.getResult();
+	uint8_t result = tpc.getResult();
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -49,7 +49,7 @@ TreePathCoder GameManager::minimax(int index) {
 		Card card = playableCards[0];
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		Result result = partyState.evaluateParty(index);
+		uint8_t result = partyState.evaluateParty(index);
 		TreePathCoder tpc(result, index, 0);
 		return tpc;
 	}
@@ -60,39 +60,39 @@ TreePathCoder GameManager::minimax(int index) {
 		cardIndex++;
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		Result result = partyState.evaluateParty(index);
+		uint8_t result = partyState.evaluateParty(index);
 		// End party early if have a result before the last round
 		if (isFirstPlayerToHit) {
-			if (result == Result::PLAYER_WIN) {				
+			if (result == PLAYER_WIN) {				
 				return TreePathCoder(result, index, cardIndex);
 			}
-			if (result == Result::OPPONENT_WIN) continue;  
+			if (result == OPPONENT_WIN) continue;  
 		}
 		else { // !isFirstPlayerToHit
-			if (result == Result::PLAYER_WIN) continue;
-			if (result == Result::OPPONENT_WIN) {				
+			if (result == PLAYER_WIN) continue;
+			if (result == OPPONENT_WIN) {				
 				return TreePathCoder(result, index, cardIndex);
 			}
 		}
-		assert(result == Result::UNDEFINED);
+		assert(result == UNDEFINED);
 		TreePathCoder tpc = minimax(index + 1);
 		result = tpc.getResult();
 		assert(result == Result::PLAYER_WIN && result == Result::OPPONENT_WIN);
-		if (isFirstPlayerToHit && result == Result::PLAYER_WIN) {
+		if (isFirstPlayerToHit && result == PLAYER_WIN) {
 			tpc.setValue(index, cardIndex);
 			return tpc;
 		}
-		if (!isFirstPlayerToHit && result == Result::OPPONENT_WIN) {
+		if (!isFirstPlayerToHit && result == OPPONENT_WIN) {
 			tpc.setValue(index, cardIndex);
 			return tpc;
 		}
 	}
 	if (isFirstPlayerToHit) {
-		TreePathCoder tpc(Result::OPPONENT_WIN, index, cardIndex);
+		TreePathCoder tpc(OPPONENT_WIN, index, cardIndex);
 		return tpc;
 	}
 	else { // !isFirstPlayerToHit
-		TreePathCoder tpc(Result::PLAYER_WIN, index, cardIndex);
+		TreePathCoder tpc(PLAYER_WIN, index, cardIndex);
 		return tpc;
 	}
 }

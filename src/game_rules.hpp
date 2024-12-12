@@ -17,13 +17,11 @@ constexpr int N_CARD_IN_HAND = 10;
 constexpr int N_ACTION = N_PLAYER * N_CARD_IN_HAND;
 constexpr int LAST_ACTION_INDEX = N_ACTION - 1;
 
-constexpr int SEED = 0;
+constexpr uint8_t RESULT_UNDEFINED = 0;
+constexpr uint8_t PLAYER_WIN = 1;
+constexpr uint8_t OPPONENT_WIN = 2;
 
-enum class Result {
-	UNDEFINED,
-	PLAYER_WIN,
-	OPPONENT_WIN
-};
+constexpr int SEED = 0;
 
 
 class Card {
@@ -252,7 +250,7 @@ public:
 	bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 	bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
 
-	Result evaluateParty(int);
+	uint8_t evaluateParty(int);
 
 	void print_current_state(int, const CardVector&);
 	void print_game_progression();
