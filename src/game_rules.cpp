@@ -215,28 +215,30 @@ uint8_t PartyState::evaluateParty(int index_) {
     else { // posInRound == 2
         for (int i = 0; i <= round; ++i) {
             int point = roundResults.getPoint(i);
-            if (actionList.isLastIndex(index_)) point++; // TODO is this okay in here?
+            if (roundResults.isLastRound(i)) point++;
             if (roundResults.getWinner(i) == actionList.getFirstPlayer()) 
                 playerPoints += point;
             else 
                 opponentPoints += point;
         }
     }
-    if (playerPoints > N_POINT_IN_DECK) return PLAYER_WIN; // Player wins  // TODO is this okay like this?
-    if (opponentPoints > N_POINT_IN_DECK) return OPPONENT_WIN; // Opponents win
+    if (playerPoints > MIN_POINT_TO_WIN) return PLAYER_WIN; // Player wins
+    if (opponentPoints > MIN_POINT_TO_WIN) return OPPONENT_WIN; // Opponents win
     assert(!actionList.isLastIndex(index_));
     return RESULT_UNDEFINED;
 }
 
 void PartyState::print_current_state(int index_, const CardVector& playableCards) {
+    int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
     int playerToHit = actionList.getPlayerToHit(index_);
+    int roundStartPlayer = actionList.getRoundStartPlayer(index_); 
 
-    std::cout << "=== Index: " << index_ << " =====================" << std::endl;
+    std::cout << "=== Index: " << index_ << "  Round: " << round << "  Pos: " << posInRound << "  =====================" << std::endl;
     // Print each players' hand
     for (int player = 0; player < N_PLAYER; ++player) {
         // Signal current player to hit with asterisk
-        std::cout << (player == playerToHit ? "*" : " ") << "Player " << player << ": ";        
+        std::cout << (player == roundStartPlayer ? "* " : "  ") << (player == playerToHit ? "->" : "  ") << " Player " << player << ": ";
         for (int i = 0; i < N_CARD_IN_HAND; ++i) {
             // Card is not played yet
             assert(playerHands.getUsed(player, i) != index_);

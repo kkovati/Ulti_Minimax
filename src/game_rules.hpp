@@ -12,10 +12,12 @@ constexpr int N_VALUE = 8;
 constexpr int LOWEST_CARD_VALUE_WITH_POINT = 6;
 constexpr int N_POINT_IN_DECK = (N_VALUE - LOWEST_CARD_VALUE_WITH_POINT) * N_SUIT;
 
-constexpr int N_PLAYER = 3; // Do not modify
+constexpr int N_PLAYER = 3;
 constexpr int N_CARD_IN_HAND = 10;
 constexpr int N_ACTION = N_PLAYER * N_CARD_IN_HAND;
 constexpr int LAST_ACTION_INDEX = N_ACTION - 1;
+
+constexpr int MIN_POINT_TO_WIN = static_cast<int>(N_POINT_IN_DECK / 2);
 
 constexpr uint8_t RESULT_UNDEFINED = 0;
 constexpr uint8_t PLAYER_WIN = 1;
@@ -133,6 +135,8 @@ public:
 	bool isLastIndex(int index_) { return index_ >= LAST_ACTION_INDEX; };
 	bool isFirstPlayerToHit(int index_) { return firstPlayer == getPlayerToHit(index_); };
 
+	int getRoundStartPlayer(int index_) { return getPlayerToHit(index_ - getPosInRound(index_)); };
+
 private:
 	using ActionVector = std::array<Action, N_ACTION>;
 
@@ -154,10 +158,14 @@ public:
 		return *this;
 	};
 
-	uint8_t getWinner(int round) { return winner[round]; };
-	uint8_t getPoint(int round) { return point[round]; };
+	uint8_t getWinner(int round) const { return winner[round]; };
+	uint8_t getPoint(int round) const { return point[round]; };
 	void setWinner(int round, int player_) { winner[round] = player_; };
 	void setPoint(int round, int point_) { point[round] = point_; };
+	bool isLastRound(int round) {
+		assert(0 <= round && round <= N_CARD_IN_HAND - 1);
+		return round == N_CARD_IN_HAND - 1;
+	};
 
 private:
 	std::array<int, N_CARD_IN_HAND> winner;

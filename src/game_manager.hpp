@@ -12,6 +12,7 @@ class TreePathCoder {
 public:
 	TreePathCoder() = default;
 	TreePathCoder(uint8_t result, int index, uint8_t value) {
+		std::fill(code.begin(), code.end(), N_CARD_IN_HAND);
 		setResult(result);
 		setValue(index, value);
 	};
@@ -53,7 +54,8 @@ public:
 	void printCode() const;
 
 private:
-	uint8_t code[N_ACTION + 1] = { 0 };
+	//uint8_t code[N_ACTION + 1] = { N_CARD_IN_HAND };  // TODO faster
+	std::array<uint8_t, N_ACTION + 1> code;
 };
 
 

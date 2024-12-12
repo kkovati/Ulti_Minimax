@@ -9,7 +9,7 @@ namespace ulti_minimax {
 
 void TreePathCoder::printCode() const {
 	for (int i = 0; i < N_ACTION; ++i) {
-		std::cout << unsigned(getValue(i));
+		std::cout << unsigned(getValue(i)) << " ";
 	}
 	std::cout << std::endl;
 }
@@ -25,6 +25,7 @@ void GameManager::simulate() {
 	// Start minimaX
 	TreePathCoder tpc = minimax(0);
 	uint8_t result = tpc.getResult();
+	tpc.printCode();
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -42,7 +43,7 @@ TreePathCoder GameManager::minimax(int index) {
 	partyState.getPlayableCards(playableCards, index);
 	partyState.simplifyPlayableCards(playableCards);
 	assert(playableCards.size());
-	//partyState.print_current_state(index, playableCards); // DEBUG PRINT
+	partyState.print_current_state(index, playableCards); // DEBUG PRINT
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);
@@ -61,6 +62,7 @@ TreePathCoder GameManager::minimax(int index) {
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
 		uint8_t result = partyState.evaluateParty(index);
+
 		// End party early if have a result before the last round
 		if (isFirstPlayerToHit) {
 			if (result == PLAYER_WIN) {				
@@ -74,10 +76,12 @@ TreePathCoder GameManager::minimax(int index) {
 				return TreePathCoder(result, index, cardIndex);
 			}
 		}
-		assert(result == UNDEFINED);
+
+		// No early ending found, continue searching optimal card
+		assert(result == RESULT_UNDEFINED);
 		TreePathCoder tpc = minimax(index + 1);
 		result = tpc.getResult();
-		assert(result == Result::PLAYER_WIN && result == Result::OPPONENT_WIN);
+		assert(result == PLAYER_WIN || result == OPPONENT_WIN);
 		if (isFirstPlayerToHit && result == PLAYER_WIN) {
 			tpc.setValue(index, cardIndex);
 			return tpc;
@@ -87,6 +91,8 @@ TreePathCoder GameManager::minimax(int index) {
 			return tpc;
 		}
 	}
+
+	// No optimal card found
 	if (isFirstPlayerToHit) {
 		TreePathCoder tpc(OPPONENT_WIN, index, cardIndex);
 		return tpc;
