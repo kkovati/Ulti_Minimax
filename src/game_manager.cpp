@@ -7,23 +7,35 @@
 
 namespace ulti_minimax {
 
+void TreePathCoder::printCode() const {
+	for (int i = 0; i < N_ACTION; ++i) {
+		std::cout << unsigned(getValue(i));
+	}
+	std::cout << std::endl;
+}
+
+
 void GameManager::simulate() {
 	auto start = std::chrono::high_resolution_clock::now();
 	
+	// Initialize
 	partyState = PartyState();
 	partyState.init();
-	int result = minimax(0);
+
+	// Start minimaX
+	TreePathCoder tpc = minimax(0);
+	Result result = tpc.getResult();
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	int time = duration.count();	
 
-	std::cout << "Result: " << result << std::endl;
+	//std::cout << "Result: " << result << std::endl;
 	std::cout << "No. calls: " << n_minimax_call << std::endl;
 	std::cout << "Duration: " << time << " ms" << std::endl;
 }
 
-int GameManager::minimax(int index) {
+TreePathCoder GameManager::minimax(int index) {
 	n_minimax_call += 1;
 
 	std::vector<Card> playableCards;
@@ -37,8 +49,9 @@ int GameManager::minimax(int index) {
 		Card card = playableCards[0];
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		uint8_t result = partyState.evaluateParty(index);
-		return result;
+		Result result = partyState.evaluateParty(index);
+		TreePathCoder tpc(result, index, 0);
+		return tpc;
 	}
 
 	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
@@ -47,44 +60,41 @@ int GameManager::minimax(int index) {
 		cardIndex++;
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		uint8_t result = partyState.evaluateParty(index);
-		// End party early if have a result already
+		Result result = partyState.evaluateParty(index);
+		// End party early if have a result before the last round
 		if (isFirstPlayerToHit) {
-			if (result == 1) {				
-				return result;
+			if (result == Result::PLAYER_WIN) {				
+				return TreePathCoder(result, index, cardIndex);
 			}
-			if (result == 2) continue;  
+			if (result == Result::OPPONENT_WIN) continue;  
 		}
 		else { // !isFirstPlayerToHit
-			if (result == 1) continue;
-			if (result == 2) {				
-				return result;
+			if (result == Result::PLAYER_WIN) continue;
+			if (result == Result::OPPONENT_WIN) {				
+				return TreePathCoder(result, index, cardIndex);
 			}
 		}
-		assert(!result); // result == 0
-		result = minimax(index + 1);
-		assert(result); // result == 1 || result == 2
-		if (isFirstPlayerToHit && result == 1) {
-			return result;
+		assert(result == Result::UNDEFINED);
+		TreePathCoder tpc = minimax(index + 1);
+		result = tpc.getResult();
+		assert(result == Result::PLAYER_WIN && result == Result::OPPONENT_WIN);
+		if (isFirstPlayerToHit && result == Result::PLAYER_WIN) {
+			tpc.setValue(index, cardIndex);
+			return tpc;
 		}
-		if (!isFirstPlayerToHit && result == 2) {
-			return result;
+		if (!isFirstPlayerToHit && result == Result::OPPONENT_WIN) {
+			tpc.setValue(index, cardIndex);
+			return tpc;
 		}
 	}
 	if (isFirstPlayerToHit) {
-		return 2;
+		TreePathCoder tpc(Result::OPPONENT_WIN, index, cardIndex);
+		return tpc;
 	}
 	else { // !isFirstPlayerToHit
-		return 1;
+		TreePathCoder tpc(Result::PLAYER_WIN, index, cardIndex);
+		return tpc;
 	}
-}
-
-
-void TreePathCoder::printCode() const {
-	for (int i = 0; i < size; ++i) {
-		std::cout << unsigned(getValue(i));
-	}
-	std::cout << std::endl;
 }
 
 }

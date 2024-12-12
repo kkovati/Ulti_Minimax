@@ -203,29 +203,29 @@ int PartyState::chooseWinnerCard(Card c0, Card c1, Card c2) {
     return 2;
 }
 
-uint8_t PartyState::evaluateParty(int index_) {
+Result PartyState::evaluateParty(int index_) {
     // TODO integrate with setNextPlayer() if possible
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
 
     int playerPoints = 0, opponentPoints = 0;
     if (posInRound == 0 || posInRound == 1) {
-        return 0;
+        Result::UNDEFINED;
     }
     else { // posInRound == 2
         for (int i = 0; i <= round; ++i) {
             int point = roundResults.getPoint(i);
-            if (actionList.isLastIndex(index_)) point++;
+            if (actionList.isLastIndex(index_)) point++; // TODO is this okay in here?
             if (roundResults.getWinner(i) == actionList.getFirstPlayer()) 
                 playerPoints += point;
             else 
                 opponentPoints += point;
         }
     }
-    if (playerPoints > N_POINT_IN_DECK) return 1; // Player wins
-    if (opponentPoints > N_POINT_IN_DECK) return 2; // Opponents win
+    if (playerPoints > N_POINT_IN_DECK) return Result::PLAYER_WIN; // Player wins  // TODO is this okay like this?
+    if (opponentPoints > N_POINT_IN_DECK) return Result::OPPONENT_WIN; // Opponents win
     assert(!actionList.isLastIndex(index_));
-    return 0;
+    return Result::UNDEFINED;
 }
 
 void PartyState::print_current_state(int index_, const CardVector& playableCards) {

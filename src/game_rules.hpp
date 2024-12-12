@@ -19,12 +19,25 @@ constexpr int LAST_ACTION_INDEX = N_ACTION - 1;
 
 constexpr int SEED = 0;
 
+enum class Result {
+	UNDEFINED,
+	PLAYER_WIN,
+	OPPONENT_WIN
+};
+
+
 class Card {
 public:
 	Card() = default;
 	Card(int suit_, int value_) : suit(suit_), value(value_) {};
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
-	Card& operator=(const Card& other) { suit = other.suit; value = other.value; return *this; };
+	Card& operator=(const Card& other) { 
+		if (this != &other) {
+			suit = other.suit;
+			value = other.value;
+		}
+		return *this;
+	};
 
 	int getSuit() { return suit; };
 	int getValue() { return value; };
@@ -76,8 +89,13 @@ public:
 	Action(const Action& other) : round(other.round), posInRound(other.posInRound), 
 		playerToHit(other.playerToHit), card(other.card) {};
 	Action& operator=(const Action& other) {
-		round = other.round; posInRound = other.posInRound;
-		playerToHit = other.playerToHit; card = other.card; return *this;
+		if (this != &other) {
+			round = other.round;
+			posInRound = other.posInRound;
+			playerToHit = other.playerToHit;
+			card = other.card;
+		}
+		return *this;
 	};
 
 	int getRound() { return round; };
@@ -100,7 +118,10 @@ public:
 	ActionList(int firstPlayer_ = 0);	
 	ActionList(const ActionList& other) : firstPlayer(other.firstPlayer), actions(other.actions) {};
 	ActionList& operator=(const ActionList& other) { 
-		firstPlayer = other.firstPlayer; actions = other.actions; return *this; 
+		if (this != &other) {
+			firstPlayer = other.firstPlayer; actions = other.actions;
+		}
+		return *this;
 	};
 
 	int getFirstPlayer() { return firstPlayer; };
@@ -129,7 +150,10 @@ public:
 	RoundResults() = default;
 	RoundResults(const RoundResults& other) : winner(other.winner), point(other.point) {};
 	RoundResults& operator=(const RoundResults& other) {
-		winner = other.winner; point = other.point; return *this;
+		if (this != &other) {
+			winner = other.winner; point = other.point;
+		}
+		return *this;
 	};
 
 	uint8_t getWinner(int round) { return winner[round]; };
@@ -148,7 +172,10 @@ public:
 	PlayerHands() = default;
 	PlayerHands(const PlayerHands& other) : playerCards(other.playerCards), playerUseds(other.playerUseds) {};
 	PlayerHands& operator=(const PlayerHands& other) {
-		playerCards = other.playerCards; playerUseds = other.playerUseds; return *this;
+		if (this != &other) {
+			playerCards = other.playerCards; playerUseds = other.playerUseds;
+		}
+		return *this;
 	};
 
 	void deal();
@@ -205,7 +232,9 @@ public:
 	PartyState(const PartyState& other) : actionList(other.actionList), roundResults(other.roundResults), 
 		playerHands(other.playerHands) {};
 	PartyState& operator=(const PartyState& other) {
-		actionList = other.actionList; roundResults = other.roundResults; playerHands = other.playerHands;
+		if (this != &other) {
+			actionList = other.actionList; roundResults = other.roundResults; playerHands = other.playerHands;
+		}
 		return *this;
 	};
 
@@ -223,7 +252,7 @@ public:
 	bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 	bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
 
-	uint8_t evaluateParty(int);
+	Result evaluateParty(int);
 
 	void print_current_state(int, const CardVector&);
 	void print_game_progression();
