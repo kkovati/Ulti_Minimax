@@ -8,6 +8,23 @@
 
 namespace ulti_minimax {
 
+class GameManager {
+public:
+	GameManager() = default;
+	void simulate();
+
+private:
+	PartyState partyState;
+
+	int minimax(int);
+
+	// Measurement
+	int n_minimax_call = 0;
+	int sum_time = 0;
+	int n_meas = 0;
+};
+
+
 class TreePathCoder {
 public:
 	TreePathCoder() = default;
@@ -55,23 +72,6 @@ public:
 private:
 	static const int size = N_ACTION;
 	uint8_t code[size + 1] = { 0 };
-};
-
-
-class GameManager {
-public:
-	GameManager() = default;
-	void simulate();
-
-private:
-	PartyState partyState;
-
-	TreePathCoder minimax(int);
-
-	// Measurement
-	int n_minimax_call = 0;
-	int sum_time = 0;
-	int n_meas = 0;
 };
 
 }

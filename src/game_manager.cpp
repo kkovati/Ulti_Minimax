@@ -7,21 +7,12 @@
 
 namespace ulti_minimax {
 
-void TreePathCoder::printCode() const {
-	for (int i = 0; i < size; ++i) {
-		std::cout << unsigned(getValue(i));
-	}
-	std::cout << std::endl;
-}
-
-
 void GameManager::simulate() {
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	partyState = PartyState();
 	partyState.init();
-	TreePathCoder tpc = minimax(0);
-	int result = tpc.getResult();
+	int result = minimax(0);
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -32,7 +23,7 @@ void GameManager::simulate() {
 	std::cout << "Duration: " << time << " ms" << std::endl;
 }
 
-TreePathCoder GameManager::minimax(int index) {
+int GameManager::minimax(int index) {
 	n_minimax_call += 1;
 
 	std::vector<Card> playableCards;
@@ -47,8 +38,7 @@ TreePathCoder GameManager::minimax(int index) {
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
 		uint8_t result = partyState.evaluateParty(index);
-		TreePathCoder tpc(result, index, 0);
-		return tpc;
+		return result;
 	}
 
 	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
@@ -61,37 +51,40 @@ TreePathCoder GameManager::minimax(int index) {
 		// End party early if have a result already
 		if (isFirstPlayerToHit) {
 			if (result == 1) {				
-				return TreePathCoder(1, index, cardIndex);
+				return result;
 			}
 			if (result == 2) continue;  
 		}
 		else { // !isFirstPlayerToHit
 			if (result == 1) continue;
 			if (result == 2) {				
-				return TreePathCoder(2, index, cardIndex);
+				return result;
 			}
 		}
 		assert(!result); // result == 0
-		TreePathCoder tpc = minimax(index + 1);
-		result = tpc.getResult();
+		result = minimax(index + 1);
 		assert(result); // result == 1 || result == 2
 		if (isFirstPlayerToHit && result == 1) {
-			tpc.setValue(index, cardIndex);
-			return tpc;
+			return result;
 		}
 		if (!isFirstPlayerToHit && result == 2) {
-			tpc.setValue(index, cardIndex);
-			return tpc;
+			return result;
 		}
 	}
 	if (isFirstPlayerToHit) {
-		TreePathCoder tpc(2, index, cardIndex);
-		return tpc;
+		return 2;
 	}
 	else { // !isFirstPlayerToHit
-		TreePathCoder tpc(1, index, cardIndex);
-		return tpc;
+		return 1;
 	}
+}
+
+
+void TreePathCoder::printCode() const {
+	for (int i = 0; i < size; ++i) {
+		std::cout << unsigned(getValue(i));
+	}
+	std::cout << std::endl;
 }
 
 }
