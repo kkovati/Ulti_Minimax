@@ -39,7 +39,7 @@ TreePathCoder GameManager::minimax(int index) {
 	partyState.getPlayableCards(playableCards, index);
 	partyState.simplifyPlayableCards(playableCards);
 	assert(playableCards.size());
-	partyState.print_current_state(index, playableCards);
+	//partyState.print_current_state(index, playableCards); // DEBUG PRINT
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);
@@ -48,7 +48,7 @@ TreePathCoder GameManager::minimax(int index) {
 		partyState.setNextPlayer(index);
 		uint8_t result = partyState.evaluateParty(index);
 		TreePathCoder tpc(result, index, 0);
-		return tpc;		
+		return tpc;
 	}
 
 	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
@@ -71,9 +71,10 @@ TreePathCoder GameManager::minimax(int index) {
 				return TreePathCoder(2, index, cardIndex);
 			}
 		}
+		assert(!result); // result == 0
 		TreePathCoder tpc = minimax(index + 1);
 		result = tpc.getResult();
-		assert(result);
+		assert(result); // result == 1 || result == 2
 		if (isFirstPlayerToHit && result == 1) {
 			tpc.setValue(index, cardIndex);
 			return tpc;
@@ -87,7 +88,7 @@ TreePathCoder GameManager::minimax(int index) {
 		TreePathCoder tpc(2, index, cardIndex);
 		return tpc;
 	}
-	else { // !isFirstPlayerToHit) 
+	else { // !isFirstPlayerToHit
 		TreePathCoder tpc(1, index, cardIndex);
 		return tpc;
 	}

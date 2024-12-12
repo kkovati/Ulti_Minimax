@@ -14,7 +14,8 @@ constexpr int N_POINT_IN_DECK = (N_VALUE - LOWEST_CARD_VALUE_WITH_POINT) * N_SUI
 
 constexpr int N_PLAYER = 3; // Do not modify
 constexpr int N_CARD_IN_HAND = 10;
-constexpr int LAST_ACTION_INDEX = N_PLAYER * N_CARD_IN_HAND - 1;
+constexpr int N_ACTION = N_PLAYER * N_CARD_IN_HAND;
+constexpr int LAST_ACTION_INDEX = N_ACTION - 1;
 
 constexpr int SEED = 0;
 
@@ -110,11 +111,11 @@ public:
 	const Card& getCard(int index_) { return getAction(index_).getCard(); };
 	void setCard(int index_, Card& card_) { actions[index_].setCard(card_); };
 
-	bool isLastIndex(int index_) { return index_ >= actions.size() - 1; };
+	bool isLastIndex(int index_) { return index_ >= LAST_ACTION_INDEX; };
 	bool isFirstPlayerToHit(int index_) { return firstPlayer == getPlayerToHit(index_); };
 
 private:
-	using ActionVector = std::array<Action, N_PLAYER * N_CARD_IN_HAND>;
+	using ActionVector = std::array<Action, N_ACTION>;
 
 	int firstPlayer;
 	ActionVector actions;	

@@ -19,16 +19,27 @@ public:
 		std::copy(std::begin(other.code), std::end(other.code), std::begin(code));
 	};
 	TreePathCoder& operator=(const TreePathCoder& other) {
-		std::copy(std::begin(other.code), std::end(other.code), std::begin(code)); 
+		if (this != &other) {
+			std::copy(std::begin(other.code), std::end(other.code), std::begin(code));
+		}
+		return *this;
+	};
+	TreePathCoder(TreePathCoder&& other) noexcept {
+		std::move(std::begin(other.code), std::end(other.code), std::begin(code));
+	};
+	TreePathCoder& operator=(TreePathCoder&& other) noexcept {
+		if (this != &other) {
+			std::move(std::begin(other.code), std::end(other.code), std::begin(code));
+		}
 		return *this;
 	};
 
 	void setValue(int index, uint8_t value) {
-		assert(0 <= index && index <= 31 && value <= 9);
+		assert(0 <= index && index < size && value <= 9);
 		code[index] = value;
 	};
 	uint8_t getValue(int index) const {
-		assert(0 <= index && index <= 31);
+		assert(0 <= index && index < size);
 		return code[index];
 	};
 	void setResult(uint8_t result) {
@@ -42,7 +53,7 @@ public:
 	void printCode() const;
 
 private:
-	static const int size = ulti_minimax::N_PLAYER * ulti_minimax::N_CARD_IN_HAND;
+	static const int size = N_ACTION;
 	uint8_t code[size + 1] = { 0 };
 };
 
