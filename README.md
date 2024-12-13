@@ -14,7 +14,8 @@ cd ..
 ```
 
 Now you can open the ```build_native/Ulti_Minimax.sln``` with Visual Studio.<br>
-In the ```Solution Explorer -> ulti_minimax -> Set as Startup Project``` and now you can build and run the project.
+In Visual Studio ```Solution Explorer -> ulti_minimax -> Set as Startup Project``` 
+and now you can build and run the project.
 
 ## Build for WASM 
 
