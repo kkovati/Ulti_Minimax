@@ -26,4 +26,19 @@ cmake --build .
 cd ..
 ```
 
+After the build copy the generated JS and WASM files to the ```webapp/```.
+```console
+cp build_wasm/cpp/src/ulti_minimax.js webapp
+cp build_wasm/cpp/src/ulti_minimax.wasm webapp
+```
+
+Use Python’s Built-in HTTP Server to host.
+```console
+cd webapp
+python -m http.server 8000
+cd ..
+```
+
+Open http://localhost:8000/index.html
+
 ## Misc
