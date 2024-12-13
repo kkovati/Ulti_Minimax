@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Cards</title>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .cards-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .card {
+            width: 100px;
+            height: 100px;
+            background-color: lightblue;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: scale(1.1);
+        }
+        .bottom-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cards-container">
+        <div class="card" onclick="moveToBottom(this)">Card 1</div>
+        <div class="card" onclick="moveToBottom(this)">Card 2</div>
+        <div class="card" onclick="moveToBottom(this)">Card 3</div>
+    </div>
+    <div class="bottom-container" id="bottomContainer">
+        <!-- Cards will move here -->
+    </div>
+
+    <script>
+        function moveToBottom(card) {
+            const bottomContainer = document.getElementById("bottomContainer");
+            card.style.transition = "none";
+            card.style.transform = "none";
+            bottomContainer.appendChild(card);
+        }
+    </script>
+</body>
+</html>
