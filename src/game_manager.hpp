@@ -51,7 +51,8 @@ public:
 		return code[N_ACTION];
 	};
 
-	void printCode() const;
+	void printResult() const;
+	void printCode() const;	
 
 private:
 	//uint8_t code[N_ACTION + 1] = { N_CARD_IN_HAND };  // TODO faster
@@ -68,6 +69,7 @@ private:
 	PartyState partyState;
 
 	TreePathCoder minimax(int);
+	void setPartyState(TreePathCoder, int);
 
 	// Measurement
 	int n_minimax_call = 0;

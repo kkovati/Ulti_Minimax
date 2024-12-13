@@ -259,7 +259,7 @@ public:
 	bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 	bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
 
-	uint8_t evaluateParty(int);
+	uint8_t evaluateParty(int, bool);
 
 	void print_current_state(int, const CardVector&);
 	void print_game_progression();

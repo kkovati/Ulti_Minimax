@@ -7,11 +7,18 @@
 
 namespace ulti_minimax {
 
+void TreePathCoder::printResult() const {
+	if (getResult() == PLAYER_WIN) std::cout << "PLAYER_WIN"; // << std::endl;
+	else if (getResult() == OPPONENT_WIN) std::cout << "OPPONENT_WIN"; // << std::endl;
+	else assert(false);
+	//std::cout << std::endl;
+}
+
 void TreePathCoder::printCode() const {
 	for (int i = 0; i < N_ACTION; ++i) {
 		std::cout << unsigned(getValue(i)) << " ";
 	}
-	std::cout << std::endl;
+	//std::cout << std::endl;
 }
 
 
@@ -24,16 +31,21 @@ void GameManager::simulate() {
 
 	// Start minimaX
 	TreePathCoder tpc = minimax(0);
-	uint8_t result = tpc.getResult();
-	tpc.printCode();
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	int time = duration.count();	
 
-	//std::cout << "Result: " << result << std::endl;
+	std::cout << "Result: ";
+	tpc.printResult();
+	std::cout << std::endl;
 	std::cout << "No. calls: " << n_minimax_call << std::endl;
 	std::cout << "Duration: " << time << " ms" << std::endl;
+	std::cout << "TreePathCoder: "; 
+	tpc.printCode();
+	std::cout << std::endl << std::endl;
+
+	setPartyState(tpc, 0);
 }
 
 TreePathCoder GameManager::minimax(int index) {
@@ -50,7 +62,7 @@ TreePathCoder GameManager::minimax(int index) {
 		Card card = playableCards[0];
 		partyState.setHitCard(index, card);
 		partyState.setNextPlayer(index);
-		uint8_t result = partyState.evaluateParty(index);
+		uint8_t result = partyState.evaluateParty(index, false);
 		TreePathCoder tpc(result, index, 0);
 		return tpc;
 	}
@@ -61,7 +73,7 @@ TreePathCoder GameManager::minimax(int index) {
 		partyState.setNextPlayer(index);
 		
 		// End party early if have a result before the last round
-		uint8_t result = partyState.evaluateParty(index);
+		uint8_t result = partyState.evaluateParty(index, false);
 		if (isFirstPlayerToHit) {
 			if (result == PLAYER_WIN) {				
 				return TreePathCoder(result, index, cardIndex);
@@ -120,6 +132,33 @@ TreePathCoder GameManager::minimax(int index) {
 		}
 	}
 	assert(false); // Unreachable code
+}
+
+// This function is heavily relying on GameManager::minimax()
+//
+void GameManager::setPartyState(TreePathCoder tpc, int index) {
+	std::vector<Card> playableCards;
+	partyState.getPlayableCards(playableCards, index);
+	partyState.simplifyPlayableCards(playableCards);
+	assert(playableCards.size() && playableCards.size() <= N_CARD_IN_HAND);
+	partyState.print_current_state(index, playableCards);
+
+	uint8_t cardIndex = tpc.getValue(index);
+	if (cardIndex < N_CARD_IN_HAND) {
+		partyState.setHitCard(index, playableCards[cardIndex]);
+		partyState.setNextPlayer(index);
+
+		uint8_t result = partyState.evaluateParty(index, true); // For printing
+	}
+
+	if (partyState.isLastIndex(index) || cardIndex >= N_CARD_IN_HAND) {
+		std::cout << std::endl;
+		tpc.printResult();
+		std::cout << std::endl;
+		return;
+	}
+
+	setPartyState(tpc, index + 1);
 }
 
 }

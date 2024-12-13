@@ -203,7 +203,7 @@ int PartyState::chooseWinnerCard(const Card c0, const Card c1, const Card c2) {
     return 2;
 }
 
-uint8_t PartyState::evaluateParty(int index_) {
+uint8_t PartyState::evaluateParty(int index_, bool print) {
     // TODO integrate with setNextPlayer() if possible
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
@@ -223,7 +223,7 @@ uint8_t PartyState::evaluateParty(int index_) {
         }
     }
 
-    if (DEBUG) std::cout << "Player Points: " << playerPoints << "  Opponent Points: " << opponentPoints << std::endl;
+    if (DEBUG || print) std::cout << "Player Points: " << playerPoints << "  Opponent Points: " << opponentPoints << std::endl;
 
     if (playerPoints > MIN_POINT_TO_WIN) return PLAYER_WIN; // Player wins
     if (opponentPoints > MIN_POINT_TO_WIN) return OPPONENT_WIN; // Opponents win
@@ -237,7 +237,7 @@ void PartyState::print_current_state(int index_, const CardVector& playableCards
     int playerToHit = actionList.getPlayerToHit(index_);
     int roundStartPlayer = actionList.getRoundStartPlayer(index_); 
 
-    std::cout << "=== Index: " << index_ << "  Round: " << round << "  Pos: " << posInRound << "  =====================" << std::endl;
+    std::cout << std::endl << "=== Index: " << index_ << "  Round: " << round << "  Pos: " << posInRound << "  =====================" << std::endl;
     // Print each players' hand
     for (int player = 0; player < N_PLAYER; ++player) {
         // Signal current player to hit with asterisk
@@ -271,6 +271,8 @@ void PartyState::print_current_state(int index_, const CardVector& playableCards
     std::cout << std::endl;
 }
 
+// This function is not in use
+//
 void PartyState::print_game_progression() {
     std::cout << "=== Game Progression: =====================" << std::endl;
     // Print each players' initial hand
