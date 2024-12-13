@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "game_manager.hpp"
-#include "game_rules.hpp"
+#include "rules.hpp"
 
 TEST(PartyStateTest, TestChooseWinnerCard) {
     ulti_minimax::PartyState partyState;
@@ -24,7 +24,6 @@ TEST(PartyStateTest, TestChooseWinnerCard) {
     };
 
     for (const auto& testCase : testCases) {
-
         ulti_minimax::Card c0(testCase[0], testCase[1]);
         ulti_minimax::Card c1(testCase[2], testCase[3]);
         ulti_minimax::Card c2(testCase[4], testCase[5]);

@@ -4,7 +4,7 @@
 #include <random>
 #include <string>
 
-#include "game_rules.hpp"
+#include "rules.hpp"
 
 namespace ulti_minimax {
 

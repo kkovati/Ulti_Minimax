@@ -3,7 +3,7 @@
 #include <optional>
 #include <tuple>
 
-#include "game_rules.hpp"
+#include "rules.hpp"
 
 
 namespace ulti_minimax {

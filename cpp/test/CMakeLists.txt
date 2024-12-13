@@ -16,4 +16,4 @@ target_link_libraries(test_ulti_game GTest::gtest_main ulti_game)
 include(GoogleTest)
 gtest_discover_tests(test_ulti_game)
 
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/cpp/src)
