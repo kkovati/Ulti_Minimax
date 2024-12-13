@@ -69,7 +69,11 @@ private:
 	PartyState partyState;
 
 	TreePathCoder minimax(int);
+
+	// Visaulization
 	void setPartyState(TreePathCoder, int);
+	int progressBar = 0;
+	void updateProgressBar();	
 
 	// Measurement
 	int n_minimax_call = 0;

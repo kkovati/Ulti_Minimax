@@ -50,6 +50,7 @@ void GameManager::simulate() {
 
 TreePathCoder GameManager::minimax(int index) {
 	n_minimax_call += 1;
+	if (index == 0 || index == 3 || index == 6) updateProgressBar();
 
 	std::vector<Card> playableCards;
 	partyState.getPlayableCards(playableCards, index);
@@ -167,6 +168,20 @@ void GameManager::setPartyState(TreePathCoder tpc, int index) {
 	}
 
 	setPartyState(tpc, index + 1);
+}
+
+void GameManager::updateProgressBar() {
+	if (progressBar != 0) 
+		std::cout.flush();
+	std::cout << "[";
+	for (int i = 0; i < 100; ++i) {
+		if (i <= progressBar)
+			std::cout << "=";
+		else
+			std::cout << " ";
+	}
+	std::cout << "] " << progressBar << " %\r";
+	progressBar++;
 }
 
 }
