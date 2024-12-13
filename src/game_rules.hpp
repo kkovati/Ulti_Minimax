@@ -262,6 +262,7 @@ public:
 	uint8_t evaluateParty(int, bool);
 
 	void print_current_state(int, const CardVector&);
+	void print_card(int);
 	void print_game_progression();
 
 private:

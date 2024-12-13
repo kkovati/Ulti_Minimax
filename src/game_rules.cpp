@@ -271,6 +271,10 @@ void PartyState::print_current_state(int index_, const CardVector& playableCards
     std::cout << std::endl;
 }
 
+void PartyState::print_card(int index_) {
+    std::cout << "Selected card: " << actionList.getCard(index_) << std::endl;
+}
+
 // This function is not in use
 //
 void PartyState::print_game_progression() {

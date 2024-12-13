@@ -68,7 +68,10 @@ TreePathCoder GameManager::minimax(int index) {
 	}
 
 	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
-	for (uint8_t cardIndex = 0; cardIndex < playableCards.size(); ++cardIndex) {
+	//for (uint8_t cardIndex = 0; cardIndex < playableCards.size(); ++cardIndex) {	// Incremental direction 
+	for (int i = playableCards.size() - 1; i >= 0 ; --i) {							// Decremental direction 
+		assert(i >= 0);
+		uint8_t cardIndex = static_cast<uint8_t>(i);
 		partyState.setHitCard(index, playableCards[cardIndex]);
 		partyState.setNextPlayer(index);
 		
@@ -79,7 +82,8 @@ TreePathCoder GameManager::minimax(int index) {
 				return TreePathCoder(result, index, cardIndex);
 			}
 			if (result == OPPONENT_WIN) {
-				if (cardIndex == playableCards.size() - 1) {
+				//if (cardIndex == playableCards.size() - 1) {		// Incremental direction 
+				if (cardIndex == 0) {								// Decremental direction 
 					return TreePathCoder(result, index, cardIndex);
 				}
 				else {
@@ -89,7 +93,8 @@ TreePathCoder GameManager::minimax(int index) {
 		}
 		else { // !isFirstPlayerToHit
 			if (result == PLAYER_WIN) {
-				if (cardIndex == playableCards.size() - 1) {
+				//if (cardIndex == playableCards.size() - 1) {		// Incremental direction 
+				if (cardIndex == 0) {								// Decremental direction 
 					return TreePathCoder(result, index, cardIndex);
 				}
 				else {
@@ -103,6 +108,7 @@ TreePathCoder GameManager::minimax(int index) {
 
 		// No early ending found, continue searching optimal card
 		assert(result == RESULT_UNDEFINED);
+		// if (DEBUG) partyState.print_card(index);
 		TreePathCoder tpc = minimax(index + 1);
 		result = tpc.getResult();
 		assert(result == PLAYER_WIN || result == OPPONENT_WIN);
@@ -116,7 +122,8 @@ TreePathCoder GameManager::minimax(int index) {
 		}
 
 		// No optimal card found
-		if (cardIndex == playableCards.size() - 1) {
+		//if (cardIndex == playableCards.size() - 1) {		// Incremental direction 
+		if (cardIndex == 0) {								// Decremental direction 
 			if (isFirstPlayerToHit) {
 				tpc.setResult(OPPONENT_WIN);
 				tpc.setValue(index, cardIndex);
@@ -148,6 +155,7 @@ void GameManager::setPartyState(TreePathCoder tpc, int index) {
 		partyState.setHitCard(index, playableCards[cardIndex]);
 		partyState.setNextPlayer(index);
 
+		partyState.print_card(index);
 		uint8_t result = partyState.evaluateParty(index, true); // For printing
 	}
 
