@@ -21,13 +21,14 @@ void TreePathCoder::printCode() const {
 	//std::cout << std::endl;
 }
 
-
-void GameManager::simulate() {
+// Start minimax simulation
+//
+void GameManager::simulate(const std::string& deal) {
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	// Initialize
 	partyState = PartyState();
-	partyState.init();
+	partyState.init(deal);
 
 	// Start minimaX
 	TreePathCoder tpc = minimax(0);

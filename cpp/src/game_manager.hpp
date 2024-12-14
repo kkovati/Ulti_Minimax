@@ -63,7 +63,7 @@ private:
 class GameManager {
 public:
 	GameManager() = default;
-	void simulate();
+	void simulate(const std::string& = "");
 
 private:
 	PartyState partyState;

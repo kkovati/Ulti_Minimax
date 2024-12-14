@@ -51,7 +51,19 @@ ActionList::ActionList(int firstPlayer_) : firstPlayer(firstPlayer_) {
 }
 
 
-void PlayerHands::deal() {
+void PlayerHands::init_deal(const std::vector<Card>& cardVector) {
+    assert(cardVector.size() == N_PLAYER * N_CARD_IN_HAND);
+    for (int i = 0; i < N_PLAYER; ++i) {
+        for (int j = 0; j < N_CARD_IN_HAND; ++j) {
+            playerCards[i][j] = cardVector[i * N_CARD_IN_HAND + j];
+            playerUseds[i][j] = LAST_ACTION_INDEX + 1;
+        }
+        // Order the cards        
+        std::sort(playerCards[i].begin(), playerCards[i].end(), Card::compareCard);
+    }
+}
+
+void PlayerHands::random_deal() {
     Deck deck = Deck();
     assert(N_PLAYER * N_CARD_IN_HAND <= deck.size());
     deck.shuffle(); 
@@ -67,8 +79,35 @@ void PlayerHands::deal() {
 }
 
 
-void PartyState::init() {
-    playerHands.deal();
+void PartyState::init(const std::string& deal) {
+    if (!deal.empty()) {
+        // Parse deal
+        assert(deal.length() == N_ACTION * 2);
+        std::vector<Card> cardVector;
+        for (int i = 0; i < deal.length(); i += 2) {
+            char suit_char = deal[i];
+            char value_char = deal[i + 1];
+            if (!std::isdigit(suit_char) || !std::isdigit(value_char)) throw std::invalid_argument("Invalid card code");
+            int suit = suit_char - '0';  // Convert char to int
+            int value = value_char - '0';
+            if (suit < 0 || 3 < suit || value < 0 || 7 < value) throw std::invalid_argument("Invalid card code");
+            cardVector.push_back(Card(suit, value));
+        }
+        // Check duplicates
+        for (int i = 0; i < cardVector.size(); ++i) {
+            for (int j = i + 1; j < cardVector.size(); ++j) {
+                Card c0 = cardVector[i];
+                Card c1 = cardVector[j];
+                if (c0 == c1 && !(c0 < c1) && !(c0 > c1)) throw std::invalid_argument("Duplicate card in code");
+            }
+        }
+        // Init the deal
+        playerHands.init_deal(cardVector);
+    }
+    else {
+        // Random deal
+        playerHands.random_deal();
+    }    
 }
 
 void PartyState::getCardsInHand(CardVector& cardVector, int player_, int index_) {

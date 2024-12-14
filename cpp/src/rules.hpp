@@ -185,7 +185,8 @@ public:
 		return *this;
 	};
 
-	void deal();
+	void init_deal(const std::vector<Card>&);
+	void random_deal();
 
 	const Card& getCard(int player_, int index_) const { 
 		return playerCards[player_][index_];
@@ -247,7 +248,7 @@ public:
 
 	using CardVector = std::vector<Card>;
 
-	void init();
+	void init(const std::string& = "");
 
 	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
