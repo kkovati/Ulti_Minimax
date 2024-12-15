@@ -47,9 +47,12 @@ Module.onRuntimeInitialized = () => {
 
 	// Call the WASM entry point
     const resultPointer = Module._wasm_main(dealPointer);
+	
+	// Read the result string
     const resultString = Module.UTF8ToString(resultPointer);
-
     console.log("WASM returned:", resultString);
 
+	// Free the allocated memory in both JS and WASM
     Module._free(dealPointer);
+	Module._free(resultPointer); // Free the memory allocated in C++ for the response
 };
