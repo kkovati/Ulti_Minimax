@@ -32,13 +32,13 @@ int main()
 extern "C" EMSCRIPTEN_KEEPALIVE const char* wasm_main(const char* deal_code)
 {
 	std::string deal(deal_code);
-	std::cout << "WASM: Received string: " << received_string << std::endl;
+	std::cout << "WASM: Received string: " << deal << std::endl;
     std::cout << "WASM: Start simulation" << std::endl;
 	auto gameManager = ulti_minimax::GameManager();
 	gameManager.simulate(deal);
 
 	// Create a response string
-	static std::string response = "Processed: " + received_string;
-	return response.c_str();
+	static std::string response = "Processed: " + deal;
+	return deal.c_str();
 }
 #endif

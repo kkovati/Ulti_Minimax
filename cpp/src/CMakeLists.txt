@@ -17,7 +17,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set_target_properties(ulti_minimax PROPERTIES
         OUTPUT_NAME "ulti_minimax"
         SUFFIX ".js"  # Emscripten generates .js glue code
-        LINK_FLAGS "-s WASM=1 -s EXPORTED_RUNTIME_METHODS=\"['cwrap', 'ccall']\""
+		# LINK_FLAGS "-s WASM=1 -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap', 'malloc', 'free', 'UTF8ToString', 'stringToUTF8']\""
+		LINK_FLAGS "-s WASM=1 -s EXPORTED_FUNCTIONS=[\"_malloc\",\"_free\",\"_wasm_main\"] -s EXPORTED_RUNTIME_METHODS=[\"ccall\",\"cwrap\",\"UTF8ToString\",\"stringToUTF8\"]"
     )
 # Native build-specific properties
 else()    

@@ -36,9 +36,20 @@ function moveToBottom(card) {
 //    });
 //};
 
+
 // Load the WASM module
 Module.onRuntimeInitialized = () => {
-    console.log("WASM module loaded");
-    // Call the entry point
-    Module._wasm_entrypoint();
+	console.log("WASM module loaded");
+    const deal = "071315172021303336370001030405111214223202061016232426273134";
+    const length = deal.length + 1;
+    const dealPointer = Module._malloc(length);
+    Module.stringToUTF8(deal, dealPointer, length);
+
+	// Call the WASM entry point
+    const resultPointer = Module._wasm_main(dealPointer);
+    const resultString = Module.UTF8ToString(resultPointer);
+
+    console.log("WASM returned:", resultString);
+
+    Module._free(dealPointer);
 };

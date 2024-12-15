@@ -36,7 +36,6 @@ Use Python’s Built-in HTTP Server to host.
 ```console
 cd webapp
 python -m http.server 8000
-cd ..
 ```
 
 Open http://localhost:8000/index.html
