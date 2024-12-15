@@ -1,0 +1,28 @@
+/* styles.css */
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: green;
+}
+
+.frame {
+    width: 80%;
+    height: 100px;
+    margin: 10px 0;
+    border: 5px solid yellow;
+    border-radius: 15px;
+    background-color: transparent;
+    transition: border-color 0.3s;
+}
+
+.frame:hover {
+    border-color: #ffff99; /* Light yellow (between yellow and white) */
+}
+
+.frame.active {
+    border-color: white;
+}
