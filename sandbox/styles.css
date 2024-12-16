@@ -37,7 +37,9 @@ body {
     border: 5px solid yellow;
     border-radius: 15px;
     background-color: transparent;
-    transition: border-color 0.3s;
+    /*transition: border-color 0.1s;*/
+	display: flex;
+    gap: 20px;
 }
 
 .hand:hover {
