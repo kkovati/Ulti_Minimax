@@ -7,3 +7,12 @@ document.querySelectorAll('.frame').forEach(frame => {
         frame.classList.add('active');
     });
 });
+
+document.querySelectorAll('.image').forEach(image => {
+    image.addEventListener('click', () => {
+        // Reset all images to default
+        document.querySelectorAll('.image').forEach(img => img.classList.remove('active'));
+        // Set the clicked image to white border
+        image.classList.add('active');
+    });
+});
