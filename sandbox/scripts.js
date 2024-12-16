@@ -1,20 +1,20 @@
 function moveToBottom(card) {
-    const activeFrame = document.querySelector('.frame.active');
+    const activeHand = document.querySelector('.hand.active');
     const deck = document.querySelector('.deck');
 
-    if (activeFrame && !activeFrame.contains(card)) {
-        activeFrame.appendChild(card);
+    if (activeHand && !activeHand.contains(card)) {
+        activeHand.appendChild(card);
     } else {
         deck.appendChild(card);
     }
 }
 
-document.querySelectorAll('.frame').forEach(frame => {
-    frame.addEventListener('click', () => {
-        // Reset all frames to yellow
-        document.querySelectorAll('.frame').forEach(f => f.classList.remove('active'));
-        // Set the clicked frame to white
-        frame.classList.add('active');
+document.querySelectorAll('.hand').forEach(hand => {
+    hand.addEventListener('click', () => {
+        // Reset all hands to yellow
+        document.querySelectorAll('.hand').forEach(f => f.classList.remove('active'));
+        // Set the clicked hand to white
+        hand.classList.add('active');
     });
 });
 

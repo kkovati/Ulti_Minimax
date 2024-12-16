@@ -30,7 +30,7 @@ body {
     transform: scale(1.1);
 }
 
-.frame {
+.hand {
     width: 80%;
     height: 100px;
     margin: 10px 0;
@@ -40,11 +40,11 @@ body {
     transition: border-color 0.3s;
 }
 
-.frame:hover {
+.hand:hover {
     border-color: #ffff99; /* Light yellow (between yellow and white) */
 }
 
-.frame.active {
+.hand.active {
     border-color: white;
 }
 
