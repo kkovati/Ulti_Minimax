@@ -27,10 +27,17 @@ body {
     border-color: white;
 }
 
+.images-title {
+    margin: 20px 0 10px;
+    font-size: 24px;
+    color: white;
+    text-align: center;
+}
+
 .image-container {
     display: flex;
     gap: 20px;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .image {
