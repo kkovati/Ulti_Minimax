@@ -1,4 +1,14 @@
-// scripts.js
+function moveToBottom(card) {
+    const activeFrame = document.querySelector('.frame.active');
+    const deck = document.querySelector('.deck');
+
+    if (activeFrame && !activeFrame.contains(card)) {
+        activeFrame.appendChild(card);
+    } else {
+        deck.appendChild(card);
+    }
+}
+
 document.querySelectorAll('.frame').forEach(frame => {
     frame.addEventListener('click', () => {
         // Reset all frames to yellow
