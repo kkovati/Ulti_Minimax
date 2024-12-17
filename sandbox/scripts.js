@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cardImage.classList.add('card');
             cardImage.setAttribute('id', `card${iSuit * nCardPerSuit + iCard}`);
             //cardImage.setAttribute('src', `path/to/card${iSuit * nCardPerSuit + iCard}.png`);
-            cardImage.setAttribute('src', `../webapp/assets/images/2${iCard}.jpg`);
+            cardImage.setAttribute('src', `../webapp/assets/images/${iSuit}${iCard}.jpg`);
             cardImage.setAttribute('alt', `Card ${iSuit * nCardPerSuit + iCard}`);
             cardImage.setAttribute('onclick', 'moveCard(this)');
             
