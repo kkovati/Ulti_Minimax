@@ -1,6 +1,38 @@
-document.getElementById('player').classList.add('active');
+document.addEventListener('DOMContentLoaded', () => {
+    const deck = document.querySelector('.deck');
+    
+    const nSuit = 4;
+    const nCardPerSuit = 8;
 
-function moveToBottom(card) {
+    for (let iSuit = 0; iSuit < nSuit; iSuit++) {
+        const cardSuitDiv = document.createElement('div');
+        cardSuitDiv.classList.add('card_suit');
+        
+        for (let iCard = 1; iCard <= nCardPerSuit; iCard++) {
+            const cardPlaceholderDiv = document.createElement('div');
+            cardPlaceholderDiv.classList.add('card_placeholder');
+            cardPlaceholderDiv.setAttribute('data-id', `placeholder${iSuit * nCardPerSuit + iCard}`);
+            
+            const cardDiv = document.createElement('div');
+            cardDiv.classList.add('card');
+            cardDiv.textContent = `Card ${iSuit * nCardPerSuit + iCard}`;
+            cardDiv.setAttribute('onclick', 'moveCard(this)'); // Dynamically attach the onclick handler
+            
+            cardPlaceholderDiv.appendChild(cardDiv);
+            cardSuitDiv.appendChild(cardPlaceholderDiv);
+        }
+        
+        deck.appendChild(cardSuitDiv);
+    }
+});
+
+//document.querySelectorAll('.card').forEach(card => {
+//    card.addEventListener('click', () => {
+//        moveCard(card);
+//    });
+//});
+
+function moveCard(card) {
     const activeHand = document.querySelector('.hand.active'); // Get the currently active hand
 
     // If the card has no original placeholder reference, store its original parent
@@ -22,6 +54,9 @@ function moveToBottom(card) {
         }
     }
 }
+
+// Make the player hand active initially
+document.getElementById('player').classList.add('active');
 
 document.querySelectorAll('.hand').forEach(hand => {
     hand.addEventListener('click', () => {
