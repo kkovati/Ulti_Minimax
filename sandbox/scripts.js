@@ -1,4 +1,4 @@
-// Generate 
+// Generate the deck of cards
 document.addEventListener('DOMContentLoaded', () => {
     const deck = document.querySelector('.deck');
     
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const cardSuitDiv = document.createElement('div');
         cardSuitDiv.classList.add('card_suit');
         
-        for (let iCard = 1; iCard <= nCardPerSuit; iCard++) {
+        for (let iCard = 0; iCard < nCardPerSuit; iCard++) {
             const cardPlaceholderDiv = document.createElement('div');
             cardPlaceholderDiv.classList.add('card_placeholder');
             cardPlaceholderDiv.setAttribute('data-id', `placeholder${iSuit * nCardPerSuit + iCard}`);
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cardImage.classList.add('card');
             cardImage.setAttribute('id', `card${iSuit * nCardPerSuit + iCard}`);
             //cardImage.setAttribute('src', `path/to/card${iSuit * nCardPerSuit + iCard}.png`);
-            cardImage.setAttribute('src', `../webapp/assets/images/20.jpg`);
+            cardImage.setAttribute('src', `../webapp/assets/images/2${iCard}.jpg`);
             cardImage.setAttribute('alt', `Card ${iSuit * nCardPerSuit + iCard}`);
             cardImage.setAttribute('onclick', 'moveCard(this)');
             
@@ -29,12 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         deck.appendChild(cardSuitDiv);
     }
 });
-
-//document.querySelectorAll('.card').forEach(card => {
-//    card.addEventListener('click', () => {
-//        moveCard(card);
-//    });
-//});
 
 function moveCard(card) {
     const activeHand = document.querySelector('.hand.active'); // Get the currently active hand
