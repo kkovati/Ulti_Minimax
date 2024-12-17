@@ -14,16 +14,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
         
         for (let iCard = 0; iCard < nCardPerSuit; iCard++) {
+			// Card placeholder to hold a fix position for the card in the deck
             const cardPlaceholderDiv = document.createElement('div');
             cardPlaceholderDiv.classList.add('card_placeholder');
             cardPlaceholderDiv.setAttribute('data-id', `placeholder${iSuit * nCardPerSuit + iCard}`);
             
+			// Card
             const cardImage = document.createElement('img');
             cardImage.classList.add('card');
-            cardImage.setAttribute('id', `card${iSuit * nCardPerSuit + iCard}`);
-            //cardImage.setAttribute('src', `path/to/card${iSuit * nCardPerSuit + iCard}.png`);
+            cardImage.setAttribute('id', `${iSuit}${iCard}`);
             cardImage.setAttribute('src', `assets/images/${iSuit}${iCard}.jpg`);
-            cardImage.setAttribute('alt', `Card ${iSuit * nCardPerSuit + iCard}`);
+            cardImage.setAttribute('alt', `Card ${iSuit}${iCard}`);
             cardImage.setAttribute('onclick', 'moveCard(this)');
             
             cardPlaceholderDiv.appendChild(cardImage);
@@ -81,56 +82,40 @@ document.querySelectorAll('.trump').forEach(trump => {
 });
 
 
-// Wait for the WASM module to load
-//Module.onRuntimeInitialized = () => {
-//    // Access the 'add' function from the WASM module
-//    const add = Module.cwrap('add', 'number', ['number', 'number']);
-//
-//    document.getElementById('compute').addEventListener('click', () => {
-//        const result = add(5, 3); // Call the WASM function
-//        document.getElementById('result').textContent = `Result: ${result}`;
-//    });
-//};
+// Assemble message to WASM by coding the hands into a string
+function getDeal() {
+    const hands = ['player', 'opponent_0', 'opponent_1'];
+    let deal = "";
+
+    hands.forEach(divId => {
+        const hand = document.getElementById(divId);
+        if (hand) {
+            // Get all cards from hand, which are child elements of the div
+            const cards = hand.children;
+
+            // Iterate over children and collect their ids
+            for (let card of cards) {
+                if (card.id) {  // Only collect if the child has an id
+                    deal += card.id;
+                }
+            }
+        }
+    });
+
+    return deal;
+}
 
 
-// Wait for the WASM module to load
-//Module.onRuntimeInitialized = () => {
-//    // Access the 'multiply' function from the WASM module
-//    const multiply = Module.cwrap('multiply', 'number', ['number', 'number']);
-//
-//    // Add event listener for button
-//    document.getElementById('calculate').addEventListener('click', () => {
-//        const num1 = parseInt(document.getElementById('num1').value, 10);
-//        const num2 = parseInt(document.getElementById('num2').value, 10);
-//        if (!isNaN(num1) && !isNaN(num2)) {
-//            const result = multiply(num1, num2); // Call the WASM function
-//            document.getElementById('result').textContent = `Result: ${result}`;
-//        } else {
-//            document.getElementById('result').textContent = 'Please enter valid numbers!';
-//        }
-//    });
-//};
+// Toast warning message
+function showToast(message) {
+	var toast = document.getElementById("toast");
+	toast.textContent = message;
+	toast.style.visibility = "visible";
+	setTimeout(function() {
+		toast.style.visibility = "hidden";
+	}, 3000); // Toast will disappear after 3 seconds
+}
 
-
-// Load the WASM module
-//Module.onRuntimeInitialized = () => {
-//	console.log("WASM module loaded");
-//    const deal = "071315172021303336370001030405111214223202061016232426273134";
-//    const length = deal.length + 1;
-//    const dealPointer = Module._malloc(length);
-//    Module.stringToUTF8(deal, dealPointer, length);
-//
-//	// Call the WASM entry point
-//    const resultPointer = Module._wasm_main(dealPointer);
-//	
-//	// Read the result string
-//    const resultString = Module.UTF8ToString(resultPointer);
-//    console.log("WASM returned:", resultString);
-//
-//	// Free the allocated memory in both JS and WASM
-//    Module._free(dealPointer);
-//	Module._free(resultPointer); // Free the memory allocated in C++ for the response
-//};
 
 // This ensures the WASM code will run once it's loaded
 Module.onRuntimeInitialized = () => {
@@ -141,7 +126,14 @@ Module.onRuntimeInitialized = () => {
 
 	// Add a click event listener to trigger WASM code on button click
 	button.addEventListener("click", () => {
-		const deal = "071315172021303336370001030405111214223202061016232426273134";
+		const deal = getDeal();
+		
+		// Check length
+		if (deal.length != 60) {
+			showToast("Hello, this is a toast notification!");
+			return;
+		}
+		
 		const length = deal.length + 1;
 		const dealPointer = Module._malloc(length);
 		Module.stringToUTF8(deal, dealPointer, length);

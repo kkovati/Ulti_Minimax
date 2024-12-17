@@ -98,3 +98,16 @@ body {
 .trump.active {
     border-color: white;
 }
+
+.toast {
+	visibility: hidden; 
+	position: fixed; 
+	bottom: 30px; 
+	left: 50%; 
+	transform: translateX(-50%); 
+	background-color: rgba(0, 0, 0, 0.7); 
+	color: white; 
+	padding: 10px 20px; 
+	border-radius: 5px; 
+	font-size: 16px;"
+}
