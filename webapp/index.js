@@ -130,7 +130,7 @@ Module.onRuntimeInitialized = () => {
 		
 		// Check length
 		if (deal.length != 60) {
-			showToast("Hello, this is a toast notification!");
+			showToast("Deal is not ready!");
 			return;
 		}
 		
