@@ -10,8 +10,20 @@ body {
 
 .deck {
     display: flex;
+    flex-direction: column; /* Arrange items vertically */
+    gap: 20px; /* Space between items */
+    margin-top: 20px;
+}
+
+.card_suit {
+    display: flex;
     gap: 20px;
     margin-top: 20px;
+}
+
+.card_placeholder {
+    width: 100px;
+    height: 100px;
 }
 
 .card {
@@ -37,7 +49,7 @@ body {
     border: 5px solid yellow;
     border-radius: 15px;
     background-color: transparent;
-    /*transition: border-color 0.1s;*/
+    /*transition: border-color 0.3s;*/
 	display: flex;
     gap: 20px;
 }

@@ -1,11 +1,25 @@
-function moveToBottom(card) {
-    const activeHand = document.querySelector('.hand.active');
-    const deck = document.querySelector('.deck');
+document.getElementById('player').classList.add('active');
 
-    if (activeHand && !activeHand.contains(card)) {
-        activeHand.appendChild(card);
+function moveToBottom(card) {
+    const activeHand = document.querySelector('.hand.active'); // Get the currently active hand
+
+    // If the card has no original placeholder reference, store its original parent
+    if (!card.dataset.originalParent) {
+        card.dataset.originalParent = card.parentElement.dataset.id; // Store the original placeholder's unique ID
+    }
+
+    // Check if the card is in its original placeholder
+    if (card.parentElement.dataset.id === card.dataset.originalParent) {
+        // Move to active hand
+        if (activeHand) {
+            activeHand.appendChild(card);
+        }
     } else {
-        deck.appendChild(card);
+        // Move back to the original placeholder using the stored ID
+        const originalPlaceholder = document.querySelector(`[data-id="${card.dataset.originalParent}"]`);
+        if (originalPlaceholder) {
+            originalPlaceholder.appendChild(card);
+        }
     }
 }
 
