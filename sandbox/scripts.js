@@ -1,3 +1,4 @@
+// Generate 
 document.addEventListener('DOMContentLoaded', () => {
     const deck = document.querySelector('.deck');
     
@@ -13,12 +14,15 @@ document.addEventListener('DOMContentLoaded', () => {
             cardPlaceholderDiv.classList.add('card_placeholder');
             cardPlaceholderDiv.setAttribute('data-id', `placeholder${iSuit * nCardPerSuit + iCard}`);
             
-            const cardDiv = document.createElement('div');
-            cardDiv.classList.add('card');
-            cardDiv.textContent = `Card ${iSuit * nCardPerSuit + iCard}`;
-            cardDiv.setAttribute('onclick', 'moveCard(this)'); // Dynamically attach the onclick handler
+            const cardImage = document.createElement('img');
+            cardImage.classList.add('card');
+            cardImage.setAttribute('id', `card${iSuit * nCardPerSuit + iCard}`);
+            //cardImage.setAttribute('src', `path/to/card${iSuit * nCardPerSuit + iCard}.png`);
+            cardImage.setAttribute('src', `../webapp/assets/images/20.jpg`);
+            cardImage.setAttribute('alt', `Card ${iSuit * nCardPerSuit + iCard}`);
+            cardImage.setAttribute('onclick', 'moveCard(this)');
             
-            cardPlaceholderDiv.appendChild(cardDiv);
+            cardPlaceholderDiv.appendChild(cardImage);
             cardSuitDiv.appendChild(cardPlaceholderDiv);
         }
         

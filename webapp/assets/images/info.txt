@@ -1,3 +1,11 @@
+Suit code:
+0 -> piros
+1 -> zold
+2 -> makk
+3 -> tok
+
+Sources:
+
 Cards:
 https://aduasz.com/magyarkartya/kartya_gyujtemeny.php
 https://aduasz.com/magyarkartya/kep/piatnik_kartyalapok_32.jpg
