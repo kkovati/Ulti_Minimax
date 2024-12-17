@@ -131,3 +131,30 @@ document.querySelectorAll('.trump').forEach(trump => {
 //    Module._free(dealPointer);
 //	Module._free(resultPointer); // Free the memory allocated in C++ for the response
 //};
+
+// This ensures the WASM code will run once it's loaded
+Module.onRuntimeInitialized = () => {
+	console.log("WASM module loaded");
+
+	// Get the button element
+	const button = document.getElementById("simulate-button");
+
+	// Add a click event listener to trigger WASM code on button click
+	button.addEventListener("click", () => {
+		const deal = "071315172021303336370001030405111214223202061016232426273134";
+		const length = deal.length + 1;
+		const dealPointer = Module._malloc(length);
+		Module.stringToUTF8(deal, dealPointer, length);
+
+		// Call the WASM entry point
+		const resultPointer = Module._wasm_main(dealPointer);
+
+		// Read the result string
+		const resultString = Module.UTF8ToString(resultPointer);
+		console.log("WASM returned:", resultString);
+
+		// Free the allocated memory in both JS and WASM
+		Module._free(dealPointer);
+		Module._free(resultPointer); // Free the memory allocated in C++ for the response
+	});
+};
