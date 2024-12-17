@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Cards</title>
+    <title>Ulti Minimax</title>
     <link rel="stylesheet" href="styles.css">
+	<script src="ulti_minimax.js" defer></script>
+    <script src="index.js" defer></script>
 </head>
 <body>
-    <div class="cards-container">
-        <div class="card" onclick="moveToBottom(this)">Card 1</div>
-        <div class="card" onclick="moveToBottom(this)">Card 2</div>
-        <div class="card" onclick="moveToBottom(this)">Card 3</div>
+	<h1 class="title-text">Ulti Minimax</h2>
+	<div class="deck"></div>
+    <div class="hand" id="player"></div>
+	<div class="opponents">
+		<!-- Opponents are in left hand order -->
+		<div class="hand" id="opponent_1"></div>
+		<div class="hand" id="opponent_0"></div>
+	</div>
+    <h2 class="title-text">Trump</h2>
+    <div class="trump-container">
+        <img src="assets/images/piros.png" alt="Piros" class="trump">
+        <img src="assets/images/zold.png" alt="Zold" class="trump">
+        <img src="assets/images/makk.png" alt="Makk" class="trump">
+        <img src="assets/images/tok.png" alt="Tok" class="trump">
     </div>
-    <div class="bottom-container" id="bottomContainer">
-        <!-- Cards will move here -->
-    </div>
-	<script src="ulti_minimax.js"></script>
-	<script src="index.js"></script>	    
 </body>
 </html>
