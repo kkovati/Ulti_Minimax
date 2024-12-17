@@ -30,6 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
+// Move card between deck and hands
 function moveCard(card) {
     const activeHand = document.querySelector('.hand.active'); // Get the currently active hand
 
@@ -41,7 +43,7 @@ function moveCard(card) {
     // Check if the card is in its original placeholder
     if (card.parentElement.dataset.id === card.dataset.originalParent) {
         // Move to active hand
-        if (activeHand) {
+        if (activeHand && activeHand.children.length < 10) {
             activeHand.appendChild(card);
         }
     } else {
@@ -65,11 +67,11 @@ document.querySelectorAll('.hand').forEach(hand => {
     });
 });
 
-document.querySelectorAll('.image').forEach(image => {
-    image.addEventListener('click', () => {
+document.querySelectorAll('.trump').forEach(trump => {
+    trump.addEventListener('click', () => {
         // Reset all images to default
-        document.querySelectorAll('.image').forEach(img => img.classList.remove('active'));
-        // Set the clicked image to white border
-        image.classList.add('active');
+        document.querySelectorAll('.trump').forEach(img => img.classList.remove('active'));
+        // Set the clicked trump to white border
+        trump.classList.add('active');
     });
 });
