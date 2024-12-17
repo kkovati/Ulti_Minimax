@@ -3,11 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const deck = document.querySelector('.deck');
     
     const nSuit = 4;
-    const nCardPerSuit = 8;
+    const nCardPerSuit = 8;	
+	cardSuitDiv = null;
 
-    for (let iSuit = 0; iSuit < nSuit; iSuit++) {
-        const cardSuitDiv = document.createElement('div');
-        cardSuitDiv.classList.add('card_suit');
+    for (let iSuit = 0; iSuit < nSuit; iSuit++) {		
+		// To have only two rows of cards in the deck
+		if (iSuit % 2 == 0) {
+			cardSuitDiv = document.createElement('div');
+			cardSuitDiv.classList.add('card_suit');
+		}
         
         for (let iCard = 0; iCard < nCardPerSuit; iCard++) {
             const cardPlaceholderDiv = document.createElement('div');
