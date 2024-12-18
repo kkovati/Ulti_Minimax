@@ -72,6 +72,9 @@ document.querySelectorAll('.hand').forEach(hand => {
     });
 });
 
+
+//TODO make trump active 
+
 document.querySelectorAll('.trump').forEach(trump => {
     trump.addEventListener('click', () => {
         // Reset all images to default
@@ -117,36 +120,15 @@ function showToast(message) {
 }
 
 
-// This ensures the WASM code will run once it's loaded
-Module.onRuntimeInitialized = () => {
-	console.log("WASM module loaded");
-
-	// Get the button element
-	const button = document.getElementById("simulate-button");
-
-	// Add a click event listener to trigger WASM code on button click
-	button.addEventListener("click", () => {
-		const deal = getDeal();
-		
-		// Check length
-		if (deal.length != 60) {
-			showToast("Deal is not ready!");
-			return;
-		}
-		
-		const length = deal.length + 1;
-		const dealPointer = Module._malloc(length);
-		Module.stringToUTF8(deal, dealPointer, length);
-
-		// Call the WASM entry point
-		const resultPointer = Module._wasm_main(dealPointer);
-
-		// Read the result string
-		const resultString = Module.UTF8ToString(resultPointer);
-		console.log("WASM returned:", resultString);
-
-		// Free the allocated memory in both JS and WASM
-		Module._free(dealPointer);
-		Module._free(resultPointer); // Free the memory allocated in C++ for the response
-	});
-};
+// Simulate button opens simulation side and codes deal into URL
+document.getElementById("simulate-button").addEventListener("click", () => {
+	const deal = getDeal();
+	
+	// Check length
+	if (deal.length != 60) {
+		showToast("Deal 10 cards to each player");
+		return;
+	}
+	
+	window.location.href = `simulation.html?deal=${deal}`;
+});

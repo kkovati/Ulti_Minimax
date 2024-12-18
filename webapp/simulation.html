@@ -6,17 +6,10 @@
     <title>Ulti Minimax</title>
     <link rel="stylesheet" href="styles.css">
 	<script src="ulti_minimax.js" defer></script>
-    <script src="index.js" defer></script>
+    <script src="simulation.js" defer></script>
 </head>
 <body>
 	<h1 class="title-text">Ulti Minimax</h2>
-	<div class="deck"></div>
-    <div class="hand" id="player"></div>
-	<div class="opponents">
-		<!-- Player and opponents are in left hand order -->
-		<div class="hand" id="opponent_1"></div>
-		<div class="hand" id="opponent_0"></div>
-	</div>
     <h2 class="title-text">Trump</h2>
     <div class="trump-container">
         <img src="assets/images/piros.png" alt="Piros" class="trump">
@@ -25,7 +18,5 @@
         <img src="assets/images/tok.png" alt="Tok" class="trump">
     </div>
 	<button id="simulate-button">Simulate</button>
-	
-	<div class="toast" id="toast">This is a toast message!</div>
 </body>
 </html>
