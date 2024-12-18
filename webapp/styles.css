@@ -43,6 +43,7 @@ body {
 }
 
 .hand {
+	position: relative; /* New positioning context for the background text */
     width: 730px;
     height: 130px;
     margin: 10px 0;
@@ -62,6 +63,19 @@ body {
 
 .hand.active {
     border-color: white;
+}
+
+.background-text {
+    position: absolute;
+    top: 50%; /* Center vertically */
+    left: 50%; /* Center horizontally */
+    transform: translate(-50%, -50%); /* Adjust for perfect centering */
+    z-index: 0; /* Stays in the background */
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.5); /* White 50% transparent */
+	font-weight: bold;
+    pointer-events: none; /* Prevent the text from interfering with interactions */
+    white-space: nowrap;
 }
 
 .opponents {

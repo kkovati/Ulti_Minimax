@@ -48,7 +48,8 @@ function moveCard(card) {
     // Check if the card is in its original placeholder
     if (card.parentElement.dataset.id === card.dataset.originalParent) {
         // Move to active hand
-        if (activeHand && activeHand.children.length < 10) {
+		// Note: the limit is set to 11 instead of 10, because the hand already contains a background text
+        if (activeHand && activeHand.children.length < 11) {
             activeHand.appendChild(card);
         }
     } else {
