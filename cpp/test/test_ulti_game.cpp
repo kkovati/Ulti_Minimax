@@ -9,32 +9,56 @@ TEST(PartyStateTest, TestChooseWinnerCard) {
     ulti_minimax::PartyState partyState;
 
     std::vector<std::vector<int>> testCases = {
-        {0, 2, 0, 0, 0, 1, 0},
-        {0, 2, 0, 4, 0, 3, 1},
-        {0, 2, 0, 0, 0, 3, 2},
+        // Each line is:
+        // suit, value, suit, value, suit, value, trump, winning card index
 
-        {0, 2, 1, 4, 2, 4, 0},
-        {0, 2, 1, 1, 2, 1, 0},
+        // These cases has intentionally uses invalid trump index (4)
+        {0, 2, 0, 0, 0, 1, 4, 0},
+        {0, 2, 0, 4, 0, 3, 4, 1},
+        {0, 2, 0, 0, 0, 3, 4, 2},
 
-        {0, 2, 0, 4, 1, 3, 1},
-        {0, 2, 0, 0, 1, 3, 0},
-        {0, 2, 0, 0, 1, 3, 0},
-        {0, 2, 1, 4, 0, 3, 2},
-        {0, 2, 1, 4, 0, 1, 0}
+        {0, 2, 1, 4, 2, 4, 4, 0},
+        {0, 2, 1, 1, 2, 1, 4, 0},
+
+        {0, 2, 0, 4, 1, 3, 4, 1},
+        {0, 2, 0, 0, 1, 3, 4, 0},
+        {0, 2, 0, 0, 1, 3, 4, 0},
+        {0, 2, 1, 4, 0, 3, 4, 2},
+        {0, 2, 1, 4, 0, 1, 4, 0},
+
+        // Valid trump cases
+        {0, 2, 0, 0, 0, 1, 0, 0},
+        {0, 2, 0, 4, 0, 3, 0, 1},
+        {0, 2, 0, 0, 0, 3, 0, 2},
+
+        {0, 2, 1, 4, 2, 4, 1, 1},
+        {0, 2, 1, 1, 2, 1, 2, 2},
+        {0, 2, 1, 1, 2, 1, 0, 0},
+
+        {0, 2, 0, 4, 1, 3, 0, 1},
+        {0, 2, 0, 0, 1, 3, 1, 2},
+        {0, 2, 0, 0, 1, 3, 0, 0},
+        {0, 2, 1, 4, 0, 3, 1, 1},
+        {0, 2, 1, 4, 0, 1, 1, 1},
+
+        {0, 2, 1, 4, 1, 1, 1, 1},
+        {0, 2, 1, 4, 0, 3, 1, 1},
+        {0, 2, 0, 3, 1, 4, 1, 2},
     };
 
     for (const auto& testCase : testCases) {
         ulti_minimax::Card c0(testCase[0], testCase[1]);
         ulti_minimax::Card c1(testCase[2], testCase[3]);
         ulti_minimax::Card c2(testCase[4], testCase[5]);
-        int winCardIndex = partyState.chooseWinnerCard(c0, c1, c2);
-        if (winCardIndex != testCase[6]) {
+        uint8_t trump = testCase[6];
+        int winCardIndex = partyState.chooseWinnerCard(c0, c1, c2, trump);
+        if (winCardIndex != testCase[7]) {
             for (int value : testCase) {
                 std::cout << value << " ";
             }
             std::cout << std::endl;
         }
-        EXPECT_EQ(winCardIndex, testCase[6]);        
+        EXPECT_EQ(winCardIndex, testCase[7]);        
     }
 }
 

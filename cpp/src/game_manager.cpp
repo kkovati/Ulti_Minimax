@@ -49,6 +49,9 @@ void GameManager::simulate(const std::string& deal) {
 	setPartyState(tpc, 0);
 }
 
+// This function implements one iteration of the minimax algorithm.
+// It handles a single sitation of the game or a single node in the tree.
+//
 TreePathCoder GameManager::minimax(int index) {
 	n_minimax_call += 1;
 	if (index == 0 || index == 3 || index == 6) updateProgressBar();

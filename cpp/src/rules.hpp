@@ -7,11 +7,13 @@
 
 namespace ulti_minimax {
 
+// Deck info
 constexpr int N_SUIT = 4;
 constexpr int N_VALUE = 8;
 constexpr int LOWEST_CARD_VALUE_WITH_POINT = 6;
 constexpr int N_POINT_IN_DECK = (N_VALUE - LOWEST_CARD_VALUE_WITH_POINT) * N_SUIT;
 
+// Game rules info
 constexpr int N_PLAYER = 3;
 constexpr int N_CARD_IN_HAND = 10;
 constexpr int N_ACTION = N_PLAYER * N_CARD_IN_HAND;
@@ -19,9 +21,26 @@ constexpr int LAST_ACTION_INDEX = N_ACTION - 1;
 
 constexpr int MIN_POINT_TO_WIN = static_cast<int>(N_POINT_IN_DECK / 2);
 
+// Party results
 constexpr uint8_t RESULT_UNDEFINED = 0;
 constexpr uint8_t PLAYER_WIN = 1;
 constexpr uint8_t OPPONENT_WIN = 2;
+
+// Trumps: 0...3
+constexpr uint8_t NO_TRUMP_CODE = 4;
+
+// Game types
+constexpr uint8_t NO_TRUMP_PARTY = 0;
+constexpr uint8_t TRUMP_PARTY = 1;
+constexpr uint8_t _40100 = 2;
+constexpr uint8_t _4ACES = 3;
+constexpr uint8_t ULTI = 4;
+constexpr uint8_t BETLI = 5;
+constexpr uint8_t NO_TRUMP_DURCHMARS = 6;
+constexpr uint8_t DURCHMARS = 7;
+constexpr uint8_t _20100 = 8;
+constexpr uint8_t _4TENS = 9;
+constexpr uint8_t NO_TRUMP_GAMES[] = { NO_TRUMP_PARTY, BETLI, NO_TRUMP_DURCHMARS };
 
 constexpr int SEED = 0;
 constexpr bool DEBUG = false;
@@ -40,9 +59,10 @@ public:
 		return *this;
 	};
 
-	int getSuit() { return suit; };
-	int getValue() { return value; };
-	int getPoint() { return value >= LOWEST_CARD_VALUE_WITH_POINT; };
+	int getSuit() const { return suit; };
+	int getValue() const { return value; };
+	int getPoint() const { return value >= LOWEST_CARD_VALUE_WITH_POINT; };
+	bool isTrump(uint8_t trump) const { return suit == trump; }
 
 	bool operator==(const Card& other) const { return suit == other.suit; }; // True if same suit
 	bool operator!=(const Card& other) const { return suit != other.suit; }; // True if different suit
@@ -237,10 +257,11 @@ private:
 class PartyState {
 public:
 	PartyState() = default;
-	PartyState(const PartyState& other) : actionList(other.actionList), roundResults(other.roundResults), 
-		playerHands(other.playerHands) {};
+	PartyState(const PartyState& other) : gameType(other.gameType), trump(other.trump),
+		actionList(other.actionList), roundResults(other.roundResults), playerHands(other.playerHands) {};
 	PartyState& operator=(const PartyState& other) {
 		if (this != &other) {
+			gameType = other.gameType; trump = other.trump;
 			actionList = other.actionList; roundResults = other.roundResults; playerHands = other.playerHands;
 		}
 		return *this;
@@ -255,21 +276,36 @@ public:
 	void simplifyPlayableCards(CardVector&);
 	void setHitCard(int, const Card&);
 	void setNextPlayer(int);
-	int chooseWinnerCard(const Card, const Card, const Card);
+	int chooseWinnerCard(const Card, const Card, const Card, uint8_t);
 
 	bool isLastIndex(int index_) { return actionList.isLastIndex(index_); };
 	bool isFirstPlayerToHit(int index_) { return actionList.isFirstPlayerToHit(index_); };
 
-	uint8_t evaluateParty(int, bool);
+	uint8_t evaluateParty(int, bool); // Evaluate the current game type	
 
 	void print_current_state(int, const CardVector&);
 	void print_card(int);
 	void print_game_progression();
 
 private:
+	uint8_t gameType = 0;
+	uint8_t trump = 0;
+
 	ActionList actionList = ActionList();
 	RoundResults roundResults = RoundResults();
-	PlayerHands playerHands = PlayerHands();			
+	PlayerHands playerHands = PlayerHands();	
+
+	// The different games types' evaluation methods
+	uint8_t evaluateNoTrumpParty(int, bool);
+	uint8_t evaluateTrumpParty(int, bool);
+	uint8_t evaluate40100(int, bool);
+	uint8_t evaluate4Aces(int, bool);
+	uint8_t evaluateUlti(int, bool);
+	uint8_t evaluateBetli(int, bool);
+	uint8_t evaluateNoTrumpDurchmars(int, bool);
+	uint8_t evaluateDurchmars(int, bool);
+	uint8_t evaluate20100(int, bool);
+	uint8_t evaluate4Tens(int, bool);
 };
 
 }

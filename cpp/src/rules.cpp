@@ -3,6 +3,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <unordered_set>
 
 #include "rules.hpp"
 
@@ -80,16 +81,39 @@ void PlayerHands::random_deal() {
 
 
 void PartyState::init(const std::string& deal) {
-    if (!deal.empty()) {
-        // Parse deal
-        assert(deal.length() == N_ACTION * 2);
+    // Parse deal string
+    if (!deal.empty()) {   
+        // Deal code structure:
+        // deal[0]		= game type
+        // deal[1]		= trump [0-3]
+        // deal[2...61]	= cards
+        if (!(deal.length() == 2 + N_ACTION * 2)) throw std::invalid_argument("Invalid deal code length");
+
+        // Game type
+        char gameTypeChar = deal[0];
+        if (!std::isdigit(gameTypeChar)) throw std::invalid_argument("Invalid game type code");
+        gameType = gameTypeChar - '0'; // Convert char to int
+        if(!(0 <= gameType && gameType <= 3)) throw std::invalid_argument("Invalid game type code");
+
+        // Trump
+        char trumpChar = deal[1];
+        if (!std::isdigit(trumpChar)) throw std::invalid_argument("Invalid trump code");
+        trump = trumpChar - '0';
+        if (!(0 <= trump && trump <= 3)) throw std::invalid_argument("Invalid trump code");
+        // Check if no-trump game type is selected
+        const std::unordered_set<uint8_t> noTrumpGameTypes(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES));
+        if (noTrumpGameTypes.find(gameType) != noTrumpGameTypes.end()) {
+            trump = NO_TRUMP_CODE;
+            // TODO ace - king order !!!!!!!
+        }
+        
         std::vector<Card> cardVector;
-        for (int i = 0; i < deal.length(); i += 2) {
-            char suit_char = deal[i];
-            char value_char = deal[i + 1];
-            if (!std::isdigit(suit_char) || !std::isdigit(value_char)) throw std::invalid_argument("Invalid card code");
-            int suit = suit_char - '0';  // Convert char to int
-            int value = value_char - '0';
+        for (int i = 2; i < deal.length(); i += 2) {
+            char suitChar = deal[i];
+            char valueChar = deal[i + 1];
+            if (!std::isdigit(suitChar) || !std::isdigit(valueChar)) throw std::invalid_argument("Invalid card code");
+            int suit = suitChar - '0'; // Convert char to int
+            int value = valueChar - '0';
             if (suit < 0 || 3 < suit || value < 0 || 7 < value) throw std::invalid_argument("Invalid card code");
             cardVector.push_back(Card(suit, value));
         }
@@ -104,8 +128,10 @@ void PartyState::init(const std::string& deal) {
         // Init the deal
         playerHands.init_deal(cardVector);
     }
+    // Random deal
     else {
-        // Random deal
+        gameType = 0;
+        trump = 0;
         playerHands.random_deal();
     }    
 }
@@ -214,7 +240,7 @@ void PartyState::setNextPlayer(int index_) {
         Card card0 = actionList.getCard(index_ - 2);
         Card card1 = actionList.getCard(index_ - 1);
         Card card2 = actionList.getCard(index_);
-        int winCardIndex = chooseWinnerCard(card0, card1, card2);
+        int winCardIndex = chooseWinnerCard(card0, card1, card2, trump);
         int firstPlayerInRound = actionList.getPlayerToHit(index_ - 2);
         int winnerPlayer = (firstPlayerInRound + winCardIndex) % N_PLAYER;
         if (!actionList.isLastIndex(index_))
@@ -224,25 +250,54 @@ void PartyState::setNextPlayer(int index_) {
     } 
 }
 
-int PartyState::chooseWinnerCard(const Card c0, const Card c1, const Card c2) {
+// Chooses the best card in a round. The 3 input cards are in order of hit.
+//
+int PartyState::chooseWinnerCard(const Card c0, const Card c1, const Card c2, uint8_t trump) {
+    // This method concentrates on cases when the second card can win
+    // (c0 == c1 && c0 > c1) || (c0 != c1) == !(c0 == c1 && c0 < c1)
     // c0 beats c1
-    bool c0bc1_ = (c0 == c1 && c0 > c1) || (c0 != c1);
-    bool c0bc1 = !(c0 == c1 && c0 < c1);
-    assert(c0bc1 == c0bc1_);
+    bool c0bc1 = !((!c0.isTrump(trump) && c1.isTrump(trump)) || (c0 == c1 && c0 < c1));
     // c0 beats c2
-    bool c0bc2 = !(c0 == c2 && c0 < c2);
+    bool c0bc2 = !((!c0.isTrump(trump) && c2.isTrump(trump)) || (c0 == c2 && c0 < c2));
 
     if (c0bc1 && c0bc2) return 0;
     if (c0bc1 && !c0bc2) return 2;
     if (!c0bc1 && c0bc2) return 1;
 
     // both c1 and c2 beats c0
-    assert(c0 == c1 && c1 == c2);
-    if (c1 > c2) return 1;
+    if (!((!c1.isTrump(trump) && c2.isTrump(trump)) || (c1 == c2 && c1 < c2))) return 1;
     return 2;
 }
 
-uint8_t PartyState::evaluateParty(int index_, bool print) {
+
+uint8_t PartyState::evaluateParty(int index, bool print) {
+    switch (gameType) {
+    case NO_TRUMP_PARTY:
+        return evaluateNoTrumpParty(index, print);
+    case TRUMP_PARTY:
+        return evaluateTrumpParty(index, print);
+    case _40100:
+        return evaluate40100(index, print);
+    case _4ACES:
+        return evaluate4Aces(index, print);
+    case ULTI:
+        return evaluateUlti(index, print);
+    case BETLI:
+        return evaluateBetli(index, print);
+    case NO_TRUMP_DURCHMARS:
+        return evaluateNoTrumpDurchmars(index, print);
+    case DURCHMARS:
+        return evaluateDurchmars(index, print);
+    case _20100:
+        return evaluate20100(index, print);
+    case _4TENS:
+        return evaluate4Tens(index, print);
+    default:
+        throw std::invalid_argument("Invalid game type code");
+    }
+}
+
+uint8_t PartyState::evaluateNoTrumpParty(int index_, bool print) {
     // TODO integrate with setNextPlayer() if possible
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
@@ -269,6 +324,16 @@ uint8_t PartyState::evaluateParty(int index_, bool print) {
     assert(!actionList.isLastIndex(index_));
     return RESULT_UNDEFINED;
 }
+
+uint8_t PartyState::evaluateTrumpParty(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluate40100(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluate4Aces(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluateUlti(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluateBetli(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluateNoTrumpDurchmars(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluateDurchmars(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluate20100(int index_, bool print) { return 0; }
+uint8_t PartyState::evaluate4Tens(int index_, bool print) { return 0; }
 
 void PartyState::print_current_state(int index_, const CardVector& playableCards) {
     int round = actionList.getRound(index_);
@@ -314,7 +379,7 @@ void PartyState::print_card(int index_) {
     std::cout << "Selected card: " << actionList.getCard(index_) << std::endl;
 }
 
-// This function is not in use
+// NOTE: This function is not in use 
 //
 void PartyState::print_game_progression() {
     std::cout << "=== Game Progression: =====================" << std::endl;

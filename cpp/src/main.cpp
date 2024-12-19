@@ -17,8 +17,16 @@ int main()
 	std::cout << "Start simulation\n";
 	auto gameManager = ulti_minimax::GameManager();
 
-	// Determined deal
-	std::string deal = "071315172021303336370001030405111214223202061016232426273134";
+	// Deal code structure:
+	// deal[0]		= game type
+	// deal[1]		= trump [0-3]
+	// deal[2...61]	= cards
+	std::string deal = "00071315172021303336370001030405111214223202061016232426273134";
+	// Start simulation
+	// Result : PLAYER_WIN
+	// No.calls: 27497887
+	// Duration : 5752 ms
+	// TreePathCoder : 7 0 0 7 0 0 6 0 0 5 0 0 4 0 0 0 2 0 0 0 0 10 10 10 10 10 10 10 10 10
 	gameManager.simulate(deal);
 
 	// Random deal
