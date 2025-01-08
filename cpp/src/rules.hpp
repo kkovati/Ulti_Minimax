@@ -19,27 +19,25 @@ constexpr int N_CARD_IN_HAND = 10;
 constexpr int N_ACTION = N_PLAYER * N_CARD_IN_HAND;
 constexpr int LAST_ACTION_INDEX = N_ACTION - 1;
 
-constexpr int MIN_POINT_TO_WIN = static_cast<int>(N_POINT_IN_DECK / 2);
-
 // Party results
-constexpr uint8_t RESULT_UNDEFINED = 0;
-constexpr uint8_t PLAYER_WIN = 1;
-constexpr uint8_t OPPONENT_WIN = 2;
+constexpr uint8_t RESULT_UNDEFINED	= 0;
+constexpr uint8_t PLAYER_WIN		= 1;
+constexpr uint8_t OPPONENT_WIN		= 2;
 
 // Trumps: 0...3
 constexpr uint8_t NO_TRUMP_CODE = 4;
 
 // Game types
-constexpr uint8_t NO_TRUMP_PARTY = 0;
-constexpr uint8_t TRUMP_PARTY = 1;
-constexpr uint8_t _40100 = 2;
-constexpr uint8_t _4ACES = 3;
-constexpr uint8_t ULTI = 4;
-constexpr uint8_t BETLI = 5;
-constexpr uint8_t NO_TRUMP_DURCHMARS = 6;
-constexpr uint8_t DURCHMARS = 7;
-constexpr uint8_t _20100 = 8;
-constexpr uint8_t _4TENS = 9;
+constexpr uint8_t NO_TRUMP_PARTY		= 0;
+constexpr uint8_t TRUMP_PARTY			= 1;
+constexpr uint8_t _40100				= 2;
+constexpr uint8_t _4ACES				= 3;
+constexpr uint8_t ULTI					= 4;
+constexpr uint8_t BETLI					= 5;
+constexpr uint8_t NO_TRUMP_DURCHMARS	= 6;
+constexpr uint8_t DURCHMARS				= 7;
+constexpr uint8_t _20100				= 8;
+constexpr uint8_t _4TENS				= 9;
 constexpr uint8_t NO_TRUMP_GAMES[] = { NO_TRUMP_PARTY, BETLI, NO_TRUMP_DURCHMARS };
 
 constexpr int SEED = 0;
@@ -64,11 +62,15 @@ public:
 	int getPoint() const { return value >= LOWEST_CARD_VALUE_WITH_POINT; };
 	bool isTrump(uint8_t trump) const { return suit == trump; }
 
+	// The following comparisons are based on the fact that there are no two equal cards in a deck
 	bool operator==(const Card& other) const { return suit == other.suit; }; // True if same suit
 	bool operator!=(const Card& other) const { return suit != other.suit; }; // True if different suit
 	bool operator>(const Card& other) const { return value > other.value; }; // True if greater value
 	bool operator<(const Card& other) const { return value < other.value; }; // True if smaller value
 	static bool compareCard(const Card&, const Card&);
+
+	// Check if two cards are equal (which cannot be in a normal decK)
+	bool equals(const Card& other) const { return suit == other.suit && value == other.value; };
 		
 	bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value && other.value != LOWEST_CARD_VALUE_WITH_POINT; };
 
@@ -161,7 +163,7 @@ public:
 private:
 	using ActionVector = std::array<Action, N_ACTION>;
 
-	int firstPlayer;
+	int firstPlayer; // Index of the player who playes against the opponents
 	ActionVector actions;	
 
 	Action getAction(int index_) { return actions[index_]; };
@@ -171,26 +173,49 @@ private:
 class RoundResults {
 public:
 	RoundResults() = default;
-	RoundResults(const RoundResults& other) : winner(other.winner), point(other.point) {};
+	RoundResults(const RoundResults& other) : 
+		winner(other.winner), point(other.point), 
+		trump0(other.trump0), ace(other.ace), ten(other.ten) {};
 	RoundResults& operator=(const RoundResults& other) {
 		if (this != &other) {
-			winner = other.winner; point = other.point;
+			winner = other.winner; point = other.point; 
+			trump0 = other.trump0; ace = other.ace; ten = other.ten;
 		}
 		return *this;
 	};
 
-	uint8_t getWinner(int round) const { return winner[round]; };
-	uint8_t getPoint(int round) const { return point[round]; };
+	int getWinner(int round) const { return winner[round]; };
+	int getPoint(int round) const { return point[round]; };
 	void setWinner(int round, int player_) { winner[round] = player_; };
 	void setPoint(int round, int point_) { point[round] = point_; };
-	bool isLastRound(int round) {
+
+	int getTrump0(int round) const { return trump0[round]; };
+	int getAce(int round) const { return ace[round]; };
+	int getTen(int round) const { return ten[round]; };
+
+	void setSpecialCard(int round, const Card c0, const Card c1, const Card c2, int trump) {
+		trump0[round] = 0;
+		ace[round] = 0;
+		ten[round] = 0;
+		for (const Card& card : std::array<Card, 3>{c0, c1, c2}) {
+			if (card.getSuit() == trump && card.getValue() == 0) trump0[round] = 1;
+			if (card.getValue() == N_VALUE - 1) ace[round]++;
+			if (card.getValue() == N_VALUE - 2) ten[round]++;
+		}
+	}	
+
+	bool isLastRound(int round) const {
 		assert(0 <= round && round <= N_CARD_IN_HAND - 1);
 		return round == N_CARD_IN_HAND - 1;
 	};
 
 private:
-	std::array<int, N_CARD_IN_HAND> winner;
-	std::array<int, N_CARD_IN_HAND> point;
+	// Keep track of each rounds' results
+	std::array<int, N_CARD_IN_HAND> winner; // Winner player of the round
+	std::array<int, N_CARD_IN_HAND> point; // No. points won
+	std::array<int, N_CARD_IN_HAND> trump0; // Is Trump0 played in the round
+	std::array<int, N_CARD_IN_HAND> ace; // Is Ace played in the round
+	std::array<int, N_CARD_IN_HAND> ten; // Is Ten played in the round
 };
 
 
@@ -220,7 +245,7 @@ public:
 			Card curr_card = getCard(player_, i);
 			if (curr_card != card_ || curr_card > card_ || curr_card < card_) continue;
 			assert(curr_card == card_ && !(curr_card > card_) && !(curr_card < card_));
-			assert(getUsed(player_, i) > actionIndex_);
+			assert(getUsed(player_, i) > actionIndex_); // Card cannot be used before current action index
 			setUsed(player_, i, actionIndex_);
 			return;
 		}
@@ -239,6 +264,14 @@ public:
 		assert(counter <= 1);
 	}
 
+	// Check if card is in player's hand
+	bool checkCard(int player_, const Card& card) const {
+		for (int i = 0; i < N_CARD_IN_HAND; ++i) {
+			if (playerCards[player_][i].equals(card)) return true;
+		}
+		return false;
+	}
+
 private:
 	using CardArray = std::array<Card, N_CARD_IN_HAND>;
 	using PlayerCardArray = std::array<CardArray, N_PLAYER>;
@@ -248,6 +281,8 @@ private:
 	PlayerCardArray playerCards;
 	PlayerUsedArray playerUseds; // Action index when that card was used
 
+	// Private version of setUsed(), where card is index int, instead of Card object
+	//
 	void setUsed(int player_, int index_, int actionIndex_) {
 		playerUseds[player_][index_] = actionIndex_;
 	}
@@ -269,7 +304,7 @@ public:
 
 	using CardVector = std::vector<Card>;
 
-	void init(const std::string& = "");
+	bool init(const std::string& = "");
 
 	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
@@ -288,24 +323,12 @@ public:
 	void print_game_progression();
 
 private:
-	uint8_t gameType = 0;
-	uint8_t trump = 0;
+	uint8_t gameType = NO_TRUMP_PARTY;
+	uint8_t trump = NO_TRUMP_CODE;
 
 	ActionList actionList = ActionList();
 	RoundResults roundResults = RoundResults();
 	PlayerHands playerHands = PlayerHands();	
-
-	// The different games types' evaluation methods
-	uint8_t evaluateNoTrumpParty(int, bool);
-	uint8_t evaluateTrumpParty(int, bool);
-	uint8_t evaluate40100(int, bool);
-	uint8_t evaluate4Aces(int, bool);
-	uint8_t evaluateUlti(int, bool);
-	uint8_t evaluateBetli(int, bool);
-	uint8_t evaluateNoTrumpDurchmars(int, bool);
-	uint8_t evaluateDurchmars(int, bool);
-	uint8_t evaluate20100(int, bool);
-	uint8_t evaluate4Tens(int, bool);
 };
 
 }

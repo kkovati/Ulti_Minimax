@@ -80,7 +80,10 @@ void PlayerHands::random_deal() {
 }
 
 
-void PartyState::init(const std::string& deal) {
+// Initialize based on the deal string or randomly
+// Return true if prerequsites are okay
+//
+bool PartyState::init(const std::string& deal) {
     // Parse deal string
     if (!deal.empty()) {   
         // Deal code structure:
@@ -104,7 +107,7 @@ void PartyState::init(const std::string& deal) {
         const std::unordered_set<uint8_t> noTrumpGameTypes(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES));
         if (noTrumpGameTypes.find(gameType) != noTrumpGameTypes.end()) {
             trump = NO_TRUMP_CODE;
-            // TODO ace - king order !!!!!!!
+            // TODO ace - king order !!!!!!!!!! not during party
         }
         
         std::vector<Card> cardVector;
@@ -122,18 +125,60 @@ void PartyState::init(const std::string& deal) {
             for (int j = i + 1; j < cardVector.size(); ++j) {
                 Card c0 = cardVector[i];
                 Card c1 = cardVector[j];
-                if (c0 == c1 && !(c0 < c1) && !(c0 > c1)) throw std::invalid_argument("Duplicate card in code");
+                if (c0.equals(c1)) throw std::invalid_argument("Duplicate card in code");
             }
         }
         // Init the deal
         playerHands.init_deal(cardVector);
     }
-    // Random deal
+    // Random deal (deal string is empty)
     else {
-        gameType = 0;
-        trump = 0;
+        gameType = NO_TRUMP_PARTY;
+        trump = NO_TRUMP_CODE;
         playerHands.random_deal();
-    }    
+    } 
+
+    // Check prerequisites
+    // Check if selected trump matches the game type
+    if (std::find(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES), gameType) != std::end(NO_TRUMP_GAMES)) {
+        if (trump != NO_TRUMP_CODE) throw std::invalid_argument("No trump game has trump selected");
+    } 
+    else {
+        if (!(trump < NO_TRUMP_CODE)) throw std::invalid_argument("Trump game has no trump selected");
+    }
+    // Check if player has the trump3 and trump4
+    if (gameType == _40100) {
+        bool trump3 = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 3));
+        bool trump4 = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 4));
+        if (!(trump3 && trump4)) return false;
+    }
+    // Check if player has the trump7
+    else if (gameType == _4ACES) {
+        if (!playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 7))) return false;
+    }
+    // Check if player has the trump0
+    else if (gameType == ULTI) {
+        if (!playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 0))) return false;
+    }
+    // Check if player does not have the trump7
+    else if (gameType == BETLI) {
+        if (playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 7))) return false;
+    }
+    else if (gameType == DURCHMARS) {
+        // Left empty on purpose
+    }
+    // Check if player has any non-trump 3 and 4
+    else if (gameType == _20100) {
+        bool flag = false;
+        for (int i = 0; i < NO_TRUMP_CODE; ++i) {
+            if (i == trump) continue;
+            bool card3 = playerHands.checkCard(actionList.getFirstPlayer(), Card(i, 3));
+            bool card4 = playerHands.checkCard(actionList.getFirstPlayer(), Card(i, 4));
+            if (card3 && card4) flag = true;
+        }
+        if (!flag) return false;
+    }
+    return true;
 }
 
 void PartyState::getCardsInHand(CardVector& cardVector, int player_, int index_) {
@@ -247,6 +292,7 @@ void PartyState::setNextPlayer(int index_) {
             actionList.setPlayerToHit(index_ + 1, winnerPlayer);
         roundResults.setWinner(round, winnerPlayer);
         roundResults.setPoint(round, card0.getPoint() + card1.getPoint() + card2.getPoint());
+        roundResults.setSpecialCard(round, card0, card1, card2, trump);
     } 
 }
 
@@ -269,40 +315,22 @@ int PartyState::chooseWinnerCard(const Card c0, const Card c1, const Card c2, ui
     return 2;
 }
 
-
-uint8_t PartyState::evaluateParty(int index, bool print) {
-    switch (gameType) {
-    case NO_TRUMP_PARTY:
-        return evaluateNoTrumpParty(index, print);
-    case TRUMP_PARTY:
-        return evaluateTrumpParty(index, print);
-    case _40100:
-        return evaluate40100(index, print);
-    case _4ACES:
-        return evaluate4Aces(index, print);
-    case ULTI:
-        return evaluateUlti(index, print);
-    case BETLI:
-        return evaluateBetli(index, print);
-    case NO_TRUMP_DURCHMARS:
-        return evaluateNoTrumpDurchmars(index, print);
-    case DURCHMARS:
-        return evaluateDurchmars(index, print);
-    case _20100:
-        return evaluate20100(index, print);
-    case _4TENS:
-        return evaluate4Tens(index, print);
-    default:
-        throw std::invalid_argument("Invalid game type code");
-    }
-}
-
-uint8_t PartyState::evaluateNoTrumpParty(int index_, bool print) {
+uint8_t PartyState::evaluateParty(int index_, bool print) {
     // TODO integrate with setNextPlayer() if possible
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
 
-    int playerPoints = 0, opponentPoints = 0;
+    int playerPoints = 0, opponentPoints = 0; // No. points won
+    int playerRounds = 0, opponentRounds = 0; // No. rounds won
+    int playerAces = 0, opponentAces = 0; // No. aces won
+    int playerTens = 0, opponentTens = 0; // No. tens won
+    // Note: Player owns trump0 is a prerequisite that is checked during initialization
+    // True if player wins the last round with trump0
+    bool playerUlti = false; 
+    // True if opponents win any round where trump0 was played by player OR
+    // player wins any round where trump0 was played and NOT last round
+    bool opponentUlti = false; 
+    
     if (posInRound == 0 || posInRound == 1) {
         return RESULT_UNDEFINED;
     }
@@ -310,30 +338,87 @@ uint8_t PartyState::evaluateNoTrumpParty(int index_, bool print) {
         for (int i = 0; i <= round; ++i) {
             int point = roundResults.getPoint(i);
             if (roundResults.isLastRound(i)) point++;
-            if (roundResults.getWinner(i) == actionList.getFirstPlayer()) 
+            int trump0 = roundResults.getTrump0(i);
+
+            // Player wins round
+            if (roundResults.getWinner(i) == actionList.getFirstPlayer()) {
                 playerPoints += point;
-            else 
+                playerRounds++;
+                playerAces += roundResults.getAce(i);
+                playerTens += roundResults.getTen(i);
+                if (trump0) {
+                    if (roundResults.isLastRound(i)) playerUlti = true;
+                    else opponentUlti = true;
+                }
+            }                
+            else { // Opponents win round
                 opponentPoints += point;
+                opponentRounds++;
+                opponentAces += roundResults.getAce(i);
+                opponentTens += roundResults.getTen(i);
+                if (trump0) opponentUlti = true;
+            }   
         }
     }
+    assert(playerPoints + opponentPoints <= N_POINT_IN_DECK + 1);
+    assert(playerRounds + opponentRounds <= N_CARD_IN_HAND);
+    assert(playerAces + opponentAces <= N_SUIT);
+    assert(playerTens + opponentTens <= N_SUIT);
+    assert(!(playerUlti && opponentUlti));
 
     if (DEBUG || print) std::cout << "Player Points: " << playerPoints << "  Opponent Points: " << opponentPoints << std::endl;
 
-    if (playerPoints > MIN_POINT_TO_WIN) return PLAYER_WIN; // Player wins
-    if (opponentPoints > MIN_POINT_TO_WIN) return OPPONENT_WIN; // Opponents win
-    assert(!actionList.isLastIndex(index_));
+    // TODO check these numbers
+
+    // Evaluate the result of different game types    
+    switch (gameType) {
+    case NO_TRUMP_PARTY:
+        if (playerPoints >= 5) return PLAYER_WIN;       // Player wins
+        if (opponentPoints >= 5) return OPPONENT_WIN;   // Opponents win
+        break;
+    case TRUMP_PARTY:
+        if (playerPoints >= 5) return PLAYER_WIN;       // Player wins
+        if (opponentPoints >= 5) return OPPONENT_WIN;   // Opponents win
+        break;
+    case _40100:
+        if (playerPoints >= 6) return PLAYER_WIN;       // Player wins
+        if (opponentPoints >= 4) return OPPONENT_WIN;   // Opponents win
+        break;
+    case _4ACES:
+        if (playerAces >= 4) return PLAYER_WIN;         // Player wins
+        if (opponentAces >= 1) return OPPONENT_WIN;     // Opponents win
+        break;
+    case ULTI:
+        if (playerUlti) return PLAYER_WIN;              // Player wins
+        if (opponentUlti) return OPPONENT_WIN;          // Opponents win
+        break;
+    case BETLI:
+        if (opponentRounds >= 10) return PLAYER_WIN;    // Player wins
+        if (playerRounds >= 1) return OPPONENT_WIN;     // Opponents win
+        break;
+    case NO_TRUMP_DURCHMARS:
+        if (playerRounds >= 10) return PLAYER_WIN;      // Player wins
+        if (opponentRounds >= 1) return OPPONENT_WIN;   // Opponents win
+        break;
+    case DURCHMARS:
+        if (playerRounds >= 10) return PLAYER_WIN;      // Player wins
+        if (opponentRounds >= 1) return OPPONENT_WIN;   // Opponents win
+        break;
+    case _20100:
+        if (playerPoints >= 8) return PLAYER_WIN;       // Player wins
+        if (opponentPoints >= 2) return OPPONENT_WIN;   // Opponents win
+        break;
+    case _4TENS:
+        if (playerTens >= 4) return PLAYER_WIN;         // Player wins
+        if (opponentTens >= 1) return OPPONENT_WIN;     // Opponents win
+        break;
+    default:
+        throw std::invalid_argument("Invalid game type code");
+    }
+
+    assert(!actionList.isLastIndex(index_)); // There must be result in the final round
     return RESULT_UNDEFINED;
 }
-
-uint8_t PartyState::evaluateTrumpParty(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluate40100(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluate4Aces(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluateUlti(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluateBetli(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluateNoTrumpDurchmars(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluateDurchmars(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluate20100(int index_, bool print) { return 0; }
-uint8_t PartyState::evaluate4Tens(int index_, bool print) { return 0; }
 
 void PartyState::print_current_state(int index_, const CardVector& playableCards) {
     int round = actionList.getRound(index_);

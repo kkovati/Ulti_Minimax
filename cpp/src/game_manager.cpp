@@ -21,6 +21,7 @@ void TreePathCoder::printCode() const {
 	//std::cout << std::endl;
 }
 
+
 // Start minimax simulation
 //
 void GameManager::simulate(const std::string& deal) {
@@ -28,10 +29,15 @@ void GameManager::simulate(const std::string& deal) {
 	
 	// Initialize
 	partyState = PartyState();
-	partyState.init(deal);
-
-	// Start minimaX
-	TreePathCoder tpc = minimax(0);
+	bool prerequisites = partyState.init(deal);
+	
+	TreePathCoder tpc;
+	if (prerequisites)
+		// Start minimax
+		tpc = minimax(0);	
+	else
+		// Prerequisites are not met
+		tpc = TreePathCoder(OPPONENT_WIN, 0, 0);
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -40,6 +46,7 @@ void GameManager::simulate(const std::string& deal) {
 	std::cout << "Result: ";
 	tpc.printResult();
 	std::cout << std::endl;
+	if (!prerequisites) std::cout << "Prerequisites are not met" << std::endl;
 	std::cout << "No. calls: " << n_minimax_call << std::endl;
 	std::cout << "Duration: " << time << " ms" << std::endl;
 	std::cout << "TreePathCoder: "; 
@@ -50,7 +57,7 @@ void GameManager::simulate(const std::string& deal) {
 }
 
 // This function implements one iteration of the minimax algorithm.
-// It handles a single sitation of the game or a single node in the tree.
+// It handles a single situation of the game, in other words, a single node in the tree.
 //
 TreePathCoder GameManager::minimax(int index) {
 	n_minimax_call += 1;
