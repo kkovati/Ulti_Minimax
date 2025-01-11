@@ -24,7 +24,7 @@ void TreePathCoder::printCode() const {
 
 // Start minimax simulation
 //
-void GameManager::simulate(const std::string& deal) {
+std::string GameManager::simulate(const std::string& deal) {
 	auto start = std::chrono::high_resolution_clock::now();
 	
 	// Initialize
@@ -43,6 +43,8 @@ void GameManager::simulate(const std::string& deal) {
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 	int time = duration.count();	
 
+	std::cout << "Game type: " << std::to_string(partyState.getGameType()) << std::endl;
+	std::cout << "Trump: " << std::to_string(partyState.getTrump()) << std::endl;
 	std::cout << "Result: ";
 	tpc.printResult();
 	std::cout << std::endl;
@@ -53,7 +55,15 @@ void GameManager::simulate(const std::string& deal) {
 	tpc.printCode();
 	std::cout << std::endl << std::endl;
 
-	setPartyState(tpc, 0);
+	// Set up PartyState based on the returned TreePathCoder,
+	// and also print the game progression to console
+	int last_index = setPartyState(tpc, 0);
+
+	// Generate game progression string from set up PartyState
+	std::string gameProgression = partyState.getGameProgressionStr(last_index);
+
+	std::cout << "Game progression str: " << gameProgression << std::endl;
+	return gameProgression;
 }
 
 // This function implements one iteration of the minimax algorithm.
@@ -67,7 +77,7 @@ TreePathCoder GameManager::minimax(int index) {
 	partyState.getPlayableCards(playableCards, index);
 	partyState.simplifyPlayableCards(playableCards);
 	assert(playableCards.size() && playableCards.size() <= N_CARD_IN_HAND);
-	if (DEBUG) partyState.print_current_state(index, playableCards);
+	if (DEBUG) partyState.printCurrentState(index, playableCards);
 
 	if (partyState.isLastIndex(index)) {
 		assert(playableCards.size() == 1);
@@ -153,32 +163,35 @@ TreePathCoder GameManager::minimax(int index) {
 	assert(false); // Unreachable code
 }
 
-// This function is heavily relying on GameManager::minimax()
+// Based on an input TreePathCoder this function recreates the party into a Party State class.
+// It also prints the game progession to console.
+// Returns the last index the game was played.
+// This function is heavily relying on GameManager::minimax().
 //
-void GameManager::setPartyState(TreePathCoder tpc, int index) {
+int GameManager::setPartyState(TreePathCoder tpc, int index) {
 	std::vector<Card> playableCards;
 	partyState.getPlayableCards(playableCards, index);
 	partyState.simplifyPlayableCards(playableCards);
 	assert(playableCards.size() && playableCards.size() <= N_CARD_IN_HAND);
-	partyState.print_current_state(index, playableCards);
+	partyState.printCurrentState(index, playableCards);
 
 	uint8_t cardIndex = tpc.getValue(index);
-	if (cardIndex < N_CARD_IN_HAND) {
+	if (cardIndex < N_CARD_IN_HAND) { // This condition is needed if the party was not played to the end
 		partyState.setHitCard(index, playableCards[cardIndex]);
 		partyState.setNextPlayer(index);
 
-		partyState.print_card(index);
-		uint8_t result = partyState.evaluateParty(index, true); // For printing
+		partyState.printCard(index);
+		uint8_t result = partyState.evaluateParty(index, true); // For printing points
 	}
 
 	if (partyState.isLastIndex(index) || cardIndex >= N_CARD_IN_HAND) {
 		std::cout << std::endl;
 		tpc.printResult();
 		std::cout << std::endl;
-		return;
+		return index;
 	}
 
-	setPartyState(tpc, index + 1);
+	return setPartyState(tpc, index + 1);
 }
 
 void GameManager::updateProgressBar() {

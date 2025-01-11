@@ -27,11 +27,11 @@ int main()
 	// No.calls: 27497887
 	// Duration : 5752 ms
 	// TreePathCoder : 7 0 0 7 0 0 6 0 0 5 0 0 4 0 0 0 2 0 0 0 0 10 10 10 10 10 10 10 10 10
-	gameManager.simulate(deal);
+	std::string gameProgression = gameManager.simulate(deal);
 
 	// Random deal
-	//gameManager.simulate();
-
+	//std::string gameProgression = gameManager.simulate();
+		
 	return 0;
 }
 
@@ -50,7 +50,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* wasm_main(const char* deal_code)
     std::cout << "WASM: Start simulation" << std::endl;
 
 	auto gameManager = ulti_minimax::GameManager();
-	gameManager.simulate(deal);
+	std::string gameProgression = gameManager.simulate(deal);
 
 	// Create a response string
 	static std::string response = "Processed: " + deal;

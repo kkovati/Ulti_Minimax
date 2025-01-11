@@ -96,7 +96,7 @@ bool PartyState::init(const std::string& deal) {
         char gameTypeChar = deal[0];
         if (!std::isdigit(gameTypeChar)) throw std::invalid_argument("Invalid game type code");
         gameType = gameTypeChar - '0'; // Convert char to int
-        if(!(0 <= gameType && gameType <= 3)) throw std::invalid_argument("Invalid game type code");
+        if(!(0 <= gameType && gameType <= 9)) throw std::invalid_argument("Invalid game type code");
 
         // Trump
         char trumpChar = deal[1];
@@ -104,8 +104,7 @@ bool PartyState::init(const std::string& deal) {
         trump = trumpChar - '0';
         if (!(0 <= trump && trump <= 3)) throw std::invalid_argument("Invalid trump code");
         // Check if no-trump game type is selected
-        const std::unordered_set<uint8_t> noTrumpGameTypes(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES));
-        if (noTrumpGameTypes.find(gameType) != noTrumpGameTypes.end()) {
+        if (std::find(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES), gameType) != std::end(NO_TRUMP_GAMES)) {
             trump = NO_TRUMP_CODE;
             // TODO ace - king order !!!!!!!!!! not during party
         }
@@ -164,6 +163,9 @@ bool PartyState::init(const std::string& deal) {
     else if (gameType == BETLI) {
         if (playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 7))) return false;
     }
+    else if (gameType == NO_TRUMP_DURCHMARS) {
+        // Left empty on purpose
+    }
     else if (gameType == DURCHMARS) {
         // Left empty on purpose
     }
@@ -177,6 +179,9 @@ bool PartyState::init(const std::string& deal) {
             if (card3 && card4) flag = true;
         }
         if (!flag) return false;
+    }
+    else if (gameType == _4TENS) {
+        // Left empty on purpose
     }
     return true;
 }
@@ -368,8 +373,6 @@ uint8_t PartyState::evaluateParty(int index_, bool print) {
 
     if (DEBUG || print) std::cout << "Player Points: " << playerPoints << "  Opponent Points: " << opponentPoints << std::endl;
 
-    // TODO check these numbers
-
     // Evaluate the result of different game types    
     switch (gameType) {
     case NO_TRUMP_PARTY:
@@ -420,7 +423,15 @@ uint8_t PartyState::evaluateParty(int index_, bool print) {
     return RESULT_UNDEFINED;
 }
 
-void PartyState::print_current_state(int index_, const CardVector& playableCards) {
+// Print the current state of the party to the console.
+// This acts like a snapshot of the party at a given moment or in other words at a given node in the tree.
+// The following infos are printed:
+// - Where the game is at (index, round, position in round)
+// - Player hands and that which cards a player can use in this moment
+//   (highlighted player to hit and player started the current round)  
+// - Cards on the table
+//
+void PartyState::printCurrentState(int index_, const CardVector& playableCards) {
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_);
     int playerToHit = actionList.getPlayerToHit(index_);
@@ -460,13 +471,16 @@ void PartyState::print_current_state(int index_, const CardVector& playableCards
     std::cout << std::endl;
 }
 
-void PartyState::print_card(int index_) {
+// Print the card which was played at the given index
+//
+void PartyState::printCard(int index_) {
     std::cout << "Selected card: " << actionList.getCard(index_) << std::endl;
 }
 
+// Print the party step-by-step 
 // NOTE: This function is not in use 
 //
-void PartyState::print_game_progression() {
+void PartyState::printGameProgression() {
     std::cout << "=== Game Progression: =====================" << std::endl;
     // Print each players' initial hand
     for (int player = 0; player < N_PLAYER; ++player) {
@@ -482,6 +496,26 @@ void PartyState::print_game_progression() {
         std::cout << actionList.getRound(i) << " " << actionList.getPosInRound(i) << " " << actionList.getPlayerToHit(i) << " " << actionList.getCard(i);
     }
 
+}
+
+// Generate a string which codes the game progression of each round
+// gameProgression[0] = round starting player index 
+// gameProgression[1] = card suit 
+// gameProgression[2] = card value
+// gameProgression[4] = next player index in the round
+//
+std::string PartyState::getGameProgressionStr(int last_index) {
+    std::string gameProgression;
+    for (int i = 0; i <= last_index; ++i) {
+        gameProgression += std::to_string(actionList.getPlayerToHit(i));
+        gameProgression += std::to_string(actionList.getCard(i).getSuit());
+        gameProgression += std::to_string(actionList.getCard(i).getValue());
+    }
+    for (int i = last_index + 1; i < N_ACTION; ++i) {
+        gameProgression += "999";
+    }
+    assert(gameProgression.size == 3 * N_ACTION);
+    return gameProgression;
 }
 
 }

@@ -306,6 +306,9 @@ public:
 
 	bool init(const std::string& = "");
 
+	uint8_t getGameType() const { return gameType; };
+	uint8_t getTrump() const { return trump; };
+
 	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
 	void simplifyPlayableCards(CardVector&);
@@ -318,9 +321,12 @@ public:
 
 	uint8_t evaluateParty(int, bool); // Evaluate the current game type	
 
-	void print_current_state(int, const CardVector&);
-	void print_card(int);
-	void print_game_progression();
+	// Printing to console
+	void printCurrentState(int, const CardVector&);
+	void printCard(int);
+	void printGameProgression();
+
+	std::string getGameProgressionStr(int);
 
 private:
 	uint8_t gameType = NO_TRUMP_PARTY;

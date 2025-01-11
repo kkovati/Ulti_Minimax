@@ -63,7 +63,7 @@ private:
 class GameManager {
 public:
 	GameManager() = default;
-	void simulate(const std::string& = "");
+	std::string simulate(const std::string& = "");
 
 private:
 	PartyState partyState;
@@ -71,7 +71,7 @@ private:
 	TreePathCoder minimax(int);
 
 	// Visaulization
-	void setPartyState(TreePathCoder, int);
+	int setPartyState(TreePathCoder, int);
 	int progressBar = 0;
 	void updateProgressBar();	
 
