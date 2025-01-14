@@ -38,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Move card between deck and hands
 function moveCard(card) {
-    const activeHand = document.querySelector('.hand.active'); // Get the currently active hand
+    // Get the currently active hand
+    const activeHand = document.querySelector('.hand.active'); 
 
     // If the card has no original placeholder reference, store its original parent
     if (!card.dataset.originalParent) {
@@ -64,6 +65,7 @@ function moveCard(card) {
 // Make the player hand active initially
 document.getElementById('player').classList.add('active');
 
+// Make the player hand active if clicked
 document.querySelectorAll('.hand').forEach(hand => {
     hand.addEventListener('click', () => {
         // Reset all hands to yellow
@@ -74,8 +76,10 @@ document.querySelectorAll('.hand').forEach(hand => {
 });
 
 
-//TODO make trump active 
+// Make trump active initially
+document.getElementById('trump_0').classList.add('active');
 
+// Make trump active if clicked
 document.querySelectorAll('.trump').forEach(trump => {
     trump.addEventListener('click', () => {
         // Reset all images to default
@@ -86,11 +90,21 @@ document.querySelectorAll('.trump').forEach(trump => {
 });
 
 
-// Assemble message to WASM by coding the hands into a string
-function getDeal() {
+// Assemble message to WASM by coding the active trump and hands into a string
+// Deal code structure:
+// deal[0]		= trump [0-3]
+// deal[1...60]	= cards
+function getDeal() {   
+    // Get the currently active trump
+    const activeTrump = document.querySelector('.trump.active');
+    if (!activeTrump) {
+        // No active trump found
+        throw new Error('No active trump found.');
+    }
+    // Read trump index from data-index
+    let deal = activeTrump.dataset.index; 
+	
     const hands = ['player', 'opponent_0', 'opponent_1'];
-    let deal = "";
-
     hands.forEach(divId => {
         const hand = document.getElementById(divId);
         if (hand) {
@@ -121,12 +135,12 @@ function showToast(message) {
 }
 
 
-// Simulate button opens simulation side and codes deal into URL
+// Simulate button opens simulation page and codes deal into URL
 document.getElementById("simulate-button").addEventListener("click", () => {
 	const deal = getDeal();
 	
 	// Check length
-	if (deal.length != 60) {
+	if (deal.length != 61) {
 		showToast("Deal 10 cards to each player");
 		return;
 	}

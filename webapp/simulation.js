@@ -1,16 +1,25 @@
-
+// Get deal string from URL
 const urlParams = new URLSearchParams(window.location.search);
-const deal = urlParams.get('deal');
+var deal = urlParams.get('deal');
 
-if (deal) {
-	console.log(deal);
-} else {
-	// TODO handle this error
-	document.getElementById('content').textContent = 'No data provided.';
+// Check deal string
+if (!deal) {
+	throw new Error("No deal string found");
 }
+if (deal.length != 61) {
+	throw new Error("Deal string length is not correct");
+}
+console.log(deal);
 
-//TODO make trump active from URL
+// Trim deal string and get trump index
+var trumpIndex = deal[0];
+deal = deal.substring(1);
+console.assert(deal.length == 60)
 
+// Make given trump active initially
+document.getElementById(`trump_${trumpIndex}`).classList.add('active');
+
+// Make trump active if clicked
 document.querySelectorAll('.trump').forEach(trump => {
     trump.addEventListener('click', () => {
         // Reset all images to default
