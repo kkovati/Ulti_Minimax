@@ -15,13 +15,13 @@ body {
     margin-top: 10px;
 }
 
-.card_suit {
+.card-suit {
     display: flex;
     gap: 20px;
     margin-top: 10px;
 }
 
-.card_placeholder {
+.card-placeholder {
     width: 61px;
     height: 100px;
 }
@@ -80,7 +80,7 @@ body {
 
 .opponents {
     display: flex;
-    gap: 20px; /* Space between opponent_0 and opponent_1 */
+    gap: 20px; /* Space between opponent-0 and opponent-1 */
     margin-bottom: 20px; /* Add some space below the opponents container */
 }
 
@@ -89,6 +89,33 @@ body {
     font-size: 24px;
     color: white;
     text-align: center;
+}
+
+.game-type {
+    display: flex;
+    align-items: center; /* Ensures items are vertically aligned */
+    justify-content: flex-start; /* Aligns items to the left */
+    gap: 10px; /* Space between the game-name and status */
+    width: 95%;
+    margin-bottom: 10px; /* Add spacing between game types */
+}
+
+.game-name {
+	margin: 10px 0 10px;
+    font-size: 24px;
+    color: white;
+    text-align: left;
+    flex: 1; /* Takes up remaining space, pushing the status to the right */
+    margin: 0; /* Reset any margins to avoid spacing issues */
+}
+
+.status {
+	margin: 10px 0 10px;
+    font-size: 24px;
+    color: white;
+    text-align: left;
+    flex: 1; /* Takes up remaining space, pushing the status to the right */
+    margin: 0; /* Reset any margins to avoid spacing issues */
 }
 
 .trump-container {

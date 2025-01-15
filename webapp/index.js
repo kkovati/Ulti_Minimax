@@ -10,13 +10,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		// To have only two rows of cards in the deck
 		if (iSuit % 2 == 0) {
 			cardSuitDiv = document.createElement('div');
-			cardSuitDiv.classList.add('card_suit');
+			cardSuitDiv.classList.add('card-suit');
 		}
         
         for (let iCard = 0; iCard < nCardPerSuit; iCard++) {
 			// Card placeholder to hold a fix position for the card in the deck
             const cardPlaceholderDiv = document.createElement('div');
-            cardPlaceholderDiv.classList.add('card_placeholder');
+            cardPlaceholderDiv.classList.add('card-placeholder');
             cardPlaceholderDiv.setAttribute('data-id', `placeholder${iSuit * nCardPerSuit + iCard}`);
             
 			// Card
@@ -77,7 +77,7 @@ document.querySelectorAll('.hand').forEach(hand => {
 
 
 // Make trump active initially
-document.getElementById('trump_0').classList.add('active');
+document.getElementById('trump-0').classList.add('active');
 
 // Make trump active if clicked
 document.querySelectorAll('.trump').forEach(trump => {
@@ -104,7 +104,7 @@ function getDeal() {
     // Read trump index from data-index
     let deal = activeTrump.dataset.index; 
 	
-    const hands = ['player', 'opponent_0', 'opponent_1'];
+    const hands = ['player', 'opponent-0', 'opponent-1'];
     hands.forEach(divId => {
         const hand = document.getElementById(divId);
         if (hand) {

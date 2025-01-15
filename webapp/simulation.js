@@ -17,7 +17,7 @@ deal = deal.substring(1);
 console.assert(deal.length == 60)
 
 // Make given trump active initially
-document.getElementById(`trump_${trumpIndex}`).classList.add('active');
+document.getElementById(`trump-${trumpIndex}`).classList.add('active');
 
 // Make trump active if clicked
 document.querySelectorAll('.trump').forEach(trump => {
