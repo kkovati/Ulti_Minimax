@@ -50,14 +50,14 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* wasm_main(const char* deal_code)
     std::cout << "WASM: Start simulation" << std::endl;
 
 	auto gameManager = ulti_minimax::GameManager();
-	std::string gameProgression = gameManager.simulate(deal);
+	static std::string gameProgression = gameManager.simulate(deal);
 
 	// Create a response string
-	static std::string response = "Processed: " + deal;
+	std::cout << "WASM: Response string: " << gameProgression << std::endl;
 
 	// Allocate memory in the WASM heap for the response string
-	char* response_cstr = (char*)malloc(response.size() + 1);
-	std::strcpy(response_cstr, response.c_str());
+	char* response_cstr = (char*)malloc(gameProgression.size() + 1);
+	std::strcpy(response_cstr, gameProgression.c_str());
 	return response_cstr;
 }
 

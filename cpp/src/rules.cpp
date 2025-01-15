@@ -502,7 +502,7 @@ void PartyState::printGameProgression() {
 // gameProgression[0] = round starting player index 
 // gameProgression[1] = card suit 
 // gameProgression[2] = card value
-// gameProgression[4] = next player index in the round
+// gameProgression[3] = next player index in the round
 //
 std::string PartyState::getGameProgressionStr(int last_index) {
     std::string gameProgression;
@@ -514,7 +514,7 @@ std::string PartyState::getGameProgressionStr(int last_index) {
     for (int i = last_index + 1; i < N_ACTION; ++i) {
         gameProgression += "999";
     }
-    assert(gameProgression.size == 3 * N_ACTION);
+    assert(gameProgression.size() == 3 * N_ACTION);
     return gameProgression;
 }
 

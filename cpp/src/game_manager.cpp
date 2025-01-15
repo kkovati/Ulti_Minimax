@@ -56,11 +56,16 @@ std::string GameManager::simulate(const std::string& deal) {
 	std::cout << std::endl << std::endl;
 
 	// Set up PartyState based on the returned TreePathCoder,
-	// and also print the game progression to console
+	// and also to print the game progression to console
 	int last_index = setPartyState(tpc, 0);
 
 	// Generate game progression string from set up PartyState
-	std::string gameProgression = partyState.getGameProgressionStr(last_index);
+	// gameProgression[0] = result 
+	// gameProgression[1] = round starting player index 
+	// gameProgression[2] = card suit 
+	// gameProgression[3] = card value
+	// gameProgression[4] = next player index in the round
+	std::string gameProgression = std::to_string(tpc.getResult()) + partyState.getGameProgressionStr(last_index);
 
 	std::cout << "Game progression str: " << gameProgression << std::endl;
 	return gameProgression;

@@ -1,20 +1,20 @@
 // Get deal string from URL
 const urlParams = new URLSearchParams(window.location.search);
-var deal = urlParams.get('deal');
+var base_deal = urlParams.get('deal');
 
 // Check deal string
-if (!deal) {
+if (!base_deal) {
 	throw new Error("No deal string found");
 }
-if (deal.length != 61) {
+if (base_deal.length != 61) {
 	throw new Error("Deal string length is not correct");
 }
-console.log(deal);
+console.log("Deal from URL: " + base_deal);
 
 // Trim deal string and get trump index
-var trumpIndex = deal[0];
-deal = deal.substring(1);
-console.assert(deal.length == 60)
+var trumpIndex = base_deal[0];
+base_deal = base_deal.substring(1);
+console.assert(base_deal.length == 60)
 
 // Make given trump active initially
 document.getElementById(`trump-${trumpIndex}`).classList.add('active');
@@ -26,6 +26,8 @@ document.querySelectorAll('.trump').forEach(trump => {
         document.querySelectorAll('.trump').forEach(img => img.classList.remove('active'));
         // Set the clicked trump to white border
         trump.classList.add('active');
+		// Set trump index
+		trumpIndex = trump.dataset.index;
     });
 });
 
@@ -39,13 +41,16 @@ Module.onRuntimeInitialized = () => {
 
 	// Add a click event listener to trigger WASM code on button click
 	button.addEventListener("click", () => {
-		const deal = getDeal();
 		
-		// Check length
-		if (deal.length != 60) {
-			showToast("Deal is not ready!");
-			return;
-		}
+		// TODO reset simulation statuses
+		
+		// Deal code structure:
+		// deal[0]		= game type
+		// deal[1]		= trump [0-3]
+		// deal[2...61]	= cards
+		var gameType = "0";
+		const deal = gameType + trumpIndex + base_deal;
+		console.assert(deal.length == 62)
 		
 		const length = deal.length + 1;
 		const dealPointer = Module._malloc(length);
@@ -62,4 +67,7 @@ Module.onRuntimeInitialized = () => {
 		Module._free(dealPointer);
 		Module._free(resultPointer); // Free the memory allocated in C++ for the response
 	});
+	
+	// Trigger simulation by clicking the button
+	button.click();
 };
