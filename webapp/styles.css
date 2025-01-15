@@ -101,11 +101,11 @@ body {
 }
 
 .game-name {
-	margin: 10px 0 10px;
+    margin: 10px 0 10px;
+    min-width: 300px;
     font-size: 24px;
     color: white;
     text-align: left;
-    flex: 1; /* Takes up remaining space, pushing the status to the right */
     margin: 0; /* Reset any margins to avoid spacing issues */
 }
 
