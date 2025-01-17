@@ -45,6 +45,8 @@ std::string GameManager::simulate(const std::string& deal) {
 
 	std::cout << "Game type: " << std::to_string(partyState.getGameType()) << std::endl;
 	std::cout << "Trump: " << std::to_string(partyState.getTrump()) << std::endl;
+	std::cout << "Rest cards: " 
+		<< partyState.getRestCards()[0] << " " << partyState.getRestCards()[1] << std::endl;
 	std::cout << "Result: ";
 	tpc.printResult();
 	std::cout << std::endl;

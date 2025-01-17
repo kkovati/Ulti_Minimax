@@ -43,6 +43,24 @@ std::vector<std::vector<Card>> Deck::deal(int nPlayer, int nCardInHand) {
     return randomHands;
 }
 
+// Find the two cards which were not dealt
+//
+std::array<Card, N_REST_CARD> Deck::findRestCards(const std::vector<Card>& dealtCards) const {
+    assert(dealtCards.size() == N_PLAYER * N_CARD_IN_HAND);
+
+    std::array<Card, N_REST_CARD> restCards;
+    int i = 0;
+    for (const Card& card : cards) {
+        // Comparison logic b/c Card::operator== is used
+        auto cardComparator = [card](const Card& c) {return card.equals(c); };
+        if (std::find_if(dealtCards.begin(), dealtCards.end(), cardComparator) == dealtCards.end()) {
+            restCards[i++] = card;
+        }
+    }
+    assert(i == 2);
+    return restCards;
+}
+
 
 ActionList::ActionList(int firstPlayer_) : firstPlayer(firstPlayer_) {
     for (int i = 0; i < actions.size(); ++i) {
@@ -52,7 +70,7 @@ ActionList::ActionList(int firstPlayer_) : firstPlayer(firstPlayer_) {
 }
 
 
-void PlayerHands::init_deal(const std::vector<Card>& cardVector) {
+std::array<Card, N_REST_CARD> PlayerHands::init_deal(const std::vector<Card>& cardVector) {
     assert(cardVector.size() == N_PLAYER * N_CARD_IN_HAND);
     for (int i = 0; i < N_PLAYER; ++i) {
         for (int j = 0; j < N_CARD_IN_HAND; ++j) {
@@ -62,9 +80,13 @@ void PlayerHands::init_deal(const std::vector<Card>& cardVector) {
         // Order the cards        
         std::sort(playerCards[i].begin(), playerCards[i].end(), Card::compareCard);
     }
+
+    // Determine the two rest cards
+    Deck deck = Deck();
+    return deck.findRestCards(cardVector);
 }
 
-void PlayerHands::random_deal() {
+std::array<Card, N_REST_CARD> PlayerHands::random_deal() {
     Deck deck = Deck();
     assert(N_PLAYER * N_CARD_IN_HAND <= deck.size());
     deck.shuffle(); 
@@ -77,6 +99,9 @@ void PlayerHands::random_deal() {
         // Order the cards        
         std::sort(playerCards[i].begin(), playerCards[i].end(), Card::compareCard);
     }
+
+    // Determine the two rest cards
+    return std::array<Card, N_REST_CARD> {deck.getCard(N_PLAYER * N_CARD_IN_HAND), deck.getCard(N_PLAYER * N_CARD_IN_HAND + 1)};
 }
 
 
@@ -101,14 +126,15 @@ bool PartyState::init(const std::string& deal) {
         // Trump
         char trumpChar = deal[1];
         if (!std::isdigit(trumpChar)) throw std::invalid_argument("Invalid trump code");
-        trump = trumpChar - '0';
+        trump = trumpChar - '0'; // Convert char to int
         if (!(0 <= trump && trump <= 3)) throw std::invalid_argument("Invalid trump code");
         // Check if no-trump game type is selected
         if (std::find(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES), gameType) != std::end(NO_TRUMP_GAMES)) {
             trump = NO_TRUMP_CODE;
-            // TODO ace - king order !!!!!!!!!! not during party
+            // TODO ace - king order !!!!!!!!!! not during party, pay attention to rest cards as well
         }
         
+        // Cards
         std::vector<Card> cardVector;
         for (int i = 2; i < deal.length(); i += 2) {
             char suitChar = deal[i];
@@ -119,6 +145,7 @@ bool PartyState::init(const std::string& deal) {
             if (suit < 0 || 3 < suit || value < 0 || 7 < value) throw std::invalid_argument("Invalid card code");
             cardVector.push_back(Card(suit, value));
         }
+
         // Check duplicates
         for (int i = 0; i < cardVector.size(); ++i) {
             for (int j = i + 1; j < cardVector.size(); ++j) {
@@ -127,14 +154,20 @@ bool PartyState::init(const std::string& deal) {
                 if (c0.equals(c1)) throw std::invalid_argument("Duplicate card in code");
             }
         }
-        // Init the deal
-        playerHands.init_deal(cardVector);
+        
+        // Init the deal and determine rest cards
+        auto restCards = playerHands.init_deal(cardVector);
+        restCard0 = restCards[0];
+        restCard1 = restCards[1];
     }
     // Random deal (deal string is empty)
     else {
         gameType = NO_TRUMP_PARTY;
         trump = NO_TRUMP_CODE;
-        playerHands.random_deal();
+        // Random deal and determine rest cards
+        auto restCards = playerHands.random_deal();
+        restCard0 = restCards[0];
+        restCard1 = restCards[1];
     } 
 
     // Check prerequisites
@@ -151,11 +184,12 @@ bool PartyState::init(const std::string& deal) {
         bool trump4 = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 4));
         if (!(trump3 && trump4)) return false;
     }
-    // Check if player has the trump7
+    // Check if player has the trump7 (ace) or any ace is not in the rest cards
     else if (gameType == _4ACES) {
         if (!playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 7))) return false;
+        if (restCard0.getValue() == 7 || restCard1.getValue() == 7) return false;
     }
-    // Check if player has the trump0
+    // Check if player has the trump0 (lowest trump)
     else if (gameType == ULTI) {
         if (!playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 0))) return false;
     }
@@ -180,8 +214,9 @@ bool PartyState::init(const std::string& deal) {
         }
         if (!flag) return false;
     }
+    // Check if any ten is not in the rest cards
     else if (gameType == _4TENS) {
-        // Left empty on purpose
+        if (restCard0.getValue() == 6 || restCard1.getValue() == 6) return false;
     }
     return true;
 }
@@ -335,6 +370,10 @@ uint8_t PartyState::evaluateParty(int index_, bool print) {
     // True if opponents win any round where trump0 was played by player OR
     // player wins any round where trump0 was played and NOT last round
     bool opponentUlti = false; 
+
+    // Count points from rest cards
+    if (restCard0.getValue() >= LOWEST_CARD_VALUE_WITH_POINT) opponentPoints++;
+    if (restCard1.getValue() >= LOWEST_CARD_VALUE_WITH_POINT) opponentPoints++;
     
     if (posInRound == 0 || posInRound == 1) {
         return RESULT_UNDEFINED;
@@ -419,7 +458,21 @@ uint8_t PartyState::evaluateParty(int index_, bool print) {
         throw std::invalid_argument("Invalid game type code");
     }
 
-    assert(!actionList.isLastIndex(index_)); // There must be result in the final round
+    // There must be result in the final round (at the end of the game), 
+    // so this code cannot be reached in final round. 
+    // In simpler terms:
+    // assert(!actionList.isLastIndex(index_)); 
+    if (actionList.isLastIndex(index_)) {
+        std::cout << std::endl << "Error: No result at the end of the game" << std::endl;
+        std::cout << "gameType: " << static_cast<int>(gameType) << std::endl;
+        std::cout << "playerPoints: " << playerPoints << " opponentPoints: " << opponentPoints << std::endl;
+        std::cout << "playerRounds: " << playerRounds << " opponentRounds: " << opponentRounds << std::endl;
+        std::cout << "playerAces: " << playerAces << " opponentAces: " << opponentAces << std::endl;
+        std::cout << "playerTens: " << playerTens << " opponentTens: " << opponentTens << std::endl;
+        std::cout << "playerUlti: " << playerUlti << " opponentUlti: " << opponentUlti << std::endl;
+        throw std::runtime_error("No result at the end of the game");
+    }
+
     return RESULT_UNDEFINED;
 }
 

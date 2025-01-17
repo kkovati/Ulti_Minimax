@@ -18,6 +18,7 @@ constexpr int N_PLAYER = 3;
 constexpr int N_CARD_IN_HAND = 10;
 constexpr int N_ACTION = N_PLAYER * N_CARD_IN_HAND;
 constexpr int LAST_ACTION_INDEX = N_ACTION - 1;
+constexpr int N_REST_CARD = N_SUIT * N_VALUE - N_PLAYER * N_CARD_IN_HAND;
 
 // Party results
 constexpr uint8_t RESULT_UNDEFINED	= 0;
@@ -47,8 +48,15 @@ constexpr bool DEBUG = false;
 class Card {
 public:
 	Card() = default;
-	Card(int suit_, int value_) : suit(suit_), value(value_) {};
+
+	Card(int suit_, int value_) : suit(suit_), value(value_) 
+	{
+		assert(0 <= suit && suit < N_SUIT);
+		assert(0 <= suit && value < N_VALUE);
+	};
+
 	Card(const Card& other) : suit(other.suit), value(other.value) {};
+
 	Card& operator=(const Card& other) { 
 		if (this != &other) {
 			suit = other.suit;
@@ -95,9 +103,12 @@ public:
 	Deck();
 
 	void shuffle();
+
 	std::vector<std::vector<Card>> deal(int, int);
-	int size() { return cards.size(); };
-	Card getCard(int index_) { return cards[index_]; };
+	std::array<Card, N_REST_CARD> findRestCards(const std::vector<Card>&) const;
+
+	int size() const { return static_cast<int>(cards.size()); };
+	Card getCard(int index_) const { return cards[index_]; };
 
 private:
 	std::array<Card, N_SUIT * N_VALUE> cards;
@@ -138,8 +149,10 @@ private:
 
 class ActionList {
 public:
-	ActionList(int firstPlayer_ = 0);	
+	ActionList(int firstPlayer_ = 0);
+
 	ActionList(const ActionList& other) : firstPlayer(other.firstPlayer), actions(other.actions) {};
+
 	ActionList& operator=(const ActionList& other) { 
 		if (this != &other) {
 			firstPlayer = other.firstPlayer; actions = other.actions;
@@ -222,7 +235,9 @@ private:
 class PlayerHands {
 public:
 	PlayerHands() = default;
+
 	PlayerHands(const PlayerHands& other) : playerCards(other.playerCards), playerUseds(other.playerUseds) {};
+
 	PlayerHands& operator=(const PlayerHands& other) {
 		if (this != &other) {
 			playerCards = other.playerCards; playerUseds = other.playerUseds;
@@ -230,8 +245,8 @@ public:
 		return *this;
 	};
 
-	void init_deal(const std::vector<Card>&);
-	void random_deal();
+	std::array<Card, N_REST_CARD> init_deal(const std::vector<Card>&);
+	std::array<Card, N_REST_CARD> random_deal();
 
 	const Card& getCard(int player_, int index_) const { 
 		return playerCards[player_][index_];
@@ -292,8 +307,10 @@ private:
 class PartyState {
 public:
 	PartyState() = default;
+
 	PartyState(const PartyState& other) : gameType(other.gameType), trump(other.trump),
 		actionList(other.actionList), roundResults(other.roundResults), playerHands(other.playerHands) {};
+
 	PartyState& operator=(const PartyState& other) {
 		if (this != &other) {
 			gameType = other.gameType; trump = other.trump;
@@ -308,6 +325,10 @@ public:
 
 	uint8_t getGameType() const { return gameType; };
 	uint8_t getTrump() const { return trump; };
+
+	std::array<Card, N_REST_CARD> getRestCards() const { 
+		return std::array<Card, N_REST_CARD> {restCard0, restCard1}; 
+	};
 
 	void getCardsInHand(CardVector&, int, int);
 	void getPlayableCards(CardVector&, int);
@@ -331,6 +352,7 @@ public:
 private:
 	uint8_t gameType = NO_TRUMP_PARTY;
 	uint8_t trump = NO_TRUMP_CODE;
+	Card restCard0, restCard1;
 
 	ActionList actionList = ActionList();
 	RoundResults roundResults = RoundResults();
