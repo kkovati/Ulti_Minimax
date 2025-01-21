@@ -118,6 +118,26 @@ body {
     margin: 0; /* Reset any margins to avoid spacing issues */
 }
 
+.loading {
+	border: 3px solid #ccc;
+    border-top: 3px solid orange;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+	flex-shrink: 0;
+    aspect-ratio: 1 / 1; /* Ensures the element stays square */
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+    to {
+		transform: rotate(360deg);
+    }
+}
+
 .trump-container {
     display: flex;
     gap: 20px;

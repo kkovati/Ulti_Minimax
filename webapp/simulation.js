@@ -42,30 +42,64 @@ Module.onRuntimeInitialized = () => {
 	// Add a click event listener to trigger WASM code on button click
 	button.addEventListener("click", () => {
 		
-		// TODO reset simulation statuses
+		// Reset simulation statuses
+		document.querySelectorAll('.game-type').forEach(gameTypeSpan => {
+			gameTypeSpan.querySelector('.status').innerHTML = "";
+		});
 		
-		// Deal code structure:
-		// deal[0]		= game type
-		// deal[1]		= trump [0-3]
-		// deal[2...61]	= cards
-		var gameType = "0";
-		const deal = gameType + trumpIndex + base_deal;
-		console.assert(deal.length == 62)
-		
-		const length = deal.length + 1;
-		const dealPointer = Module._malloc(length);
-		Module.stringToUTF8(deal, dealPointer, length);
+		// Iterate through all game types
+		document.querySelectorAll('.game-type').forEach(gameTypeSpan => {
+			// Get game type
+			const gameType = gameTypeSpan.dataset.index;
+			
+			// Add the spinning loader
+			const statusSpan = gameTypeSpan.querySelector('.status');
+			statusSpan.innerHTML = '<div class="loading"></div>';
+			
+			// Deal code structure:
+			// deal[0]		= game type
+			// deal[1]		= trump [0-3]
+			// deal[2...61]	= cards
+			const deal = gameType + trumpIndex + base_deal;
+			console.assert(deal.length == 62)
+			
+			const length = deal.length + 1;
+			const dealPointer = Module._malloc(length);
+			Module.stringToUTF8(deal, dealPointer, length);
 
-		// Call the WASM entry point
-		const resultPointer = Module._wasm_main(dealPointer);
+			// Call the WASM entry point
+			const resultPointer = Module._wasm_main(dealPointer);
 
-		// Read the result string
-		const resultString = Module.UTF8ToString(resultPointer);
-		console.log("WASM returned:", resultString);
+			// Read game progression string
+			// gameProgression[0] = result 
+			// gameProgression[1] = round starting player index 
+			// gameProgression[2] = card suit 
+			// gameProgression[3] = card value
+			// gameProgression[4] = next player index in the round
+			const gameProgression = Module.UTF8ToString(resultPointer);
+			console.assert(gameProgression.length == 91)
+			console.log("WASM returned:", gameProgression);
 
-		// Free the allocated memory in both JS and WASM
-		Module._free(dealPointer);
-		Module._free(resultPointer); // Free the memory allocated in C++ for the response
+			// Free the allocated memory in both JS and WASM
+			Module._free(dealPointer);
+			Module._free(resultPointer); // Free the memory allocated in C++ for the response
+			
+			// Update status based on game result
+			const result = gameProgression[0];
+			if (result == "1") {
+				// Player win
+				statusSpan.innerHTML = '✔';
+			}
+			else if (result == "2") {
+				// Opponent win
+				statusSpan.innerHTML = '✘';
+			}
+			else {
+				throw new Error('Undefined result was returned from simulation');
+			}			
+			
+		});		
+
 	});
 	
 	// Trigger simulation by clicking the button
