@@ -52,7 +52,7 @@ public:
 	Card(int suit_, int value_) : suit(suit_), value(value_) 
 	{
 		assert(0 <= suit && suit < N_SUIT);
-		assert(0 <= suit && value < N_VALUE);
+		assert(0 <= value && value < N_VALUE);
 	};
 
 	Card(const Card& other) : suit(other.suit), value(other.value) {};

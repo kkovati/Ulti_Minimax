@@ -169,8 +169,7 @@ bool PartyState::init(const std::string& deal) {
         restCard0 = restCards[0];
         restCard1 = restCards[1];
     } 
-
-    // Check prerequisites
+        
     // Check if selected trump matches the game type
     if (std::find(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES), gameType) != std::end(NO_TRUMP_GAMES)) {
         if (trump != NO_TRUMP_CODE) throw std::invalid_argument("No trump game has trump selected");
@@ -178,8 +177,16 @@ bool PartyState::init(const std::string& deal) {
     else {
         if (!(trump < NO_TRUMP_CODE)) throw std::invalid_argument("Trump game has no trump selected");
     }
+
+    // Check prerequisites
+    if (gameType == NO_TRUMP_PARTY) {
+        // Left empty on purpose
+    }
+    else if (gameType == TRUMP_PARTY) {
+        // Left empty on purpose
+    }
     // Check if player has the trump3 and trump4
-    if (gameType == _40100) {
+    else if (gameType == _40100) {
         bool trump3 = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 3));
         bool trump4 = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 4));
         if (!(trump3 && trump4)) return false;
@@ -193,9 +200,8 @@ bool PartyState::init(const std::string& deal) {
     else if (gameType == ULTI) {
         if (!playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 0))) return false;
     }
-    // Check if player does not have the trump7
     else if (gameType == BETLI) {
-        if (playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 7))) return false;
+        // Left empty on purpose
     }
     else if (gameType == NO_TRUMP_DURCHMARS) {
         // Left empty on purpose

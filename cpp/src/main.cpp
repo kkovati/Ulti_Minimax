@@ -27,6 +27,13 @@ int main()
 	// No.calls: 27497887
 	// Duration : 5752 ms
 	// TreePathCoder : 7 0 0 7 0 0 6 0 0 5 0 0 4 0 0 0 2 0 0 0 0 10 10 10 10 10 10 10 10 10
+
+	// Generate game progression string from set up PartyState
+	// gameProgression[0] = result 
+	// gameProgression[1] = round starting player index 
+	// gameProgression[2] = card suit 
+	// gameProgression[3] = card value
+	// gameProgression[4] = next player index in the round
 	std::string gameProgression = gameManager.simulate(deal);
 
 	// Random deal
@@ -50,7 +57,7 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* wasm_main(const char* deal_code)
     std::cout << "WASM: Start simulation" << std::endl;
 
 	auto gameManager = ulti_minimax::GameManager();
-	static std::string gameProgression = gameManager.simulate(deal);
+	std::string gameProgression = gameManager.simulate(deal);
 
 	// Create a response string
 	std::cout << "WASM: Response string: " << gameProgression << std::endl;
