@@ -40,21 +40,28 @@ Module.onRuntimeInitialized = () => {
 	const button = document.getElementById("simulate-button");
 
 	// Add a click event listener to trigger WASM code on button click
-	button.addEventListener("click", () => {
+	button.addEventListener("click", async () => {
 		
 		// Reset simulation statuses
 		document.querySelectorAll('.game-type').forEach(gameTypeSpan => {
 			gameTypeSpan.querySelector('.status').innerHTML = "";
 		});
 		
+		// Ensure the browser processes the DOM update and starts the animation
+		await new Promise(resolve => requestAnimationFrame(() => resolve()));
+		
 		// Iterate through all game types
-		document.querySelectorAll('.game-type').forEach(gameTypeSpan => {
+		for (const gameTypeSpan of document.querySelectorAll('.game-type')) {
+
 			// Get game type
 			const gameType = gameTypeSpan.dataset.index;
 			
 			// Add the spinning loader
 			const statusSpan = gameTypeSpan.querySelector('.status');
 			statusSpan.innerHTML = '<div class="loading"></div>';
+			
+			// Ensure the browser processes the DOM update and starts the animation
+			await new Promise(resolve => requestAnimationFrame(() => resolve()));
 			
 			// Deal code structure:
 			// deal[0]		= game type
@@ -98,7 +105,7 @@ Module.onRuntimeInitialized = () => {
 				throw new Error('Undefined result was returned from simulation');
 			}			
 			
-		});		
+		}
 
 	});
 	
