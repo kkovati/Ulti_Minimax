@@ -130,12 +130,19 @@ body {
 }
 
 .game-progression {
+    position: relative;
     display: flex;
     width: 1500px;
     height: 500px;
     top: 10px;
     left: 10px;
 	background-color: white;
+}
+
+#card-00 {
+	position: absolute;
+	left: 100px;
+	top: 100px;
 }
 
 .loading {
