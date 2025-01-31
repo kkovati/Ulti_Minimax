@@ -129,7 +129,7 @@ body {
     margin: 0; /* Reset any margins to avoid spacing issues */
 }
 
-.game-progression {
+#game-progression {
     position: relative;
     display: flex;
     width: 1500px;
@@ -137,12 +137,6 @@ body {
     top: 10px;
     left: 10px;
 	background-color: white;
-}
-
-#card-00 {
-	position: absolute;
-	left: 100px;
-	top: 100px;
 }
 
 .loading {
@@ -214,8 +208,8 @@ body {
 
 :is(.green-button).smaller {
     margin-top: 0px;
-    font-size: 14px;
-    padding: 6px 10px;
+    font-size: 16px;
+    padding: 4px 8px;
     border-radius: 6px;
 }
 

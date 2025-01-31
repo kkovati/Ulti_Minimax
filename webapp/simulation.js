@@ -31,6 +31,23 @@ document.querySelectorAll('.trump').forEach(trump => {
     });
 });
 
+// Put cards onto game-progression div based on game progression string
+function showGameProgression(gameProgression) {
+	//for (let iCard = 0; iCard < nCardPerSuit; iCard++) {
+	
+	// Create card
+	const cardImage = document.createElement('img');
+	cardImage.classList.add('card');
+	//cardImage.setAttribute('src', `assets/images/${iSuit}${iCard}.jpg`);
+	cardImage.setAttribute('src', `assets/images/10.jpg`);
+	//cardImage.setAttribute('alt', `Card ${iSuit}${iCard}`);
+	cardImage.style.position = "absolute";
+	cardImage.style.left = "200px";
+	cardImage.style.top = "100px";
+	
+	// Display card
+	document.getElementById(`game-progression`).appendChild(cardImage);
+}
 
 // This ensures the WASM code will run once it's loaded
 Module.onRuntimeInitialized = () => {
@@ -76,7 +93,7 @@ Module.onRuntimeInitialized = () => {
 			Module.stringToUTF8(deal, dealPointer, length);
 
 			// Call the WASM entry point
-			const resultPointer = Module._wasm_main(dealPointer);
+			const gameProgressionPointer = Module._wasm_main(dealPointer);
 
 			// Read game progression string
 			// gameProgression[0] = result 
@@ -84,13 +101,13 @@ Module.onRuntimeInitialized = () => {
 			// gameProgression[2] = card suit 
 			// gameProgression[3] = card value
 			// gameProgression[4] = next player index in the round
-			const gameProgression = Module.UTF8ToString(resultPointer);
+			const gameProgression = Module.UTF8ToString(gameProgressionPointer);
 			console.assert(gameProgression.length == 91)
 			console.log("WASM returned:", gameProgression);
 
-			// Free the allocated memory in both JS and WASM
+			// Free the memory allocated in WASM (C++)
 			Module._free(dealPointer);
-			Module._free(resultPointer); // Free the memory allocated in C++ for the response
+			Module._free(gameProgressionPointer);
 			
 			// Update status based on game result
 			const result = gameProgression[0];
@@ -103,7 +120,9 @@ Module.onRuntimeInitialized = () => {
 				show_button.textContent = "Show";
 				show_button.classList.add("green-button");
 				show_button.classList.add("smaller");
-				//show_button.dataset.index = index; // Store index for reference if needed
+				//show_button.dataset.index = index;
+				//show_button.dataset.info = gameProgression;
+				show_button.addEventListener("click", () => showGameProgression(gameProgression));
 				gameTypeSpan.insertBefore(show_button, gameTypeSpan.querySelector(".status").nextSibling);
 			}
 			else if (result == "2") {
