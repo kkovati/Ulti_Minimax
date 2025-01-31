@@ -121,7 +121,7 @@ body {
 
 .status {
 	margin: 10px 0 10px;
-	min-width: 50px;
+	min-width: 30px;
     font-size: 24px;
     color: white;
     text-align: left;
@@ -187,29 +187,36 @@ body {
     border-color: white;
 }
 
-#simulate-button {
-  margin-top:20px;
-  /*background: linear-gradient(135deg, #6a11cb, #2575fc); /* Gradient */
-  background: #006400;
-  color: white;
-  font-size: 24px;
-  font-family: "Times New Roman";
-  font-weight: bold;
-  padding: 12px 20px;
-  border-radius: 8px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease; /* Smooth transition */
+.green-button {
+    margin-top: 20px;
+    /*background: linear-gradient(135deg, #6a11cb, #2575fc); /* Gradient */
+    background: #006400;
+    color: white;
+    font-size: 24px;
+    font-family: "Times New Roman";
+    font-weight: bold;
+    padding: 12px 20px;
+    border-radius: 8px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease; /* Smooth transition */
 }
 
-#simulate-button:hover {
-  transform: translateY(-2px); /* Hover lift effect */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow */  
+.green-button:hover {
+    transform: translateY(-6px); /* Hover lift effect */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow */  
 }
 
-#simulate-button:active {
-  transform: translateY(0); /* Reset on click */
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+.green-button:active {
+    transform: translateY(0); /* Reset on click */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+:is(.green-button).smaller {
+    margin-top: 0px;
+    font-size: 14px;
+    padding: 6px 10px;
+    border-radius: 6px;
 }
 
 .toast {

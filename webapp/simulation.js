@@ -70,6 +70,7 @@ Module.onRuntimeInitialized = () => {
 			const deal = gameType + trumpIndex + base_deal;
 			console.assert(deal.length == 62)
 			
+			// Allocate memory for deal string in WASM
 			const length = deal.length + 1;
 			const dealPointer = Module._malloc(length);
 			Module.stringToUTF8(deal, dealPointer, length);
@@ -96,6 +97,14 @@ Module.onRuntimeInitialized = () => {
 			if (result == "1") {
 				// Player win
 				statusSpan.innerHTML = '✔';
+				
+				// Button to show game progression
+				let show_button = document.createElement("button");
+				show_button.textContent = "Show";
+				show_button.classList.add("green-button");
+				show_button.classList.add("smaller");
+				//show_button.dataset.index = index; // Store index for reference if needed
+				gameTypeSpan.insertBefore(show_button, gameTypeSpan.querySelector(".status").nextSibling);
 			}
 			else if (result == "2") {
 				// Opponent win
