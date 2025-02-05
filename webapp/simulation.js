@@ -37,6 +37,9 @@ function showGameProgression(gameProgression) {
 	const result = gameProgression[0];
 	const gp = gameProgression.substring(1, 91);
 	
+	// Delete previous game progression displayed	
+	document.getElementById(`game-progression`).innerHTML = "";    
+	
 	// Display parameters
 	const nRow = 2; 
 	const nRoundInRow = 5;
@@ -49,42 +52,44 @@ function showGameProgression(gameProgression) {
 	const stepInRoundY = 20;
 	
 	// Display cards
-	for (let iRow = 0; iRow < nRow; iRow++) {
-		for (let iRoundInRow = 0; iRoundInRow < nRoundInRow; iRoundInRow++) {
-			let iRound = iRow * nRoundInRow + iRoundInRow;
-			let startIdx = iRound * 9; // Start index of round in gameProgression
-			
-			if (gp[startIdx] > 2 || gp[startIdx + 3] > 2 || gp[startIdx + 6] > 2) {
-				break; // Invalid round, stop displaying more cards
-			}
-			
-			// Coords of the round
-			let roundX = offsetX + iRoundInRow * roundWidht;
-			let roundY = offsetY + iRow * roundHeight;
-			
-			// Coords of the 3 cards in a round
-			for (let iCard = 0; iCard < 3; iCard++) {
-				// X depends on which player's cards
-				let cardX = roundX + gp[startIdx + iCard * 3] * stepInRoundX;
-				// Y depends on which order the cards were hit
-				let cardY = roundY + iCard * stepInRoundY;
+	setTimeout(() => { // Blink effect
+		for (let iRow = 0; iRow < nRow; iRow++) {
+			for (let iRoundInRow = 0; iRoundInRow < nRoundInRow; iRoundInRow++) {
+				let iRound = iRow * nRoundInRow + iRoundInRow;
+				let startIdx = iRound * 9; // Start index of round in gameProgression
 				
-				// Create card
-				let suit = gp[startIdx + iCard * 3 + 1];
-				let value = gp[startIdx + iCard * 3 + 2];
-				const cardImage = document.createElement('img');
-				cardImage.classList.add('card');
-				cardImage.setAttribute('src', `assets/images/${suit}${value}.jpg`);
-				cardImage.setAttribute('alt', `Card ${suit}${value}`);
-				cardImage.style.position = "absolute";
-				cardImage.style.left = `${cardX}px`;
-				cardImage.style.top = `${cardY}px`;
+				if (gp[startIdx] > 2 || gp[startIdx + 3] > 2 || gp[startIdx + 6] > 2) {
+					break; // Invalid round, stop displaying more cards
+				}
 				
-				// Display card
-				document.getElementById(`game-progression`).appendChild(cardImage);
+				// Coords of the round
+				let roundX = offsetX + iRoundInRow * roundWidht;
+				let roundY = offsetY + iRow * roundHeight;
+				
+				// Coords of the 3 cards in a round
+				for (let iCard = 0; iCard < 3; iCard++) {
+					// X depends on which player's cards
+					let cardX = roundX + gp[startIdx + iCard * 3] * stepInRoundX;
+					// Y depends on which order the cards were hit
+					let cardY = roundY + iCard * stepInRoundY;
+					
+					// Create card
+					let suit = gp[startIdx + iCard * 3 + 1];
+					let value = gp[startIdx + iCard * 3 + 2];
+					const cardImage = document.createElement('img');
+					cardImage.classList.add('card');
+					cardImage.setAttribute('src', `assets/images/${suit}${value}.jpg`);
+					cardImage.setAttribute('alt', `Card ${suit}${value}`);
+					cardImage.style.position = "absolute";
+					cardImage.style.left = `${cardX}px`;
+					cardImage.style.top = `${cardY}px`;
+					
+					// Display card
+					document.getElementById(`game-progression`).appendChild(cardImage);
+				}
 			}
 		}
-	}
+	}, 200); // Short delay
 }
 
 // This ensures the WASM code will run once it's loaded
@@ -98,21 +103,25 @@ Module.onRuntimeInitialized = () => {
 	button.addEventListener("click", async () => {
 		
 		// Reset simulation statuses
-		document.querySelectorAll('.game-type').forEach(gameTypeSpan => {
-			gameTypeSpan.querySelector('.status').innerHTML = "";
+		document.querySelectorAll('.game-type').forEach(gameTypeDiv => {
+			gameTypeDiv.querySelector('.status').innerHTML = "";
+			gameTypeDiv.querySelectorAll("button").forEach(button_ => button_.remove());
 		});
 		
+		// Delete previous game progression displayed	
+		document.getElementById(`game-progression`).innerHTML = "";
+
 		// Ensure the browser processes the DOM update and starts the animation
 		await new Promise(resolve => requestAnimationFrame(() => resolve()));
 		
 		// Iterate through all game types
-		for (const gameTypeSpan of document.querySelectorAll('.game-type')) {
+		for (const gameTypeDiv of document.querySelectorAll('.game-type')) {
 
 			// Get game type
-			const gameType = gameTypeSpan.dataset.index;
+			const gameType = gameTypeDiv.dataset.index;
 			
 			// Add the spinning loader
-			const statusSpan = gameTypeSpan.querySelector('.status');
+			const statusSpan = gameTypeDiv.querySelector('.status');
 			statusSpan.innerHTML = '<div class="loading"></div>';
 			
 			// Ensure the browser processes the DOM update and starts the animation
@@ -161,7 +170,7 @@ Module.onRuntimeInitialized = () => {
 				//show_button.dataset.index = index;
 				//show_button.dataset.info = gameProgression;
 				show_button.addEventListener("click", () => showGameProgression(gameProgression));
-				gameTypeSpan.insertBefore(show_button, gameTypeSpan.querySelector(".status").nextSibling);
+				gameTypeDiv.insertBefore(show_button, gameTypeDiv.querySelector(".status").nextSibling);
 			}
 			else if (result == "2") {
 				// Opponent win
