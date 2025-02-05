@@ -12,6 +12,8 @@ constexpr int N_SUIT = 4;
 constexpr int N_VALUE = 8;
 constexpr int LOWEST_CARD_VALUE_WITH_POINT = 6;
 constexpr int N_POINT_IN_DECK = (N_VALUE - LOWEST_CARD_VALUE_WITH_POINT) * N_SUIT;
+constexpr int NEUTRAL_CARDS_LO_VALUE = 1;
+constexpr int NEUTRAL_CARDS_HI_VALUE = 5;
 
 // Game rules info
 constexpr int N_PLAYER = 3;
@@ -40,6 +42,7 @@ constexpr uint8_t DURCHMARS				= 7;
 constexpr uint8_t _20100				= 8;
 constexpr uint8_t _4TENS				= 9;
 constexpr uint8_t NO_TRUMP_GAMES[] = { NO_TRUMP_PARTY, BETLI, NO_TRUMP_DURCHMARS };
+constexpr uint8_t NO_SPECIAL_CARD_GAMES[] = { BETLI, NO_TRUMP_DURCHMARS };
 
 constexpr int SEED = 0;
 constexpr bool DEBUG = false;
@@ -79,8 +82,9 @@ public:
 
 	// Check if two cards are equal (which cannot be in a normal decK)
 	bool equals(const Card& other) const { return suit == other.suit && value == other.value; };
-		
-	bool isNextInSeries(const Card& other) const { return suit == other.suit && value + 1 == other.value && other.value != LOWEST_CARD_VALUE_WITH_POINT; };
+	
+	// Check if the two cards are in series for simplified hitting
+	bool isNextInSeries(const Card&, bool) const;
 
 	std::string toString() const { 
 		std::string s = std::string(1, (char)('A' + suit)) + std::to_string(value);
@@ -309,11 +313,15 @@ public:
 	PartyState() = default;
 
 	PartyState(const PartyState& other) : gameType(other.gameType), trump(other.trump),
+		no_special_card_game(other.no_special_card_game),
+		restCard0(other.restCard0), restCard1(other.restCard1),
 		actionList(other.actionList), roundResults(other.roundResults), playerHands(other.playerHands) {};
 
 	PartyState& operator=(const PartyState& other) {
 		if (this != &other) {
 			gameType = other.gameType; trump = other.trump;
+			no_special_card_game = other.no_special_card_game;
+			restCard0 = other.restCard0; restCard1 = other.restCard1;
 			actionList = other.actionList; roundResults = other.roundResults; playerHands = other.playerHands;
 		}
 		return *this;
@@ -352,6 +360,7 @@ public:
 private:
 	uint8_t gameType = NO_TRUMP_PARTY;
 	uint8_t trump = NO_TRUMP_CODE;
+	bool no_special_card_game = true;
 	Card restCard0, restCard1;
 
 	ActionList actionList = ActionList();

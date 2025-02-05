@@ -5,6 +5,7 @@
 #include "game_manager.hpp"
 #include "rules.hpp"
 
+
 TEST(PartyStateTest, TestChooseWinnerCard) {
     ulti_minimax::PartyState partyState;
 
@@ -59,6 +60,145 @@ TEST(PartyStateTest, TestChooseWinnerCard) {
             std::cout << std::endl;
         }
         EXPECT_EQ(winCardIndex, testCase[7]);        
+    }
+}
+
+TEST(PartyStateTest, simplifyPlayableCards) {
+    // Special card game
+    std::string deal = "00071315172021303336370001030405111214223202061016232426273134";
+    ulti_minimax::PartyState partyStateSpecial;
+    bool prerequisites = partyStateSpecial.init(deal);
+
+    // No special card game
+    deal = "50071315172021303336370001030405111214223202061016232426273134";
+    ulti_minimax::PartyState partyStateNoSpecial;
+    prerequisites = partyStateNoSpecial.init(deal);
+
+    // Create test cases
+    std::vector<std::tuple<std::vector<int>, std::vector<int>, std::vector<int>>> testCases = {
+        // Each tuple consist two lines is:
+        // First line is original card vector: suit, value, suit, value, ...
+        // Second line is simplified card vector WITH special cards: suit, value, suit, value, ...
+        // Third line is simplified card vector WITHOUT special cards: suit, value, suit, value, ...
+
+        {
+            {0, 1, 0, 2, 0, 3, 0, 4}, // Original
+            {0, 1}, // Simplified WITH special cards
+            {0, 1}, // Simplified WITHOUT special cards
+        }, 
+        {
+            {0, 1, 0, 2, 0, 3, 0, 4, 0, 5},
+            {0, 1},
+            {0, 1},
+        },        
+        {
+            {0, 1, 0, 2, 0, 4, 0, 5},
+            {0, 1, 0, 4},
+            {0, 1, 0, 4},
+        },
+        {
+            {0, 0, 0, 2, 0, 4, 0, 5},
+            {0, 0, 0, 2, 0, 4},
+            {0, 0, 0, 2, 0, 4},
+        },        
+        {
+            {0, 0, 0, 1, 0, 2, 0, 4, 0, 5},
+            {0, 0, 0, 1, 0, 4},
+            {0, 0, 0, 4},
+        },
+        {
+            {0, 0, 0, 2, 0, 3, 0, 4, 0, 5},
+            {0, 0, 0, 2},
+            {0, 0, 0, 2},
+        },
+        {
+            {0, 0, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7},
+            {0, 0, 0, 2, 0, 6, 0, 7},
+            {0, 0, 0, 2},
+        },
+        {
+            {0, 0, 0, 2, 0, 3, 0, 4, 0, 5, 0, 7},
+            {0, 0, 0, 2, 0, 7},
+            {0, 0, 0, 2, 0, 7},
+        },            
+        {
+            {0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 7},
+            {0, 0, 0, 1, 0, 7},
+            {0, 0, 0, 7},
+        },          
+        {
+            {0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7},
+            {0, 0, 0, 1, 0, 6, 0, 7},
+            {0, 0},
+        },        
+        {
+            {1, 4, 1, 5, 1, 6},
+            {1, 4, 1, 6},
+            {1, 4},
+        },        
+        {
+            {2, 4, 2, 5, 2, 6, 2, 7},
+            {2, 4, 2, 6, 2, 7},
+            {2, 4},
+        },        
+        {
+            {1, 4, 1, 5, 2, 6, 2, 7},
+            {1, 4, 2, 6, 2, 7},
+            {1, 4, 2, 6},
+        },        
+        {
+            {0, 0, 0, 1, 1, 0, 1, 1, 2, 1, 2, 2, 3, 3},
+            {0, 0, 0, 1, 1, 0, 1, 1, 2, 1, 3, 3},
+            {0, 0, 1, 0, 2, 1, 3, 3},
+        },
+    };
+
+    // Iterate through test cases
+    for (const auto& testCase : testCases) { 
+
+        // SPECIAL CARD TEST CASE
+        auto originalCardsStr = std::get<0>(testCase);
+        auto simplifiedCardsStr = std::get<1>(testCase);
+        // Create original card vector
+        std::vector<ulti_minimax::Card> originalCardVector;
+        for (int i = 0; i < originalCardsStr.size(); i += 2) {
+            originalCardVector.push_back(ulti_minimax::Card(originalCardsStr[i], originalCardsStr[i + 1]));
+        }
+        // Create simplified target card vector WITH special cards
+        std::vector<ulti_minimax::Card> simplifiedCardVector;
+        for (int i = 0; i < simplifiedCardsStr.size(); i += 2) {
+            simplifiedCardVector.push_back(ulti_minimax::Card(simplifiedCardsStr[i], simplifiedCardsStr[i + 1]));
+        }        
+        // Simplify
+        partyStateSpecial.simplifyPlayableCards(originalCardVector);
+        // Check simplification results
+        EXPECT_EQ(originalCardVector.size(), simplifiedCardVector.size());
+        if (originalCardVector.size() != simplifiedCardVector.size()) break;
+        for (int i = 0; i < originalCardVector.size(); ++i) {
+            EXPECT_TRUE(originalCardVector[i].equals(simplifiedCardVector[i]));
+        }
+
+
+        // NO SPECIAL CARD TEST CASE
+        simplifiedCardsStr = std::get<2>(testCase);
+        // Create original card vector
+        originalCardVector.clear();
+        for (int i = 0; i < originalCardsStr.size(); i += 2) {
+            originalCardVector.push_back(ulti_minimax::Card(originalCardsStr[i], originalCardsStr[i + 1]));
+        }
+        // Create simplified target card vector WITHOUT special cards
+        simplifiedCardVector.clear();
+        for (int i = 0; i < simplifiedCardsStr.size(); i += 2) {
+            simplifiedCardVector.push_back(ulti_minimax::Card(simplifiedCardsStr[i], simplifiedCardsStr[i + 1]));
+        }
+        // Simplify
+        partyStateNoSpecial.simplifyPlayableCards(originalCardVector);
+        // Check simplification results
+        EXPECT_EQ(originalCardVector.size(), simplifiedCardVector.size());
+        if (originalCardVector.size() != simplifiedCardVector.size()) break;
+        for (int i = 0; i < originalCardVector.size(); ++i) {
+            EXPECT_TRUE(originalCardVector[i].equals(simplifiedCardVector[i]));
+        }
     }
 }
 

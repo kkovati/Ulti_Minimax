@@ -10,10 +10,25 @@
 namespace ulti_minimax {
 
 // Compare for sorting
+//
 bool Card::compareCard(const Card& a, const Card& b) {
     if (a == b) return a < b;
     return a.suit < b.suit;
 }
+
+// Check if the two cards are in series for simplified hitting
+//
+bool Card::isNextInSeries(const Card& other, bool no_special_card_game) const {
+    assert(suit <= other.suit);
+    if (suit == other.suit) assert(value < other.value);
+    if (no_special_card_game) {
+        return suit == other.suit && value + 1 == other.value;
+    }
+    else {
+        return suit == other.suit && value + 1 == other.value && 
+            NEUTRAL_CARDS_LO_VALUE <= value && other.value <= NEUTRAL_CARDS_HI_VALUE;
+    }    
+};
 
 
 Deck::Deck() {
@@ -57,7 +72,7 @@ std::array<Card, N_REST_CARD> Deck::findRestCards(const std::vector<Card>& dealt
             restCards[i++] = card;
         }
     }
-    assert(i == 2);
+    assert(i == N_REST_CARD);
     return restCards;
 }
 
@@ -133,6 +148,9 @@ bool PartyState::init(const std::string& deal) {
             trump = NO_TRUMP_CODE;
             // TODO ace - king order !!!!!!!!!! not during party, pay attention to rest cards as well
         }
+        // Check if no-special-card game type is selected
+        no_special_card_game = std::find(
+            std::begin(NO_SPECIAL_CARD_GAMES), std::end(NO_SPECIAL_CARD_GAMES), gameType) != std::end(NO_SPECIAL_CARD_GAMES);
         
         // Cards
         std::vector<Card> cardVector;
@@ -292,13 +310,21 @@ void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
     assert(cardVector.size());
 }
 
+// Decrease the number of playable cards. 
+// If the player must choose between multiple cards, and these cards are in a series,
+// it is indifferent which card the player chooses.
+// This is because the other players do not have cards which can go between these cards so
+// it does not have any effect on the final outcome of the game. The player can choose any of the
+// cards is that series. 
+// If the game type has special cards, like ace, ten or trump 7, then these cards cannot form a series.
+//
 void PartyState::simplifyPlayableCards(CardVector& cardVector) {
     for (int i = 0; i < cardVector.size() - 1; ++i) {
         int series_length = 0;
         Card cardI = cardVector[i];
         for (int j = i + 1; j < cardVector.size(); ++j) {
             Card cardJ = cardVector[j];
-            if (cardI.isNextInSeries(cardJ)) {
+            if (cardI.isNextInSeries(cardJ, no_special_card_game)) {
                 cardI = cardJ;
                 series_length++;
             }
