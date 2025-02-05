@@ -44,15 +44,33 @@ function showGameProgression(gameProgression) {
 	const nRow = 2; 
 	const nRoundInRow = 5;
 	console.assert(nRow * nRoundInRow == 10);
-	const offsetX = 10; // Offset from parent div's edge
-	const offsetY = 10;	
-	const roundWidht = 200; // Width of 3 cards in a round
-	const roundHeight = 150;	
+	const offsetX = 40; // Offset from parent div's edge
+	const offsetY = 130;	
+	const playerOffsetX = 30; // Player name offset from parent div's edge
+	const playerOffsetY = 10;
+	const nextPlayerOffsetX = 40; // Next player name offset from previous
+	const nextPlayerOffsetY = 30;
+	const indexOffsetX = -25; // Round index text offset from round
+	const indexOffsetY = 0;
+	const roundWidht = 210; // Width of 3 cards in a round
+	const roundHeight = 180;	
 	const stepInRoundX = 50; // Vertical step of cards in a round
 	const stepInRoundY = 20;
 	
-	// Display cards
+	// Display cards and texts
 	setTimeout(() => { // Blink effect
+		// Display player texts
+		["Player", "Opponent 1", "Opponent 2"].forEach((item, index) => {
+			const playerName = document.createElement("h1");
+			playerName.className = "title-text";
+			playerName.textContent = item;
+			playerName.style.position = "absolute";
+			playerName.style.left = `${playerOffsetX + index * nextPlayerOffsetX}px`;
+			playerName.style.top = `${playerOffsetY + index * nextPlayerOffsetY}px`;
+			document.getElementById(`game-progression`).appendChild(playerName);
+		});
+	
+		// Iterate through rounds
 		for (let iRow = 0; iRow < nRow; iRow++) {
 			for (let iRoundInRow = 0; iRoundInRow < nRoundInRow; iRoundInRow++) {
 				let iRound = iRow * nRoundInRow + iRoundInRow;
@@ -65,6 +83,15 @@ function showGameProgression(gameProgression) {
 				// Coords of the round
 				let roundX = offsetX + iRoundInRow * roundWidht;
 				let roundY = offsetY + iRow * roundHeight;
+				
+				// Display round index text
+				const roundIndex = document.createElement("h1");
+				roundIndex.className = "title-text";
+				roundIndex.textContent = `${iRound + 1}`;
+				roundIndex.style.position = "absolute";
+				roundIndex.style.left = `${roundX + indexOffsetX - (iRound == 9 ? 5 : 0)}px`;
+				roundIndex.style.top = `${roundY + indexOffsetY}px`;
+				document.getElementById(`game-progression`).appendChild(roundIndex);
 				
 				// Coords of the 3 cards in a round
 				for (let iCard = 0; iCard < 3; iCard++) {
