@@ -33,20 +33,58 @@ document.querySelectorAll('.trump').forEach(trump => {
 
 // Put cards onto game-progression div based on game progression string
 function showGameProgression(gameProgression) {
-	//for (let iCard = 0; iCard < nCardPerSuit; iCard++) {
+	console.assert(gameProgression.length == 91)
+	const result = gameProgression[0];
+	const gp = gameProgression.substring(1, 91);
 	
-	// Create card
-	const cardImage = document.createElement('img');
-	cardImage.classList.add('card');
-	//cardImage.setAttribute('src', `assets/images/${iSuit}${iCard}.jpg`);
-	cardImage.setAttribute('src', `assets/images/10.jpg`);
-	//cardImage.setAttribute('alt', `Card ${iSuit}${iCard}`);
-	cardImage.style.position = "absolute";
-	cardImage.style.left = "200px";
-	cardImage.style.top = "100px";
+	// Display parameters
+	const nRow = 2; 
+	const nRoundInRow = 5;
+	console.assert(nRow * nRoundInRow == 10);
+	const offsetX = 10; // Offset from parent div's edge
+	const offsetY = 10;	
+	const roundWidht = 200; // Width of 3 cards in a round
+	const roundHeight = 150;	
+	const stepInRoundX = 50; // Vertical step of cards in a round
+	const stepInRoundY = 20;
 	
-	// Display card
-	document.getElementById(`game-progression`).appendChild(cardImage);
+	// Display cards
+	for (let iRow = 0; iRow < nRow; iRow++) {
+		for (let iRoundInRow = 0; iRoundInRow < nRoundInRow; iRoundInRow++) {
+			let iRound = iRow * nRoundInRow + iRoundInRow;
+			let startIdx = iRound * 9; // Start index of round in gameProgression
+			
+			if (gp[startIdx] > 2 || gp[startIdx + 3] > 2 || gp[startIdx + 6] > 2) {
+				break; // Invalid round, stop displaying more cards
+			}
+			
+			// Coords of the round
+			let roundX = offsetX + iRoundInRow * roundWidht;
+			let roundY = offsetY + iRow * roundHeight;
+			
+			// Coords of the 3 cards in a round
+			for (let iCard = 0; iCard < 3; iCard++) {
+				// X depends on which player's cards
+				let cardX = roundX + gp[startIdx + iCard * 3] * stepInRoundX;
+				// Y depends on which order the cards were hit
+				let cardY = roundY + iCard * stepInRoundY;
+				
+				// Create card
+				let suit = gp[startIdx + iCard * 3 + 1];
+				let value = gp[startIdx + iCard * 3 + 2];
+				const cardImage = document.createElement('img');
+				cardImage.classList.add('card');
+				cardImage.setAttribute('src', `assets/images/${suit}${value}.jpg`);
+				cardImage.setAttribute('alt', `Card ${suit}${value}`);
+				cardImage.style.position = "absolute";
+				cardImage.style.left = `${cardX}px`;
+				cardImage.style.top = `${cardY}px`;
+				
+				// Display card
+				document.getElementById(`game-progression`).appendChild(cardImage);
+			}
+		}
+	}
 }
 
 // This ensures the WASM code will run once it's loaded
