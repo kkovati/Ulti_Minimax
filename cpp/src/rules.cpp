@@ -129,30 +129,31 @@ bool PartyState::init(const std::string& deal) {
         // Deal code structure:
         // deal[0]		= game type
         // deal[1]		= trump [0-3]
-        // deal[2...61]	= cards
+        // deal[2...61]	= cards [suit, value]
         if (!(deal.length() == 2 + N_ACTION * 2)) throw std::invalid_argument("Invalid deal code length");
 
         // Game type
         char gameTypeChar = deal[0];
         if (!std::isdigit(gameTypeChar)) throw std::invalid_argument("Invalid game type code");
         gameType = gameTypeChar - '0'; // Convert char to int
-        if(!(0 <= gameType && gameType <= 9)) throw std::invalid_argument("Invalid game type code");
+        if (!(0 <= gameType && gameType <= 9)) throw std::invalid_argument("Invalid game type code");
 
         // Trump
         char trumpChar = deal[1];
         if (!std::isdigit(trumpChar)) throw std::invalid_argument("Invalid trump code");
         trump = trumpChar - '0'; // Convert char to int
         if (!(0 <= trump && trump <= 3)) throw std::invalid_argument("Invalid trump code");
+
         // Check if no-trump game type is selected
         if (std::find(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES), gameType) != std::end(NO_TRUMP_GAMES)) {
             trump = NO_TRUMP_CODE;
-            // TODO ace - king order !!!!!!!!!! not during party, pay attention to rest cards as well
-        }
+        }   
+
         // Check if no-special-card game type is selected
-        no_special_card_game = std::find(
-            std::begin(NO_SPECIAL_CARD_GAMES), std::end(NO_SPECIAL_CARD_GAMES), gameType) != std::end(NO_SPECIAL_CARD_GAMES);
+        no_special_card_game = std::find(std::begin(NO_SPECIAL_CARD_GAMES), std::end(NO_SPECIAL_CARD_GAMES), gameType) 
+            != std::end(NO_SPECIAL_CARD_GAMES);
         
-        // Cards
+        // Parse cards from deal
         std::vector<Card> cardVector;
         for (int i = 2; i < deal.length(); i += 2) {
             char suitChar = deal[i];

@@ -6,6 +6,42 @@
 #include "rules.hpp"
 
 
+TEST(GameManagerTest, ApplyAceTenOrder) {
+    ulti_minimax::GameManager gameManager;
+
+    // Special card game -> ace-ten order
+    std::string deal = "00071315172021303336370001030405111214223202061016232426273134";
+    std::string expectedAceTenDeal = "00071614172021303635370001060304111213223202051015262325273133";
+    std::string aceTenDeal = gameManager.applyAceTenOrder(deal);
+    EXPECT_EQ(expectedAceTenDeal, aceTenDeal);
+
+    // No special card game -> remain original ace-king order
+    deal = "50071315172021303336370001030405111214223202061016232426273134";
+    expectedAceTenDeal = "50071315172021303336370001030405111214223202061016232426273134";
+    aceTenDeal = gameManager.applyAceTenOrder(deal);
+    EXPECT_EQ(expectedAceTenDeal, aceTenDeal);
+}
+
+TEST(GameManagerTest, ApplyAceKingOrder) {
+    ulti_minimax::GameManager gameManager;
+
+    // Special card game -> ace-ten order
+    std::string deal = "00071315172021303336370001030405111214223202061016232426273134";
+    std::string gameProgression = "9900901902903904905906907910921932903914925936907900900900900900900900900900900900900900900";
+    std::string expectedAceKingGameProgression = "9900901902904905906903907910921932904915926933907900900900900900900900900900900900900900900";
+    gameManager.applyAceTenOrder(deal); // Set game type
+    std::string AceKingGameProgression = gameManager.applyAceKingOrder(gameProgression);
+    EXPECT_EQ(expectedAceKingGameProgression, AceKingGameProgression);
+
+    // No special card game -> remain original ace-king order
+    deal = "50071315172021303336370001030405111214223202061016232426273134";
+    gameProgression = "9900901902903904905906907910921932903914925936907900900900900900900900900900900900900900900";
+    expectedAceKingGameProgression = "9900901902903904905906907910921932903914925936907900900900900900900900900900900900900900900";
+    gameManager.applyAceTenOrder(deal); // Set game type
+    AceKingGameProgression = gameManager.applyAceKingOrder(gameProgression);
+    EXPECT_EQ(expectedAceKingGameProgression, AceKingGameProgression);
+}
+
 TEST(PartyStateTest, TestChooseWinnerCard) {
     ulti_minimax::PartyState partyState;
 
@@ -63,7 +99,7 @@ TEST(PartyStateTest, TestChooseWinnerCard) {
     }
 }
 
-TEST(PartyStateTest, simplifyPlayableCards) {
+TEST(PartyStateTest, SimplifyPlayableCards) {
     // Special card game
     std::string deal = "00071315172021303336370001030405111214223202061016232426273134";
     ulti_minimax::PartyState partyStateSpecial;

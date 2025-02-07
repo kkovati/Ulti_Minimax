@@ -63,14 +63,23 @@ private:
 class GameManager {
 public:
 	GameManager() = default;
+
+	// Convert between ace-king and ace-ten order
+	std::string applyAceTenOrder(const std::string&);
+	std::string applyAceKingOrder(const std::string&);
+
+	// Main simulation function
 	std::string simulate(const std::string& = "");
 
 private:
+	bool no_special_card_game = true;
+
 	PartyState partyState;
 
+	// Minimax algorithm
 	TreePathCoder minimax(int);
 
-	// Visaulization
+	// Visualization
 	int setPartyState(TreePathCoder, int);
 	int progressBar = 0;
 	void updateProgressBar();	

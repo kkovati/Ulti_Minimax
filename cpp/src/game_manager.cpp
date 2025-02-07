@@ -22,6 +22,102 @@ void TreePathCoder::printCode() const {
 }
 
 
+// Apply ace-ten order from original ace ace-king order.
+// Ace-king order is the default order from the webapp.
+// Ace-king order: (real card value(order in game))
+// 0(0), 1(1), 2(2), 3(3), 4(4), 5(5), 6(6), 7(7)
+// Ace-ten order: (real card value(order in game))
+// 0(0), 1(1), 2(2), 4(3), 5(4), 6(5), 3(6), 7(7)
+// NOTE: rest cards will be determined correctly after this conversion
+//
+std::string GameManager::applyAceTenOrder(const std::string& deal) {
+	// Game type (same as in PartyState::init())
+	char gameTypeChar = deal[0];
+	if (!std::isdigit(gameTypeChar)) throw std::invalid_argument("Invalid game type code");
+	uint8_t gameType = gameTypeChar - '0'; // Convert char to int
+	if (!(0 <= gameType && gameType <= 9)) throw std::invalid_argument("Invalid game type code");
+
+	// Check if no-special-card game type is selected (similar as in PartyState::init())
+	if (std::find(std::begin(NO_SPECIAL_CARD_GAMES), std::end(NO_SPECIAL_CARD_GAMES), gameType) != std::end(NO_SPECIAL_CARD_GAMES)) {
+		// No-special-card game type is selected: ace-king order 
+		no_special_card_game = true;
+		return deal;
+	}
+	no_special_card_game = false;
+
+	// Apply ace-ten order to deal string
+	// Deal code structure:
+	// deal[0]		= game type
+	// deal[1]		= trump [0-3]
+	// deal[2...61]	= cards	[suit, value]
+	std::string aceTenDeal = deal; // Copy the deal string
+	for (int i = 2; i < deal.length(); i += 2) {  // (similar as in PartyState::init())
+		char valueChar = deal[i + 1];
+		if (!std::isdigit(valueChar)) throw std::invalid_argument("Invalid card code");
+		int value = valueChar - '0';
+		if (value < 0 || 7 < value) throw std::invalid_argument("Invalid card code");
+		switch (valueChar) {
+		case '3':
+			aceTenDeal[i + 1] = '6';
+			break;
+		case '4':
+			aceTenDeal[i + 1] = '3';
+			break;
+		case '5':
+			aceTenDeal[i + 1] = '4';
+			break;
+		case '6':
+			aceTenDeal[i + 1] = '5';
+			break;
+		default:
+			break;
+		}
+	}
+	return aceTenDeal;
+}
+
+// Apply ace-king order from ace-ten order.
+// Ace-king order is the default order from the webapp.
+// This is the inverse of function applyAceTenOrder().
+//
+std::string GameManager::applyAceKingOrder(const std::string& gameProgression) {
+	// Check if no-special-card game type is selected
+	if (no_special_card_game) {
+		// No-special-card game type is selected: ace-king order 
+		return gameProgression;
+	}
+
+	// Apply ace-king order to gameProgression string
+	// Game progression string structure:
+	// gameProgression[0] = result 
+	// gameProgression[1] = round starting player index 
+	// gameProgression[2] = card suit 
+	// gameProgression[3] = card value
+	// gameProgression[4] = next player index in the round
+	assert(gameProgression.length() == 1 + 3 * N_ACTION);
+	std::string AceKingGameProgression = gameProgression; // Copy the gameProgression string
+	for (int i = 1; i < gameProgression.length(); i += 3) {
+		char valueChar = gameProgression[i + 2];
+		switch (valueChar) {
+		case '3':
+			AceKingGameProgression[i + 2] = '4';
+			break;
+		case '4':
+			AceKingGameProgression[i + 2] = '5';
+			break;
+		case '5':
+			AceKingGameProgression[i + 2] = '6';
+			break;
+		case '6':
+			AceKingGameProgression[i + 2] = '3';
+			break;
+		default:
+			break;
+		}
+	}
+	return AceKingGameProgression;
+}
+
 // Start minimax simulation
 //
 std::string GameManager::simulate(const std::string& deal) {
@@ -74,7 +170,7 @@ std::string GameManager::simulate(const std::string& deal) {
 }
 
 // This function implements one iteration of the minimax algorithm.
-// It handles a single situation of the game, in other words, a single node in the tree.
+// It handles a single situation of the game, or in other words, a single node in the tree.
 //
 TreePathCoder GameManager::minimax(int index) {
 	n_minimax_call += 1;

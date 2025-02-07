@@ -20,7 +20,7 @@ int main()
 	// Deal code structure:
 	// deal[0]		= game type
 	// deal[1]		= trump [0-3]
-	// deal[2...61]	= cards
+	// deal[2...61]	= cards [suit, value]
 	std::string deal = "00071315172021303336370001030405111214223202061016232426273134";
 	// Start simulation
 	// Result : PLAYER_WIN
