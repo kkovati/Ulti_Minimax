@@ -57,7 +57,9 @@ extern "C" EMSCRIPTEN_KEEPALIVE const char* wasm_main(const char* deal_code)
     std::cout << "WASM: Start simulation" << std::endl;
 
 	auto gameManager = ulti_minimax::GameManager();
+	deal = gameManager.applyAceTenOrder(deal);
 	std::string gameProgression = gameManager.simulate(deal);
+	gameProgression = gameManager.applyAceKingOrder(gameProgression);
 
 	// Create a response string
 	std::cout << "WASM: Response string: " << gameProgression << std::endl;
