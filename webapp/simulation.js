@@ -62,7 +62,7 @@ function showGameProgression(gameProgression) {
 		// Display player texts
 		["Player", "Opponent 1", "Opponent 2"].forEach((item, index) => {
 			const playerName = document.createElement("h1");
-			playerName.className = "title-text";
+			playerName.className = "main-text";
 			playerName.textContent = item;
 			playerName.style.position = "absolute";
 			playerName.style.left = `${playerOffsetX + index * nextPlayerOffsetX}px`;
@@ -86,7 +86,7 @@ function showGameProgression(gameProgression) {
 				
 				// Display round index text
 				const roundIndex = document.createElement("h1");
-				roundIndex.className = "title-text";
+				roundIndex.className = "main-text";
 				roundIndex.textContent = `${iRound + 1}`;
 				roundIndex.style.position = "absolute";
 				roundIndex.style.left = `${roundX + indexOffsetX - (iRound == 9 ? 5 : 0)}px`;
