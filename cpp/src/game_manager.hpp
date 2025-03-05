@@ -72,9 +72,8 @@ public:
 	std::string simulate(const std::string& = "");
 
 private:
-	bool no_special_card_game = true;
-
-	PartyState partyState;
+	uint8_t card_order = 0;
+	PartyState partyState;	
 
 	// Minimax algorithm
 	TreePathCoder minimax(int);

@@ -12,8 +12,6 @@ constexpr int N_SUIT = 4;
 constexpr int N_VALUE = 8;
 constexpr int LOWEST_CARD_VALUE_WITH_POINT = 6;
 constexpr int N_POINT_IN_DECK = (N_VALUE - LOWEST_CARD_VALUE_WITH_POINT) * N_SUIT;
-constexpr int NEUTRAL_CARDS_LO_VALUE = 1;
-constexpr int NEUTRAL_CARDS_HI_VALUE = 5;
 
 // Game rules info
 constexpr int N_PLAYER = 3;
@@ -27,9 +25,6 @@ constexpr uint8_t RESULT_UNDEFINED	= 0;
 constexpr uint8_t PLAYER_WIN		= 1;
 constexpr uint8_t OPPONENT_WIN		= 2;
 
-// Trumps: 0...3
-constexpr uint8_t NO_TRUMP_CODE = 4;
-
 // Game types
 constexpr uint8_t NO_TRUMP_PARTY		= 0;
 constexpr uint8_t TRUMP_PARTY			= 1;
@@ -41,8 +36,24 @@ constexpr uint8_t NO_TRUMP_DURCHMARS	= 6;
 constexpr uint8_t DURCHMARS				= 7;
 constexpr uint8_t _20100				= 8;
 constexpr uint8_t _4TENS				= 9;
+
+// Trumps: [0, 1, 2, 3]
+constexpr uint8_t NO_TRUMP_CODE = 4;
 constexpr uint8_t NO_TRUMP_GAMES[] = { NO_TRUMP_PARTY, BETLI, NO_TRUMP_DURCHMARS };
-constexpr uint8_t NO_SPECIAL_CARD_GAMES[] = { BETLI, NO_TRUMP_DURCHMARS };
+
+// Card order
+constexpr uint8_t ACE_KING_ORDER	= 1;
+constexpr uint8_t ACE_TEN_ORDER		= 2;
+constexpr uint8_t ACE_KING_ORDER_GAMES[] = { BETLI, NO_TRUMP_DURCHMARS };
+
+// Series terminating card schemes (to simplify playable cards)
+constexpr uint8_t NO_TERMINATE	= 1;
+constexpr uint8_t TERMINATE_6	= 2; // Terminate at ten
+constexpr uint8_t TERMINATE_7	= 3; // Terminate at ace
+constexpr uint8_t TERMINATE_06	= 4; // Terminate at seven and ten
+constexpr uint8_t TERMINATE_67	= 5; // Terminate at ten and ace
+constexpr uint8_t TERMINATE_067	= 6; // Terminate at seven, ten and ace
+
 
 constexpr int SEED = 0;
 constexpr bool DEBUG = false;
@@ -84,7 +95,7 @@ public:
 	bool equals(const Card& other) const { return suit == other.suit && value == other.value; };
 	
 	// Check if the two cards are in series for simplified hitting
-	bool isNextInSeries(const Card&, bool) const;
+	bool isNextInSeries(const Card&, uint8_t) const;
 
 	std::string toString() const { 
 		std::string s = std::string(1, (char)('A' + suit)) + std::to_string(value);
@@ -313,14 +324,14 @@ public:
 	PartyState() = default;
 
 	PartyState(const PartyState& other) : gameType(other.gameType), trump(other.trump),
-		no_special_card_game(other.no_special_card_game),
+		series_terminate_scheme(other.series_terminate_scheme),
 		restCard0(other.restCard0), restCard1(other.restCard1),
 		actionList(other.actionList), roundResults(other.roundResults), playerHands(other.playerHands) {};
 
 	PartyState& operator=(const PartyState& other) {
 		if (this != &other) {
 			gameType = other.gameType; trump = other.trump;
-			no_special_card_game = other.no_special_card_game;
+			series_terminate_scheme = other.series_terminate_scheme;
 			restCard0 = other.restCard0; restCard1 = other.restCard1;
 			actionList = other.actionList; roundResults = other.roundResults; playerHands = other.playerHands;
 		}
@@ -360,7 +371,7 @@ public:
 private:
 	uint8_t gameType = NO_TRUMP_PARTY;
 	uint8_t trump = NO_TRUMP_CODE;
-	bool no_special_card_game = true;
+	uint8_t series_terminate_scheme = 0;
 	Card restCard0, restCard1;
 
 	ActionList actionList = ActionList();

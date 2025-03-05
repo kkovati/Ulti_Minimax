@@ -37,13 +37,14 @@ std::string GameManager::applyAceTenOrder(const std::string& deal) {
 	uint8_t gameType = gameTypeChar - '0'; // Convert char to int
 	if (!(0 <= gameType && gameType <= 9)) throw std::invalid_argument("Invalid game type code");
 
-	// Check if no-special-card game type is selected (similar as in PartyState::init())
-	if (std::find(std::begin(NO_SPECIAL_CARD_GAMES), std::end(NO_SPECIAL_CARD_GAMES), gameType) != std::end(NO_SPECIAL_CARD_GAMES)) {
-		// No-special-card game type is selected: ace-king order 
-		no_special_card_game = true;
+	// Check if ace-king order game type is selected (similar as in PartyState::init())
+	assert(card_order == 0);
+	if (std::find(std::begin(ACE_KING_ORDER_GAMES), std::end(ACE_KING_ORDER_GAMES), gameType) != std::end(ACE_KING_ORDER_GAMES)) {
+		// Ace-king order game type is selected and because this is the default card order no change is required
+		card_order = ACE_KING_ORDER;
 		return deal;
 	}
-	no_special_card_game = false;
+	card_order = ACE_TEN_ORDER;
 
 	// Apply ace-ten order to deal string
 	// Deal code structure:
@@ -81,11 +82,12 @@ std::string GameManager::applyAceTenOrder(const std::string& deal) {
 // This is the inverse of function applyAceTenOrder().
 //
 std::string GameManager::applyAceKingOrder(const std::string& gameProgression) {
-	// Check if no-special-card game type is selected
-	if (no_special_card_game) {
-		// No-special-card game type is selected: ace-king order 
+	// Check if ace-king card order game type is selected
+	if (card_order == ACE_KING_ORDER) {
+		// Already (default) ace-king order is applied, no change is required
 		return gameProgression;
 	}
+	assert(card_order == ACE_TEN_ORDER);
 
 	// Apply ace-king order to gameProgression string
 	// Game progression string structure:

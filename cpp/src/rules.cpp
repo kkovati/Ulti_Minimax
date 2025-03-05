@@ -18,16 +18,39 @@ bool Card::compareCard(const Card& a, const Card& b) {
 
 // Check if the two cards are in series for simplified hitting
 //
-bool Card::isNextInSeries(const Card& other, bool no_special_card_game) const {
+bool Card::isNextInSeries(const Card& other, uint8_t series_terminate_scheme) const {
     assert(suit <= other.suit);
     if (suit == other.suit) assert(value < other.value);
-    if (no_special_card_game) {
+
+    if (series_terminate_scheme == NO_TERMINATE) {
         return suit == other.suit && value + 1 == other.value;
     }
-    else {
-        return suit == other.suit && value + 1 == other.value && 
-            NEUTRAL_CARDS_LO_VALUE <= value && other.value <= NEUTRAL_CARDS_HI_VALUE;
+    else if (series_terminate_scheme == TERMINATE_6) {
+        // Terminate between 5 and 6
+        // this   other
+        //    |   |
+        //    V   V
+        //  4 5 | 6 7 
+        return value != 5 && suit == other.suit && value + 1 == other.value;
     }    
+    else if (series_terminate_scheme == TERMINATE_7) {
+        return value != 6 && suit == other.suit && value + 1 == other.value;
+    }
+    else if (series_terminate_scheme == TERMINATE_06) {
+        // Terminate between 0 and 1 (and between 5 and 6 too)
+        // this   other
+        //    |   |
+        //    V   V
+        //    0 | 1 
+        return value != 0 && value != 5 && suit == other.suit && value + 1 == other.value;
+    }
+    else if (series_terminate_scheme == TERMINATE_67) {
+        return value != 5 && value != 6 && suit == other.suit && value + 1 == other.value;
+    }
+    else if (series_terminate_scheme == TERMINATE_067) {
+        // This termination scheme is not in use
+        throw std::runtime_error("Not implemented");
+    }
 };
 
 
@@ -145,13 +168,10 @@ bool PartyState::init(const std::string& deal) {
         if (!(0 <= trump && trump <= 3)) throw std::invalid_argument("Invalid trump code");
 
         // Check if no-trump game type is selected
+        // TODO this should be obsolete and done at each game type prerequisite part
         if (std::find(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES), gameType) != std::end(NO_TRUMP_GAMES)) {
             trump = NO_TRUMP_CODE;
         }   
-
-        // Check if no-special-card game type is selected
-        no_special_card_game = std::find(std::begin(NO_SPECIAL_CARD_GAMES), std::end(NO_SPECIAL_CARD_GAMES), gameType) 
-            != std::end(NO_SPECIAL_CARD_GAMES);
         
         // Parse cards from deal
         std::vector<Card> cardVector;
@@ -197,53 +217,74 @@ bool PartyState::init(const std::string& deal) {
         if (!(trump < NO_TRUMP_CODE)) throw std::invalid_argument("Trump game has no trump selected");
     }
 
-    // Check prerequisites
+    // Check prerequisites and series terminating scheme for simplification
+    bool prerequisite = false;
+    assert(series_terminate_scheme == 0);
+    // NO_TRUMP_PARTY
     if (gameType == NO_TRUMP_PARTY) {
-        // Left empty on purpose
+        prerequisite = true; // No prerequisites
+        series_terminate_scheme = TERMINATE_6;
     }
+    // TRUMP_PARTY
     else if (gameType == TRUMP_PARTY) {
-        // Left empty on purpose
+        prerequisite = true; // No prerequisites
+        series_terminate_scheme = TERMINATE_6;
     }
+    // 40100
     // Check if player has the trump3 and trump4
     else if (gameType == _40100) {
         bool trump3 = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 3));
         bool trump4 = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 4));
-        if (!(trump3 && trump4)) return false;
+        prerequisite = trump3 && trump4;
+        series_terminate_scheme = TERMINATE_6;
     }
+    // 4ACES
     // Check if player has the trump7 (ace) or any ace is not in the rest cards
     else if (gameType == _4ACES) {
-        if (!playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 7))) return false;
-        if (restCard0.getValue() == 7 || restCard1.getValue() == 7) return false;
+        prerequisite = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 7)) && 
+            restCard0.getValue() != 7 && restCard1.getValue() != 7;
+        series_terminate_scheme = TERMINATE_7;
     }
+    // ULTI
     // Check if player has the trump0 (lowest trump)
     else if (gameType == ULTI) {
-        if (!playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 0))) return false;
+        prerequisite = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 0));
+        series_terminate_scheme = TERMINATE_06;
     }
+    // BETLI
     else if (gameType == BETLI) {
-        // Left empty on purpose
+        prerequisite = true; // No prerequisites
+        series_terminate_scheme = NO_TERMINATE;
     }
+    // NO_TRUMP_DURCHMARS
     else if (gameType == NO_TRUMP_DURCHMARS) {
-        // Left empty on purpose
+        prerequisite = true; // No prerequisites
+        series_terminate_scheme = NO_TERMINATE;
     }
+    // DURCHMARS
     else if (gameType == DURCHMARS) {
-        // Left empty on purpose
+        prerequisite = true; // No prerequisites
+        series_terminate_scheme = NO_TERMINATE;
     }
+    // 20100
     // Check if player has any non-trump 3 and 4
     else if (gameType == _20100) {
-        bool flag = false;
         for (int i = 0; i < NO_TRUMP_CODE; ++i) {
             if (i == trump) continue;
             bool card3 = playerHands.checkCard(actionList.getFirstPlayer(), Card(i, 3));
             bool card4 = playerHands.checkCard(actionList.getFirstPlayer(), Card(i, 4));
-            if (card3 && card4) flag = true;
+            if (card3 && card4) prerequisite = true;
         }
-        if (!flag) return false;
+        series_terminate_scheme = TERMINATE_6;
     }
+    // 4TENS
     // Check if any ten is not in the rest cards
     else if (gameType == _4TENS) {
-        if (restCard0.getValue() == 6 || restCard1.getValue() == 6) return false;
+        prerequisite = restCard0.getValue() != 6 && restCard1.getValue() != 6;
+        series_terminate_scheme = TERMINATE_67;
     }
-    return true;
+
+    return prerequisite;
 }
 
 void PartyState::getCardsInHand(CardVector& cardVector, int player_, int index_) {
@@ -325,7 +366,7 @@ void PartyState::simplifyPlayableCards(CardVector& cardVector) {
         Card cardI = cardVector[i];
         for (int j = i + 1; j < cardVector.size(); ++j) {
             Card cardJ = cardVector[j];
-            if (cardI.isNextInSeries(cardJ, no_special_card_game)) {
+            if (cardI.isNextInSeries(cardJ, series_terminate_scheme)) {
                 cardI = cardJ;
                 series_length++;
             }
