@@ -50,6 +50,11 @@ bool Card::isNextInSeries(const Card& other, uint8_t series_terminate_scheme) co
     else if (series_terminate_scheme == TERMINATE_067) {
         // This termination scheme is not in use
         throw std::runtime_error("Not implemented");
+        return false;
+    }
+    else {
+        throw std::runtime_error("Wrong argument 'series_terminate_scheme'");
+        return false;
     }
 };
 
@@ -89,11 +94,12 @@ std::array<Card, N_REST_CARD> Deck::findRestCards(const std::vector<Card>& dealt
     std::array<Card, N_REST_CARD> restCards;
     int i = 0;
     for (const Card& card : cards) {
-        // Comparison logic b/c Card::operator== is used
+        if (i >= N_REST_CARD) break;
+        // Comparison logic b/c Card::operator== is used for suit comparison
         auto cardComparator = [card](const Card& c) {return card.equals(c); };
         if (std::find_if(dealtCards.begin(), dealtCards.end(), cardComparator) == dealtCards.end()) {
             restCards[i++] = card;
-        }
+        }        
     }
     assert(i == N_REST_CARD);
     return restCards;

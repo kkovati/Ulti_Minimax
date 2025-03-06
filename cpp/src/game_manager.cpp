@@ -139,7 +139,7 @@ std::string GameManager::simulate(const std::string& deal) {
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-	int time = duration.count();	
+	int time = static_cast<int>(duration.count());
 
 	std::cout << "Game type: " << std::to_string(partyState.getGameType()) << std::endl;
 	std::cout << "Trump: " << std::to_string(partyState.getTrump()) << std::endl;
@@ -196,7 +196,7 @@ TreePathCoder GameManager::minimax(int index) {
 
 	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
 	//for (uint8_t cardIndex = 0; cardIndex < playableCards.size(); ++cardIndex) {	// Incremental direction 
-	for (int i = playableCards.size() - 1; i >= 0 ; --i) {							// Decremental direction 
+	for (int i = (int)playableCards.size() - 1; i >= 0 ; --i) {						// Decremental direction 
 		assert(i >= 0);
 		uint8_t cardIndex = static_cast<uint8_t>(i);
 		partyState.setHitCard(index, playableCards[cardIndex]);
@@ -265,7 +265,8 @@ TreePathCoder GameManager::minimax(int index) {
 			}
 		}
 	}
-	assert(false); // Unreachable code
+	throw std::runtime_error("Unreachable code");
+	return TreePathCoder();
 }
 
 // Based on an input TreePathCoder this function recreates the party into a Party State class.

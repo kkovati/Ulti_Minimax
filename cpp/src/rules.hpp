@@ -147,11 +147,11 @@ public:
 		return *this;
 	};
 
-	int getRound() { return round; };
-	int getPosInRound() { return posInRound; };
-	int getPlayerToHit() { return playerToHit; };
+	int getRound() const { return round; };
+	int getPosInRound() const { return posInRound; };
+	int getPlayerToHit() const { return playerToHit; };
 	void setPlayerToHit(int playerToHit_) { playerToHit = playerToHit_; };
-	const Card& getCard() { return card; };
+	const Card& getCard() const { return card; };
 	void setCard(const Card& card_) { card = card_; };
 
 private:
@@ -175,12 +175,12 @@ public:
 		return *this;
 	};
 
-	int getFirstPlayer() { return firstPlayer; };
-	int getRound(int index_) { return getAction(index_).getRound(); };
-	int getPosInRound(int index_) { return getAction(index_).getPosInRound(); };
-	int getPlayerToHit(int index_) { return getAction(index_).getPlayerToHit(); };
+	int getFirstPlayer() const { return firstPlayer; };
+	int getRound(int index_) const { return getAction(index_).getRound(); };
+	int getPosInRound(int index_) const { return getAction(index_).getPosInRound(); };
+	int getPlayerToHit(int index_) const { return getAction(index_).getPlayerToHit(); };
 	void setPlayerToHit(int index_, int player_) { actions[index_].setPlayerToHit(player_); };
-	const Card& getCard(int index_) { return getAction(index_).getCard(); };
+	const Card& getCard(int index_) const { return getAction(index_).getCard(); };
 	void setCard(int index_, const Card& card_) { actions[index_].setCard(card_); };
 
 	bool isLastIndex(int index_) { return index_ >= LAST_ACTION_INDEX; };
@@ -194,7 +194,7 @@ private:
 	int firstPlayer; // Index of the player who playes against the opponents
 	ActionVector actions;	
 
-	Action getAction(int index_) { return actions[index_]; };
+	const Action& getAction(int index_) const { return actions[index_]; };
 };
 
 
@@ -372,7 +372,7 @@ private:
 	uint8_t gameType = NO_TRUMP_PARTY;
 	uint8_t trump = NO_TRUMP_CODE;
 	uint8_t series_terminate_scheme = 0;
-	Card restCard0, restCard1;
+	Card restCard0{}, restCard1{};
 
 	ActionList actionList = ActionList();
 	RoundResults roundResults = RoundResults();
