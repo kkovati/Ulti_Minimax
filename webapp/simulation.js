@@ -16,19 +16,22 @@ var trumpIndex = base_deal[0];
 base_deal = base_deal.substring(1);
 console.assert(base_deal.length == 60)
 
-// Make given trump active initially
-document.getElementById(`trump-${trumpIndex}`).classList.add('active');
+// Initialize
+document.addEventListener('DOMContentLoaded', () => {
+	// Make given trump active initially
+	document.getElementById(`trump-${trumpIndex}`).classList.add('active');
 
-// Make trump active if clicked
-document.querySelectorAll('.trump').forEach(trump => {
-    trump.addEventListener('click', () => {
-        // Reset all images to default
-        document.querySelectorAll('.trump').forEach(img => img.classList.remove('active'));
-        // Set the clicked trump to white border
-        trump.classList.add('active');
-		// Set trump index
-		trumpIndex = trump.dataset.index;
-    });
+	// Make trump active if clicked
+	document.querySelectorAll('.trump').forEach(trump => {
+		trump.addEventListener('click', () => {
+			// Reset all images to default
+			document.querySelectorAll('.trump').forEach(img => img.classList.remove('active'));
+			// Set the clicked trump to white border
+			trump.classList.add('active');
+			// Set trump index
+			trumpIndex = trump.dataset.index;
+		});
+	});
 });
 
 // Put cards onto game-progression div based on game progression string
