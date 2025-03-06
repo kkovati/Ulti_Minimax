@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const cardImage = document.createElement('img');
             cardImage.classList.add('card');
             cardImage.setAttribute('id', `${iSuit}${iCard}`);
-            cardImage.setAttribute('src', `assets/images/${iSuit}${iCard}.jpg`);
+            cardImage.setAttribute('src', `webapp/assets/images/${iSuit}${iCard}.jpg`);
             cardImage.setAttribute('alt', `Card ${iSuit}${iCard}`);
             cardImage.setAttribute('onclick', 'moveCard(this)');
             
@@ -145,5 +145,5 @@ document.getElementById("simulate-button").addEventListener("click", () => {
 		return;
 	}
 	
-	window.location.href = `simulation.html?deal=${deal}`;
+	window.location.href = `webapp/simulation.html?deal=${deal}`;
 });
