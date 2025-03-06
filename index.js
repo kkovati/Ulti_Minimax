@@ -1,11 +1,10 @@
-// Generate the deck of cards
 document.addEventListener('DOMContentLoaded', () => {
-    const deck = document.querySelector('.deck');
-    
+	
+	// Generate the deck of cards
+    const deck = document.querySelector('.deck');    
     const nSuit = 4;
     const nCardPerSuit = 8;	
 	cardSuitDiv = null;
-
     for (let iSuit = 0; iSuit < nSuit; iSuit++) {		
 		// To have only two rows of cards in the deck
 		if (iSuit % 2 == 0) {
@@ -32,9 +31,47 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         deck.appendChild(cardSuitDiv);
-    }
-});
+    }	
+	
+	// Make the player hand active initially
+	document.getElementById('player').classList.add('active');
 
+	// Make the player hand active if clicked
+	document.querySelectorAll('.hand').forEach(hand => {
+		hand.addEventListener('click', () => {
+			// Reset all hands to yellow
+			document.querySelectorAll('.hand').forEach(f => f.classList.remove('active'));
+			// Set the clicked hand to white
+			hand.classList.add('active');
+		});
+	});
+
+	// Make trump active initially
+	document.getElementById('trump-0').classList.add('active');
+
+	// Make trump active if clicked
+	document.querySelectorAll('.trump').forEach(trump => {
+		trump.addEventListener('click', () => {
+			// Reset all images to default
+			document.querySelectorAll('.trump').forEach(img => img.classList.remove('active'));
+			// Set the clicked trump to white border
+			trump.classList.add('active');
+		});
+	});	
+	
+	// Simulate button opens simulation page and codes deal into URL
+	document.getElementById("simulate-button").addEventListener("click", () => {
+		const deal = getDeal();
+		
+		// Check length
+		if (deal.length != 61) {
+			showToast("Deal 10 cards to each player");
+			return;
+		}
+		
+		window.location.href = `webapp/simulation.html?deal=${deal}`;
+	});	
+});
 
 // Move card between deck and hands
 function moveCard(card) {
@@ -61,34 +98,6 @@ function moveCard(card) {
         }
     }
 }
-
-// Make the player hand active initially
-document.getElementById('player').classList.add('active');
-
-// Make the player hand active if clicked
-document.querySelectorAll('.hand').forEach(hand => {
-    hand.addEventListener('click', () => {
-        // Reset all hands to yellow
-        document.querySelectorAll('.hand').forEach(f => f.classList.remove('active'));
-        // Set the clicked hand to white
-        hand.classList.add('active');
-    });
-});
-
-
-// Make trump active initially
-document.getElementById('trump-0').classList.add('active');
-
-// Make trump active if clicked
-document.querySelectorAll('.trump').forEach(trump => {
-    trump.addEventListener('click', () => {
-        // Reset all images to default
-        document.querySelectorAll('.trump').forEach(img => img.classList.remove('active'));
-        // Set the clicked trump to white border
-        trump.classList.add('active');
-    });
-});
-
 
 // Assemble message to WASM by coding the active trump and hands into a string
 // Deal code structure:
@@ -123,7 +132,6 @@ function getDeal() {
     return deal;
 }
 
-
 // Toast warning message
 function showToast(message) {
 	var toast = document.getElementById("toast");
@@ -133,17 +141,3 @@ function showToast(message) {
 		toast.style.visibility = "hidden";
 	}, 3000); // Toast will disappear after 3 seconds
 }
-
-
-// Simulate button opens simulation page and codes deal into URL
-document.getElementById("simulate-button").addEventListener("click", () => {
-	const deal = getDeal();
-	
-	// Check length
-	if (deal.length != 61) {
-		showToast("Deal 10 cards to each player");
-		return;
-	}
-	
-	window.location.href = `webapp/simulation.html?deal=${deal}`;
-});
