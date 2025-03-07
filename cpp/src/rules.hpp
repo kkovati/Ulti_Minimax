@@ -47,12 +47,13 @@ constexpr uint8_t ACE_TEN_ORDER		= 2;
 constexpr uint8_t ACE_KING_ORDER_GAMES[] = { BETLI, NO_TRUMP_DURCHMARS };
 
 // Series terminating card schemes (to simplify playable cards)
-constexpr uint8_t NO_TERMINATE	= 1;
-constexpr uint8_t TERMINATE_6	= 2; // Terminate at ten
-constexpr uint8_t TERMINATE_7	= 3; // Terminate at ace
-constexpr uint8_t TERMINATE_06	= 4; // Terminate at seven and ten
-constexpr uint8_t TERMINATE_67	= 5; // Terminate at ten and ace
-constexpr uint8_t TERMINATE_067	= 6; // Terminate at seven, ten and ace
+constexpr uint8_t NO_TERMINATE		= 1;
+constexpr uint8_t TERMINATE_TRUMP_0	= 2;	// Terminate at trump seven
+constexpr uint8_t TERMINATE_6		= 3;	// Terminate at ten
+constexpr uint8_t TERMINATE_7		= 4;	// Terminate at ace
+constexpr uint8_t TERMINATE_06		= 5;	// Terminate at seven and ten
+constexpr uint8_t TERMINATE_67		= 6;	// Terminate at ten and ace
+constexpr uint8_t TERMINATE_067		= 7;	// Terminate at seven, ten and ace
 
 
 constexpr int SEED = 0;
@@ -95,7 +96,7 @@ public:
 	bool equals(const Card& other) const { return suit == other.suit && value == other.value; };
 	
 	// Check if the two cards are in series for simplified hitting
-	bool isNextInSeries(const Card&, uint8_t) const;
+	bool isNextInSeries(const Card&, uint8_t, uint8_t) const;
 
 	std::string toString() const { 
 		std::string s = std::string(1, (char)('A' + suit)) + std::to_string(value);

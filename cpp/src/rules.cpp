@@ -18,12 +18,16 @@ bool Card::compareCard(const Card& a, const Card& b) {
 
 // Check if the two cards are in series for simplified hitting
 //
-bool Card::isNextInSeries(const Card& other, uint8_t series_terminate_scheme) const {
+bool Card::isNextInSeries(const Card& other, uint8_t series_terminate_scheme, uint8_t trump) const {
     assert(suit <= other.suit);
     if (suit == other.suit) assert(value < other.value);
 
     if (series_terminate_scheme == NO_TERMINATE) {
         return suit == other.suit && value + 1 == other.value;
+    }
+    else if (series_terminate_scheme == TERMINATE_TRUMP_0) {
+        // Terminate if this Card is trump 0
+        return !(suit == trump && value == 0) && suit == other.suit && value + 1 == other.value;
     }
     else if (series_terminate_scheme == TERMINATE_6) {
         // Terminate between 5 and 6
@@ -255,7 +259,7 @@ bool PartyState::init(const std::string& deal) {
     // Check if player has the trump0 (lowest trump)
     else if (gameType == ULTI) {
         prerequisite = playerHands.checkCard(actionList.getFirstPlayer(), Card(trump, 0));
-        series_terminate_scheme = TERMINATE_06;
+        series_terminate_scheme = TERMINATE_TRUMP_0; // NOTE: it can be TERMINATE_06
     }
     // BETLI
     else if (gameType == BETLI) {
@@ -372,7 +376,7 @@ void PartyState::simplifyPlayableCards(CardVector& cardVector) {
         Card cardI = cardVector[i];
         for (int j = i + 1; j < cardVector.size(); ++j) {
             Card cardJ = cardVector[j];
-            if (cardI.isNextInSeries(cardJ, series_terminate_scheme)) {
+            if (cardI.isNextInSeries(cardJ, series_terminate_scheme, trump)) {
                 cardI = cardJ;
                 series_length++;
             }
@@ -435,6 +439,9 @@ int PartyState::chooseWinnerCard(const Card c0, const Card c1, const Card c2, ui
     return 2;
 }
 
+// Evaluate if the party at the current state does have a final result.
+// It always returns a definit result at the last index.
+//
 uint8_t PartyState::evaluateParty(int index_, bool print) {
     // TODO integrate with setNextPlayer() if possible
     int round = actionList.getRound(index_);
