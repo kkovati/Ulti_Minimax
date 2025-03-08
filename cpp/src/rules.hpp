@@ -60,6 +60,9 @@ constexpr int SEED = 0;
 constexpr bool DEBUG = false;
 
 
+// This class represents a single card with a suit and a value, 
+// and implements the basic comparison logics
+//
 class Card {
 public:
 	Card() = default;
@@ -92,7 +95,7 @@ public:
 	bool operator<(const Card& other) const { return value < other.value; }; // True if smaller value
 	static bool compareCard(const Card&, const Card&);
 
-	// Check if two cards are equal (which cannot be in a normal decK)
+	// Check if two cards are equal (which cannot be in a normal deck)
 	bool equals(const Card& other) const { return suit == other.suit && value == other.value; };
 	
 	// Check if the two cards are in series for simplified hitting
@@ -103,6 +106,7 @@ public:
 		return s;
 	};
 
+	// Print in stream
 	friend std::ostream& operator<< (std::ostream& os, const Card& card) {
 		os << card.toString();
 		return os;
@@ -114,6 +118,8 @@ private:
 };
 
 
+// Shuffling and dealing of a deck of cards
+//
 class Deck {
 public:
 	Deck();
@@ -131,13 +137,18 @@ private:
 };
 
 
+// Atomic event of the gameplay
+//
 class Action {
 public:
 	Action() = default;
+
 	Action(int round_, int posInRound_) : round(round_), posInRound(posInRound_), 
 		playerToHit(-1), card() {};
+
 	Action(const Action& other) : round(other.round), posInRound(other.posInRound), 
 		playerToHit(other.playerToHit), card(other.card) {};
+
 	Action& operator=(const Action& other) {
 		if (this != &other) {
 			round = other.round;
@@ -163,6 +174,8 @@ private:
 };
 
 
+// List of all atomic events of the gameplay
+//
 class ActionList {
 public:
 	ActionList(int firstPlayer_ = 0);
@@ -192,19 +205,23 @@ public:
 private:
 	using ActionVector = std::array<Action, N_ACTION>;
 
-	int firstPlayer; // Index of the player who playes against the opponents
-	ActionVector actions;	
+	ActionVector actions; // Contains all the atomic events of the gameplay
+	int firstPlayer; // Index of the player who playes against the opponents		
 
 	const Action& getAction(int index_) const { return actions[index_]; };
 };
 
 
+// Contains results of each round, like points and winning special cards
+//
 class RoundResults {
 public:
 	RoundResults() = default;
+
 	RoundResults(const RoundResults& other) : 
 		winner(other.winner), point(other.point), 
 		trump0(other.trump0), ace(other.ace), ten(other.ten) {};
+
 	RoundResults& operator=(const RoundResults& other) {
 		if (this != &other) {
 			winner = other.winner; point = other.point; 
@@ -222,6 +239,7 @@ public:
 	int getAce(int round) const { return ace[round]; };
 	int getTen(int round) const { return ten[round]; };
 
+	// Record the winning of special cards 
 	void setSpecialCard(int round, const Card c0, const Card c1, const Card c2, int trump) {
 		trump0[round] = 0;
 		ace[round] = 0;
@@ -240,14 +258,16 @@ public:
 
 private:
 	// Keep track of each rounds' results
-	std::array<int, N_CARD_IN_HAND> winner; // Winner player of the round
-	std::array<int, N_CARD_IN_HAND> point; // No. points won
-	std::array<int, N_CARD_IN_HAND> trump0; // Is Trump0 played in the round
-	std::array<int, N_CARD_IN_HAND> ace; // Is Ace played in the round
-	std::array<int, N_CARD_IN_HAND> ten; // Is Ten played in the round
+	std::array<int, N_CARD_IN_HAND> winner;	// Winner player of the round
+	std::array<int, N_CARD_IN_HAND> point;	// No. points won
+	std::array<int, N_CARD_IN_HAND> trump0;	// Is Trump0 played in the round
+	std::array<int, N_CARD_IN_HAND> ace;	// Is Ace played in the round
+	std::array<int, N_CARD_IN_HAND> ten;	// Is Ten played in the round
 };
 
-
+// Keeps track of each players' cards in their hands,
+// and which action index it was used
+//
 class PlayerHands {
 public:
 	PlayerHands() = default;
@@ -267,6 +287,8 @@ public:
 	const Card& getCard(int player_, int index_) const { 
 		return playerCards[player_][index_];
 	};
+
+	// Track that the given card of the given player was used in which action index
 	int getUsed(int player_, int index_) const {
 		return playerUseds[player_][index_];
 	};
@@ -277,11 +299,13 @@ public:
 			if (curr_card != card_ || curr_card > card_ || curr_card < card_) continue;
 			assert(curr_card == card_ && !(curr_card > card_) && !(curr_card < card_));
 			assert(getUsed(player_, i) > actionIndex_); // Card cannot be used before current action index
-			setUsed(player_, i, actionIndex_);
+			setUsed(player_, i, actionIndex_); // Private setUsed()
 			return;
 		}
 		assert(false);
 	};
+
+	// Delete the given action index which from the "used" table
 	void clearActionIndex(int actionIndex_) {
 		int counter = 0;
 		for (int player = 0; player < N_PLAYER; ++player) {
@@ -309,17 +333,21 @@ private:
 	using IntArray = std::array<int, N_CARD_IN_HAND>;
 	using PlayerUsedArray = std::array<IntArray, N_PLAYER>;
 
-	PlayerCardArray playerCards;
+	PlayerCardArray playerCards; // Cards dealt into players' hands
 	PlayerUsedArray playerUseds; // Action index when that card was used
 
-	// Private version of setUsed(), where card is index int, instead of Card object
-	//
+	// Private version of public setUsed(), where card is index int, instead of Card object
 	void setUsed(int player_, int index_, int actionIndex_) {
 		playerUseds[player_][index_] = actionIndex_;
 	}
 };
 
 
+// PartyState stores every information of the party, every action and every result.
+// This class is instantiated only once and is used to store the current state of the pary 
+// throughout the simulation. It serves to code a single node in the tree while the 
+// minimax algorithm searches an optimal route.
+//
 class PartyState {
 public:
 	PartyState() = default;

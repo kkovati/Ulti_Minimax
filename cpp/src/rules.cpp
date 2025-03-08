@@ -63,6 +63,8 @@ bool Card::isNextInSeries(const Card& other, uint8_t series_terminate_scheme, ui
 };
 
 
+// Initialize all cards
+//
 Deck::Deck() {
     for (int i = 0; i < N_SUIT; ++i) {
         for (int j = 0; j < N_VALUE; ++j) {
@@ -90,7 +92,7 @@ std::vector<std::vector<Card>> Deck::deal(int nPlayer, int nCardInHand) {
     return randomHands;
 }
 
-// Find the two cards which were not dealt
+// Find the two cards which were not dealt (rest cards)
 //
 std::array<Card, N_REST_CARD> Deck::findRestCards(const std::vector<Card>& dealtCards) const {
     assert(dealtCards.size() == N_PLAYER * N_CARD_IN_HAND);
@@ -118,6 +120,8 @@ ActionList::ActionList(int firstPlayer_) : firstPlayer(firstPlayer_) {
 }
 
 
+// Distribute cards into players' hands
+//
 std::array<Card, N_REST_CARD> PlayerHands::init_deal(const std::vector<Card>& cardVector) {
     assert(cardVector.size() == N_PLAYER * N_CARD_IN_HAND);
     for (int i = 0; i < N_PLAYER; ++i) {
@@ -305,6 +309,8 @@ void PartyState::getCardsInHand(CardVector& cardVector, int player_, int index_)
     }
 }
 
+// Get a list of cards which is playable in the current state of the game
+//
 void PartyState::getPlayableCards(CardVector& cardVector, int index_) {
     playerHands.clearActionIndex(index_);
     int posInRound = actionList.getPosInRound(index_);
@@ -390,6 +396,8 @@ void PartyState::simplifyPlayableCards(CardVector& cardVector) {
     }
 }
 
+// Set the card which was played out 
+//
 void PartyState::setHitCard(int index_, const Card& card_) {
     actionList.setCard(index_, card_);
     int playerToHit = actionList.getPlayerToHit(index_);

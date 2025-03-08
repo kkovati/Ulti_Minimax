@@ -120,7 +120,7 @@ std::string GameManager::applyAceKingOrder(const std::string& gameProgression) {
 	return AceKingGameProgression;
 }
 
-// Start minimax simulation
+// Initialize and start minimax simulation
 //
 std::string GameManager::simulate(const std::string& deal) {
 	auto start = std::chrono::high_resolution_clock::now();
@@ -173,6 +173,7 @@ std::string GameManager::simulate(const std::string& deal) {
 
 // This function implements one iteration of the minimax algorithm.
 // It handles a single situation of the game, or in other words, a single node in the tree.
+// It is called recursively.
 //
 TreePathCoder GameManager::minimax(int index) {
 	n_minimax_call += 1;
