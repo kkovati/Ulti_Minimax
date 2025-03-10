@@ -197,8 +197,7 @@ TreePathCoder GameManager::minimax(int index) {
 
 	bool isFirstPlayerToHit = partyState.isFirstPlayerToHit(index);
 	//for (uint8_t cardIndex = 0; cardIndex < playableCards.size(); ++cardIndex) {	// Incremental direction 
-	for (int i = (int)playableCards.size() - 1; i >= 0 ; --i) {						// Decremental direction 
-		assert(i >= 0);
+	for (int i = (int)playableCards.size() - 1; i >= 0; --i) {						// Decremental direction 
 		uint8_t cardIndex = static_cast<uint8_t>(i);
 		partyState.setHitCard(index, playableCards[cardIndex]);
 		partyState.setNextPlayer(index);
@@ -239,6 +238,7 @@ TreePathCoder GameManager::minimax(int index) {
 		// if (DEBUG) partyState.print_card(index);
 		TreePathCoder tpc = minimax(index + 1);
 		result = tpc.getResult();
+		// Minimax must return a definit result
 		assert(result == PLAYER_WIN || result == OPPONENT_WIN);
 		if (isFirstPlayerToHit && result == PLAYER_WIN) {
 			tpc.setValue(index, cardIndex);
@@ -249,7 +249,7 @@ TreePathCoder GameManager::minimax(int index) {
 			return tpc;
 		}
 
-		// No optimal card found
+		// No optimal card found among all playable cards
 		//if (cardIndex == playableCards.size() - 1) {		// Incremental direction 
 		if (cardIndex == 0) {								// Decremental direction 
 			if (isFirstPlayerToHit) {

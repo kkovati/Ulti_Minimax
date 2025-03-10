@@ -182,7 +182,6 @@ bool PartyState::init(const std::string& deal) {
         if (!(0 <= trump && trump <= 3)) throw std::invalid_argument("Invalid trump code");
 
         // Check if no-trump game type is selected
-        // TODO this should be obsolete and done at each game type prerequisite part
         if (std::find(std::begin(NO_TRUMP_GAMES), std::end(NO_TRUMP_GAMES), gameType) != std::end(NO_TRUMP_GAMES)) {
             trump = NO_TRUMP_CODE;
         }   
@@ -404,6 +403,10 @@ void PartyState::setHitCard(int index_, const Card& card_) {
     playerHands.setUsed(playerToHit, card_, index_);
 }
 
+// Set the next player in the ActionList
+// If it is the end of a round, evaluate the round to determine the next player
+// in the next round
+//
 void PartyState::setNextPlayer(int index_) {
     int round = actionList.getRound(index_);
     int posInRound = actionList.getPosInRound(index_); 
