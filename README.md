@@ -16,7 +16,7 @@ Additionally, the simulator is accessible as a
 [webapp](https://kkovati.github.io/Ulti_Minimax/) 
 hosted on GitHub Pages.
 
-## 🖥️ Use the webapp!
+## 🖥️ Use the Webapp!
 
 The primary way to use this tool is through the web application: 
 [kkovati.github.io/Ulti_Minimax](https://kkovati.github.io/Ulti_Minimax/)
@@ -75,7 +75,7 @@ cp build_wasm/cpp/src/ulti_minimax.js webapp
 cp build_wasm/cpp/src/ulti_minimax.wasm webapp
 ```
 
-## 💻 Run in localhost
+## 💻 Run in Localhost
 
 1) Use Python’s Built-in HTTP Server to host the application from the root folder with this command:
 
@@ -85,4 +85,78 @@ python -m http.server 8000
 
 2) Open http://localhost:8000/index.html in browser.
 
-## Misc
+## 🤖 Under the Hood
+
+### Minimax Algorithm 
+The minimax algorithm is a decision-making strategy used in turn-based games to find the optimal moves for the participants. 
+It traverses a game tree, where each node represents a state of the game. 
+The algorithm explores future states by making recursive function calls, simulating decisions of the players one-by-one.
+
+Each player aims to maximize their best possible score, in this case they aim to win the game.
+This version of Minimax evaluates states based on the final game outcomes, backpropagating values up the tree to determine the best moves.
+
+### Party State
+
+At each node, the algorithm searches for the best card to play that would lead the current player to win the game.
+This is done by recursively evaluating each possible move (with a recursive call) and determining which decision (card in this case) is the best. 
+In this case, each node represents a card played by the player, leading to the next state of the game.
+
+The way data is structured and passed between parent and child nodes is crucial for performance.
+This simulator aims to minimize the amount of data transferred between and stored inside the nodes.
+
+The program uses a singleton object called **PartyState**, which stores all information about the party and its progression.
+Each node only knows which turn and moment of the game it is responsible for, and its role is to check all possible actions and test them one by one.
+
+However, instead of passing actions directly to the next node, they are recorded in PartyState.
+The next node doesn’t inherit information from its parent but instead reads from PartyState to determine the current game state.
+This approach minimizes memory usage since nodes don’t store any game data themselves, 
+reducing the amount of data passed between them and making the program significantly faster.
+
+The following tables provide visual clues about the data structures stored in **PartyState**.
+Check [this Excel spreadsheet](https://github.com/kkovati/Ulti_Minimax/blob/main/docs/party_state_docs.xlsx) for further details.
+
+**ActionList**
+
+| index | round | pos in round | player to hit | card |
+| -------- | ------- | ------- | ------- | ------- |
+| 0 | 0 | 0 | 0 | A0 |
+| 1 | 0 | 1 | 1 | B0 |
+| 2 | 0 | 2 | 2 | C0 |
+| 3 | 1 | 0 | 2 | C1 |
+| 4 | 1 | 1 | 0 | A1 |
+| 5 | 1 | 2 | 1 | B1 |
+| ... | ... | ... | ... | ... |
+| 27 | 9 | 0 | 1 | B9 |
+| 28 | 9 | 1 | 2 | C9 |
+| 29 | 9 | 2 | 0 | A9 |
+
+
+### Tree Path Encoding
+
+Besides determining whether a perfect strategy exists, the simulator also returns a possible winning sequence of moves.
+This means that nodes must propagate the series of actions (in this case, the cards played) back to their parents.
+So by the time the simulation reaches the root node (the first action), both the existence of a perfect strategy and the full sequence of moves are known.
+
+A minimal-size object called **TreePathCoder** is used for that, 
+which is essentially an array that stores only the indices representing which card a player chose from their hand.
+Each node has an instance of TreePathCoder, which it returns to its parent.
+The parent extends it with its own information (optimal card) and recursion continures.
+
+### Rules of Ulti
+
+Playable cards - fundamental rule
+Set next player - who wins the round
+
+Card order
+ace-king order vs ace-ten order
+
+### Heuristics and Optimizations
+
+early stopping, party evaluation, keep track of important aspect of game type
+
+simplify cards - terminate scheme
+
+prerequisite
+
+
+
