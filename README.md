@@ -115,7 +115,7 @@ reducing the amount of data passed between them and making the program significa
 The following tables provide visual clues about the data structures stored in **PartyState**.
 Check [this Excel spreadsheet](https://github.com/kkovati/Ulti_Minimax/blob/main/docs/party_state_docs.xlsx) for further details.
 
-**ActionList**
+**ActionList** contains all events of the game. Tracks which player played which card, in which round, and in what order.
 
 | index | round | pos in round | player to hit | card |
 | -------- | ------- | ------- | ------- | ------- |
@@ -130,6 +130,26 @@ Check [this Excel spreadsheet](https://github.com/kkovati/Ulti_Minimax/blob/main
 | 28 | 9 | 1 | 2 | C9 |
 | 29 | 9 | 2 | 0 | A9 |
 
+
+**RoundResults** contains the results of each round. This means won points and special cards.
+
+| round | winner player | points | trump 7 | ace | ten | 
+| -------- | ------- | ------- | ------- | ------- | ------- |
+| 0 | 2 | 1 | 0 | 0 | 0 |
+| 1 | 0 | 2 | 0 | 1 | 0 |
+| 2 | 0 | 0 | 0 | 2 | 1 |
+| ... | ... | ... | ... | ... | ... |
+| 9 | 1 | 0 | 1 | 0 | 0 |
+
+**PlayerHands** keeps track of each players' cards in hand and records in which round the cards were played out.
+
+| player 0 hand | player 0 used | player 1 hand | player 1 used | player 2 hand | player 2 used |
+| -------- | ------- | ------- | ------- | ------- | ------- |
+| A0 | 0 | B0 | 1 | C0 | 0 |
+| A1 | 4 | B1 | 5 | C1 | 3 |
+| A2 | 30 | B2 | 2 | C2 | 30 |
+| ... | ... | ... | ... | ... | ... |
+| A9 | 30 | B9 | 0 | C9 | 30 |
 
 ### Tree Path Encoding
 
