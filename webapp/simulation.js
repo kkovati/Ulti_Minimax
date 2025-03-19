@@ -244,17 +244,23 @@ function initializeSimulation() {
 function waitForWasmAndDom() {
     return new Promise(resolve => {
         if (document.readyState === "complete" || document.readyState === "interactive") {
+			console.log("DOM is loaded");
             if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+				console.log("WASM is loaded");
                 resolve();
             } else {
+				console.log("WASM is not loaded");
                 Module.onRuntimeInitialized = resolve;
             }
         } else {
+			console.log("DOM is not loaded");
             document.addEventListener("DOMContentLoaded", () => {
                 if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+					console.log("WASM is loaded");
                     resolve();
                 } else {
                     Module.onRuntimeInitialized = resolve;
+					console.log("WASM is not loaded");
                 }
             });
         }
