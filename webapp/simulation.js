@@ -223,58 +223,65 @@ function initializeSimulation() {
 
 
 // Wait for both DOM and WASM module to be loaded, then run initializeSimulation()
-//Promise.all([
-//    new Promise(resolve => {
-//        if (document.readyState === "complete" || document.readyState === "interactive") {
-//            resolve();
-//        } else {
-//            document.addEventListener("DOMContentLoaded", resolve);
-//        }
-//    }),
-//    new Promise(resolve => {
-//        Module.onRuntimeInitialized = resolve;
-//    })
-//]).then(() => {
-//	console.log("DOM and WASM module is loaded");
-//    initializeSimulation();
-//});
+Promise.all([
+    new Promise(resolve => {
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            resolve();
+        } else {
+            document.addEventListener("DOMContentLoaded", resolve);
+        }
+    }),
+    new Promise(resolve => {
+		if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+			resolve();
+		} else if (typeof Module?._wasm_main === "function") {
+			console.log("typeof Module?._wasm_main");
+			resolve();
+		} else {
+			Module.onRuntimeInitialized = resolve;
+		}
+    })
+]).then(() => {
+	console.log("DOM and WASM module is loaded");
+    initializeSimulation();
+});
 
 
 // Wait for both DOM and WASM, but ensure WASM is checked even if already initialized
-function waitForWasmAndDom() {
-    return new Promise(resolve => {
-        if (document.readyState === "complete" || document.readyState === "interactive") {
-			console.log("DOM is loaded");
-			console.log("Module.hasOwnProperty('onRuntimeInitialized')");
-			console.log(Module.hasOwnProperty("onRuntimeInitialized"));
-			console.log("Module.onRuntimeInitialized");
-			console.log(Module.onRuntimeInitialized);
-            if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
-				console.log("WASM is loaded");
-                resolve();
-            } else {
-				console.log("WASM is not loaded");
-                //Module.onRuntimeInitialized = resolve;
-				Module['onRuntimeInitialized'] = resolve;
-            }
-        } else {
-			console.log("DOM is not loaded");
-            document.addEventListener("DOMContentLoaded", () => {
-                if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
-					console.log("WASM is loaded");
-                    resolve();
-                } else {
-                    console.log("WASM is not loaded");
-					//Module.onRuntimeInitialized = resolve;
-					Module['onRuntimeInitialized'] = resolve;
-                }
-            });
-        }
-    });
-}
-
-// Call initializeSimulation() after both are ready
-waitForWasmAndDom().then(() => {
-    console.log("DOM and WASM loaded, initializing...");
-    initializeSimulation();
-});
+//function waitForWasmAndDom() {
+//    return new Promise(resolve => {
+//        if (document.readyState === "complete" || document.readyState === "interactive") {
+//			console.log("DOM is loaded");
+//			console.log("Module.hasOwnProperty('onRuntimeInitialized')");
+//			console.log(Module.hasOwnProperty("onRuntimeInitialized"));
+//			console.log("Module.onRuntimeInitialized");
+//			console.log(Module.onRuntimeInitialized);
+//            if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+//				console.log("WASM is loaded");
+//                resolve();
+//            } else {
+//				console.log("WASM is not loaded");
+//                //Module.onRuntimeInitialized = resolve;
+//				Module['onRuntimeInitialized'] = resolve;
+//            }
+//        } else {
+//			console.log("DOM is not loaded");
+//            document.addEventListener("DOMContentLoaded", () => {
+//                if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+//					console.log("WASM is loaded");
+//                    resolve();
+//                } else {
+//                    console.log("WASM is not loaded");
+//					//Module.onRuntimeInitialized = resolve;
+//					Module['onRuntimeInitialized'] = resolve;
+//                }
+//            });
+//        }
+//    });
+//}
+//
+//// Call initializeSimulation() after both are ready
+//waitForWasmAndDom().then(() => {
+//    console.log("DOM and WASM loaded, initializing...");
+//    initializeSimulation();
+//});
