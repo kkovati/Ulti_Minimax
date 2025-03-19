@@ -221,19 +221,48 @@ function initializeSimulation() {
 	button.click();
 }
 
+
 // Wait for both DOM and WASM module to be loaded, then run initializeSimulation()
-Promise.all([
-    new Promise(resolve => {
+//Promise.all([
+//    new Promise(resolve => {
+//        if (document.readyState === "complete" || document.readyState === "interactive") {
+//            resolve();
+//        } else {
+//            document.addEventListener("DOMContentLoaded", resolve);
+//        }
+//    }),
+//    new Promise(resolve => {
+//        Module.onRuntimeInitialized = resolve;
+//    })
+//]).then(() => {
+//	console.log("DOM and WASM module is loaded");
+//    initializeSimulation();
+//});
+
+
+// Wait for both DOM and WASM, but ensure WASM is checked even if already initialized
+function waitForWasmAndDom() {
+    return new Promise(resolve => {
         if (document.readyState === "complete" || document.readyState === "interactive") {
-            resolve();
+            if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+                resolve();
+            } else {
+                Module.onRuntimeInitialized = resolve;
+            }
         } else {
-            document.addEventListener("DOMContentLoaded", resolve);
+            document.addEventListener("DOMContentLoaded", () => {
+                if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+                    resolve();
+                } else {
+                    Module.onRuntimeInitialized = resolve;
+                }
+            });
         }
-    }),
-    new Promise(resolve => {
-        Module.onRuntimeInitialized = resolve;
-    })
-]).then(() => {
-	console.log("DOM and WASM module is loaded");
+    });
+}
+
+// Call initializeSimulation() after both are ready
+waitForWasmAndDom().then(() => {
+    console.log("DOM and WASM loaded, initializing...");
     initializeSimulation();
 });
