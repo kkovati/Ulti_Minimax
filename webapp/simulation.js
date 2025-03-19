@@ -122,12 +122,15 @@ function showGameProgression(gameProgression) {
 	}, 200); // Short delay
 }
 
-// This ensures the WASM code will run once it's loaded
-Module.onRuntimeInitialized = () => {
-	console.log("WASM module loaded");
 
+// Initialize WASM code, simulation management and start the simulation
+function initializeSimulation() {
 	// Get the button element
 	const button = document.getElementById("simulate-button");
+	if (!button) {
+        console.error("Button not found");
+        return;
+    }
 
 	// Add a click event listener to trigger WASM code on button click
 	button.addEventListener("click", async () => {
@@ -216,4 +219,21 @@ Module.onRuntimeInitialized = () => {
 	
 	// Trigger simulation by clicking the button
 	button.click();
-};
+}
+
+// Wait for both DOM and WASM module to be loaded, then run initializeSimulation()
+Promise.all([
+    new Promise(resolve => {
+        if (document.readyState === "complete" || document.readyState === "interactive") {
+            resolve();
+        } else {
+            document.addEventListener("DOMContentLoaded", resolve);
+        }
+    }),
+    new Promise(resolve => {
+        Module.onRuntimeInitialized = resolve;
+    })
+]).then(() => {
+	console.log("DOM and WASM module is loaded");
+    initializeSimulation();
+});

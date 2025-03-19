@@ -112,8 +112,8 @@ The next node doesn’t inherit information from its parent but instead reads fr
 This approach minimizes memory usage since nodes don’t store any game data themselves, 
 reducing the amount of data passed between them and making the program significantly faster.
 
-The following tables provide visual clues about the data structures stored in **PartyState**.
-Check [this Excel spreadsheet](https://github.com/kkovati/Ulti_Minimax/blob/main/docs/party_state_docs.xlsx) for further details.
+The following tables provide visual clues about the data structures stored in **PartyState**.<br>
+Check [this Excel spreadsheet](https://github.com/kkovati/Ulti_Minimax/blob/main/docs/party_state_docs.xlsx) for more details.
 
 **ActionList** contains all events of the game. Tracks which player played which card, in which round, and in what order.
 
