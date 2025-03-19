@@ -254,7 +254,8 @@ function waitForWasmAndDom() {
                 resolve();
             } else {
 				console.log("WASM is not loaded");
-                Module.onRuntimeInitialized = resolve;
+                //Module.onRuntimeInitialized = resolve;
+				Module['onRuntimeInitialized'] = resolve;
             }
         } else {
 			console.log("DOM is not loaded");
@@ -263,8 +264,9 @@ function waitForWasmAndDom() {
 					console.log("WASM is loaded");
                     resolve();
                 } else {
-                    Module.onRuntimeInitialized = resolve;
-					console.log("WASM is not loaded");
+                    console.log("WASM is not loaded");
+					//Module.onRuntimeInitialized = resolve;
+					Module['onRuntimeInitialized'] = resolve;
                 }
             });
         }
