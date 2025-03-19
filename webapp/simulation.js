@@ -245,6 +245,10 @@ function waitForWasmAndDom() {
     return new Promise(resolve => {
         if (document.readyState === "complete" || document.readyState === "interactive") {
 			console.log("DOM is loaded");
+			console.log("Module.hasOwnProperty('onRuntimeInitialized')");
+			console.log(Module.hasOwnProperty("onRuntimeInitialized"));
+			console.log("Module.onRuntimeInitialized");
+			console.log(Module.onRuntimeInitialized);
             if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
 				console.log("WASM is loaded");
                 resolve();
