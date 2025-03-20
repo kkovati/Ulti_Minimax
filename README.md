@@ -160,23 +160,57 @@ So by the time the simulation reaches the root node (the first action), both the
 A minimal-size object called **TreePathCoder** is used for that, 
 which is essentially an array that stores only the indices representing which card a player chose from their hand.
 Each node has an instance of TreePathCoder, which it returns to its parent.
-The parent extends it with its own information (optimal card) and recursion continures.
+The parent extends it with its own information (optimal card) and recursion continues.
 
 ### Rules of Ulti
+The core gameplay mechanics of Ulti are implemented using the recursive function 
+```GameManager::minimax()```.
+Each call to this function is responsible for managing an atomic steps of the game.
 
-Playable cards - fundamental rule
-Set next player - who wins the round
+- Checks the current state of the gameplay, based on the round index and the player's position within the round,
+- lists the playable cards for the current player and 
+- verifies whether the game has reached an ending condition.<br>
 
-Card order
-ace-king order vs ace-ten order
+Based on this, the function either proceeds with the next recursive call or returns the result 
+if it has already been determined.
+
+The **three fundamental rules** of the game are:
+- Determining which cards a player can legally play at any given moment, 
+which is implemented in ```PartyState::getPlayableCards()```.
+- Identifying the next player who wins the current round, 
+which is implemented in ```PartyState::setNextPlayer()```.
+- Evaluating the winning conditions based on the chosen game type in ```PartyState::evaluateParty()```.
+
+Ulti has two **card orders**, **ace-king order** and **ace-ten order**.<br>
+During the simulation, the program represents card values as integers to determine their relative order, 
+to apply the termination scheme (see it in chapter *Heuristics and Optimizations*) and to identify special cards.
+This requires a conversion between the cards' "real" value and integer representation.
+Functions ```GameManager::applyAceKingOrder``` and ```GameManager::applyAceTenOrder``` are responsible for that.
 
 ### Heuristics and Optimizations
 
-early stopping, party evaluation, keep track of important aspect of game type
+**Early Stopping** - Each game type has a winning condition, which is checked in ```PartyState::evaluateParty()```.
+During simulation, this function is called at the end of each round to determine whether a player has met 
+a winning condition.<br>
+If so, the simulation stops at that state and returns the result instead of continuing the game.
+This prevents the simulator from traversing the full game tree, allowing it to stop at intermediate (non-leaf) nodes, 
+significantly improving performance.
 
-simplify cards - terminate scheme
+**Simplify Cards** - Certain sets of cards are interchangeable at any given points in the game.
+In other words, if a player would play out any card from such a set, choosing another card from this set would not 
+affect the game's outcome, so the program treats them as a single option.<br>
+For example, if a player holds both the 8 and 9 of the same suit, 
+either card can be played interchangeably since they form a strict sequence with no other card between them.<br>
+During the simulation, when a player has to decide between interchangeable cards, 
+the program simplifies the decision to a single representative card.
+This reduces the number of child nodes in the game tree, decreasing its size and speeding up the simulation.<br>
+However, this strict sequence can be broken by special cards, such as cards with points or 
+cards a player aims to collect. These special cards depend on the chosen game type.
+Each game type has a termination scheme that defines which cards can be simplified 
+and which must be considered separately.<br>
+See functions ```PartyState::simplifyPlayableCards``` and ```Card::isNextInSeries``` for implementation details.
 
-prerequisite
-
-
-
+**Prerequisites** - If the special requirements of the chosen game type is not met 
+(e.g., in Ulti the player does not have the trump 7 or in 40-100 the player does not have 40), 
+then the simulation does not start. 
+These conditions are checked in ```PartyState::init()```.
