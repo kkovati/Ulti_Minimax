@@ -31,10 +31,9 @@ determines whether a perfect strategy exists for the Player.<br>
 If a perfect strategy was found, a possible winning game for the Player is displayed.
 
 Here are some ready-made deals for You:<br>
-[a](https://kkovati.github.io/Ulti_Minimax/webapp/simulation.html?deal=0070605040302012737173112323313143435151620212322242526103011)<br>
-[b](https://kkovati.github.io/Ulti_Minimax/webapp/simulation.html?deal=0071315172021303336370001030405111214223202061016232426273134)<br>
-[c](https://kkovati.github.io/Ulti_Minimax/webapp/simulation.html?deal=0202122232425262700013736351514021334331207060504031716323111)<br>
-[d](https://kkovati.github.io/Ulti_Minimax/webapp/simulation.html?deal=0070605040300173727021213323322232414341510112021303125263536)<br>
+[Strong hand](https://kkovati.github.io/Ulti_Minimax/webapp/simulation.html?deal=0070605040302012737173112323313143435151620212322242526103011)<br>
+[Great Betli](https://kkovati.github.io/Ulti_Minimax/webapp/simulation.html?deal=0202122232425262700013736351514021334331207060504031716323111)<br>
+[Slow simulation](https://kkovati.github.io/Ulti_Minimax/webapp/simulation.html?deal=0070605040300173727021213323322232414341510112021303125263536)<br>
 
 ## 📟 Native Build (e.g. Visual Studio)
 

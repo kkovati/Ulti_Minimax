@@ -234,7 +234,7 @@ Promise.all([
     new Promise(resolve => {
 		if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
 			resolve();
-		} else if (typeof Module?._wasm_main === "function") {
+		} else if (typeof Module?._malloc === "function" && typeof Module?._wasm_main === "function") {
 			resolve();
 		} else {
 			Module.onRuntimeInitialized = resolve;
