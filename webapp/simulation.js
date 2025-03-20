@@ -232,10 +232,12 @@ Promise.all([
         }
     }),
     new Promise(resolve => {
-		if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
-			resolve();
-		} else if (typeof Module?._malloc === "function" && typeof Module?._wasm_main === "function") {
-			resolve();
+		//if (Module.hasOwnProperty("onRuntimeInitialized") && Module.onRuntimeInitialized) {
+		//	resolve();
+		//} else if (typeof Module?._malloc === "function" && typeof Module?._wasm_main === "function") {
+		//	resolve();
+		if (Module?.calledRun) {  // Emscripten sets this when runtime is initialized
+            resolve();
 		} else {
 			Module.onRuntimeInitialized = resolve;
 		}
