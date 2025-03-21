@@ -1,5 +1,7 @@
 # 🎴 Ulti Minimax
 
+[![Demo](https://github.com/kkovati/Ulti_Minimax/blob/main/docs/demo.gif)](https://kkovati.github.io/Ulti_Minimax/)
+
 ## 💡 Introduction
 
 Ulti Minimax is a simulator tool to find perfect strategies for the Hungarian card game, 
@@ -16,9 +18,9 @@ Additionally, the simulator is accessible as a
 [webapp](https://kkovati.github.io/Ulti_Minimax/) 
 hosted on GitHub Pages.
 
-## 🖥️ Use the [Webapp](ttps://kkovati.github.io/Ulti_Minimax/)!
+## 🖥️ Use the [Webapp](https://kkovati.github.io/Ulti_Minimax/)!
 
-The primary way to use this tool is through the web application: 
+The primary way to use this tool is via the web application: 
 [kkovati.github.io/Ulti_Minimax](https://kkovati.github.io/Ulti_Minimax/)
 
 How to use:
